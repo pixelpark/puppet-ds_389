@@ -14,15 +14,19 @@
 # @param cacerts_path Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
 # @param home_dir Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
 # @param instances A hash of ds_389::instance resources. Optional.
+# @param dnf_module_name The name of the DNF module that should be enabled on RHEL. Optional.
+# @param dnf_module_version The version of the DNF module that should be enabled on RHEL. Optional.
 #
 class ds_389 (
-  String               $package_name   = '389-ds-base',
+  Variant[String,Array] $package_name  = $::ds_389::params::package_name,
   String               $package_ensure = 'installed',
   String               $user           = 'dirsrv',
   String               $group          = 'dirsrv',
   Stdlib::Absolutepath $cacerts_path   = '/etc/openldap/cacerts',
   Stdlib::Absolutepath $home_dir       = '/usr/share/dirsrv',
   Optional[Hash]       $instances      = undef,
+  Optional[String]     $dnf_module_name = $::ds_389::params::dnf_module_name,
+  Optional[String]     $dnf_module_version = $::ds_389::params::dnf_module_version,
 ) inherits ds_389::params {
 
   class { '::ds_389::install': }

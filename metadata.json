@@ -25,6 +25,7 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
+        "8",
         "7",
         "6"
       ]
@@ -32,6 +33,7 @@
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
+        "8",
         "7",
         "6"
       ]
