@@ -24,6 +24,7 @@ class ds_389 (
   String               $group          = 'dirsrv',
   Stdlib::Absolutepath $cacerts_path   = '/etc/openldap/cacerts',
   Stdlib::Absolutepath $home_dir       = '/usr/share/dirsrv',
+  String $path = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
   Optional[Hash]       $instances      = undef,
   Optional[String]     $dnf_module_name = $::ds_389::params::dnf_module_name,
   Optional[String]     $dnf_module_version = $::ds_389::params::dnf_module_version,

@@ -1,0 +1,10 @@
+dn: <%= $bind_dn %>
+objectClass: inetorgperson
+objectClass: person
+objectClass: top
+cn: <%= $replication_user %>
+givenName: Replication
+sn: Manager
+userPassword: <%= $replication_pass %>
+passwordExpirationTime: 20380119031407Z
+nsIdleTimeout: 0

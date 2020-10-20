@@ -93,6 +93,8 @@ define ds_389::replication(
   Boolean                           $init_hubs           = false,
   Boolean                           $init_consumers      = false,
 ) {
+  # Restarting the service while initializing could break replication.
+  Ds_389::Service<| title == $title |> -> Ds_389::Replication<| title == $title |>
 
   if $bind_dn {
     $_bind_dn = $bind_dn
@@ -122,37 +124,71 @@ define ds_389::replication(
       if $consumers {
         $consumers.each |$replica| {
           if $replica != $name and $replica != $::fqdn {
-            file { "/etc/dirsrv/slapd-${name}/consumer_${replica}.ldif":
-              ensure  => file,
-              mode    => '0440',
-              owner   => $user,
-              group   => $group,
-              content => template('ds_389/replication_agreement.erb'),
-            }
-            exec { "Create replication agreement for consumer ${replica}: ${name}":
-              command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/consumer_${replica}.ldif ; touch /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
-              path    => '/usr/bin:/bin',
-              creates => "/etc/dirsrv/slapd-${name}/consumer_${replica}.done",
+            $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
+            $repl_enable_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "replication enable",
+              "--suffix \'${suffix}\'",
+              "--role=consumer",
+              "--replica-id=${id}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "&& touch ${repl_enable_done}",
+            ], ' ')
+
+            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
+            $repl_agreement_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt create",
+              "--suffix=\'${suffix}\'",
+              "--host=\'${replica}\'",
+              "--port=${replica_port}",
+              "--conn-protocol=${replica_transport}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "--bind-method=SIMPLE",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_agreement_done}",
+            ], ' ')
+
+            exec { "Enable replication for consumer ${replica}: ${name}":
+              command => $repl_enable_command,
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
               require => [
-                File["/etc/dirsrv/slapd-${name}/consumer_${replica}.ldif"],
-                Exec["Set up replication: ${name}"],
+                Exec["Add replication user: ${name}"],
               ],
+            }
+            -> exec { "Create replication agreement for consumer ${replica}: ${name}":
+              command => $repl_agreement_command,
+              path    => $ds_389::path,
+              creates => $repl_agreement_done,
             }
 
             if $init_consumers {
-              file { "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif":
-                ensure  => file,
-                mode    => '0440',
-                owner   => $user,
-                group   => $group,
-                content => template('ds_389/replication_init.erb'),
-              }
+              $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
+              $repl_init_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt init",
+              "--suffix=\'${suffix}\'",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_init_done}",
+              ], ' ')
+
               exec { "Initialize consumer ${replica}: ${name}":
-                command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif ; touch /etc/dirsrv/slapd-${name}/consumer_${replica}_init.done", # lint:ignore:140chars
-                path    => '/usr/bin:/bin',
-                creates => "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done",
+                command => $repl_init_command,
+                path    => $ds_389::path,
+                creates => $repl_init_done,
                 require => [
-                  File["/etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif"],
                   Exec["Create replication agreement for consumer ${replica}: ${name}"],
                 ],
               }
@@ -174,37 +210,72 @@ define ds_389::replication(
       if $suppliers {
         $suppliers.each |$replica| {
           if $replica != $name and $replica != $::fqdn {
-            file { "/etc/dirsrv/slapd-${name}/supplier_${replica}.ldif":
-              ensure  => file,
-              mode    => '0440',
-              owner   => $user,
-              group   => $group,
-              content => template('ds_389/replication_agreement.erb'),
-            }
-            exec { "Create replication agreement for supplier ${replica}: ${name}":
-              command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/supplier_${replica}.ldif ; touch /etc/dirsrv/slapd-${name}/supplier_${replica}.done", # lint:ignore:140chars
-              path    => '/usr/bin:/bin',
-              creates => "/etc/dirsrv/slapd-${name}/supplier_${replica}.done",
+
+            $repl_enable_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_enable.done"
+            $repl_enable_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "replication enable",
+              "--suffix \'${suffix}\'",
+              "--role=master",
+              "--replica-id=${id}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "&& touch ${repl_enable_done}",
+            ], ' ')
+
+            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_agreement.done"
+            $repl_agreement_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt create",
+              "--suffix=\'${suffix}\'",
+              "--host=\'${replica}\'",
+              "--port=${replica_port}",
+              "--conn-protocol=${replica_transport}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "--bind-method=SIMPLE",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_agreement_done}",
+            ], ' ')
+
+            exec { "Enable replication for supplier ${replica}: ${name}":
+              command => $repl_enable_command,
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
               require => [
-                File["/etc/dirsrv/slapd-${name}/supplier_${replica}.ldif"],
-                Exec["Set up replication: ${name}"],
+                Exec["Add replication user: ${name}"],
               ],
+            }
+            -> exec { "Create replication agreement for supplier ${replica}: ${name}":
+              command => $repl_agreement_command,
+              path    => $ds_389::path,
+              creates => $repl_agreement_done,
             }
 
             if $init_suppliers {
-              file { "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.ldif":
-                ensure  => file,
-                mode    => '0440',
-                owner   => $user,
-                group   => $group,
-                content => template('ds_389/replication_init.erb'),
-              }
+              $repl_init_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.done"
+              $repl_init_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt init",
+              "--suffix=\'${suffix}\'",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_init_done}",
+              ], ' ')
+
               exec { "Initialize supplier ${replica}: ${name}":
-                command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/supplier_${replica}_init.ldif ; touch /etc/dirsrv/slapd-${name}/supplier_${replica}_init.done", # lint:ignore:140chars
-                path    => '/usr/bin:/bin',
-                creates => "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.done",
+                command => $repl_init_command,
+                path    => $ds_389::path,
+                creates => $repl_init_done,
                 require => [
-                  File["/etc/dirsrv/slapd-${name}/supplier_${replica}_init.ldif"],
                   Exec["Create replication agreement for supplier ${replica}: ${name}"],
                 ],
               }
@@ -215,38 +286,72 @@ define ds_389::replication(
       if $hubs {
         $hubs.each |$replica| {
           if $replica != $name and $replica != $::fqdn {
-            file { "/etc/dirsrv/slapd-${name}/hub_${replica}.ldif":
-              ensure  => file,
-              mode    => '0440',
-              owner   => $user,
-              group   => $group,
-              content => template('ds_389/replication_agreement.erb'),
-            }
-            exec { "Create replication agreement for hub ${replica}: ${name}":
-              command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/hub_${replica}.ldif ; touch /etc/dirsrv/slapd-${name}/hub_${replica}.done", # lint:ignore:140chars
-              path    => '/usr/bin:/bin',
-              creates => "/etc/dirsrv/slapd-${name}/hub_${replica}.done",
+            $repl_enable_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_enable.done"
+            $repl_enable_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "replication enable",
+              "--suffix \'${suffix}\'",
+              "--role=hub",
+              "--replica-id=${id}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "&& touch ${repl_enable_done}",
+            ], ' ')
+
+            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_agreement.done"
+            $repl_agreement_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt create",
+              "--suffix=\'${suffix}\'",
+              "--host=\'${replica}\'",
+              "--port=${replica_port}",
+              "--conn-protocol=${replica_transport}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "--bind-method=SIMPLE",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_agreement_done}",
+            ], ' ')
+
+            exec { "Enable replication for hub ${replica}: ${name}":
+              command => $repl_enable_command,
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
               require => [
-                File["/etc/dirsrv/slapd-${name}/hub_${replica}.ldif"],
-                Exec["Set up replication: ${name}"],
+                Exec["Add replication user: ${name}"],
               ],
+            }
+            -> exec { "Create replication agreement for hub ${replica}: ${name}":
+              command => $repl_agreement_command,
+              path    => $ds_389::path,
+              creates => $repl_agreement_done,
             }
 
             if $init_hubs {
-              file { "/etc/dirsrv/slapd-${name}/hub_${replica}_init.ldif":
-                ensure  => file,
-                mode    => '0440',
-                owner   => $user,
-                group   => $group,
-                content => template('ds_389/replication_init.erb'),
-                require => Anchor["${name}_replication_suppliers"],
-              }
+              $repl_init_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_init.done"
+              $repl_init_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt init",
+              "--suffix=\'${suffix}\'",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_init_done}",
+              ], ' ')
+
               exec { "Initialize hub ${replica}: ${name}":
-                command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/hub_${replica}_init.ldif ; touch /etc/dirsrv/slapd-${name}/hub_${replica}_init.done", # lint:ignore:140chars
-                path    => '/usr/bin:/bin',
-                creates => "/etc/dirsrv/slapd-${name}/hub_${replica}_init.done",
+                command => $repl_init_command,
+                path    => $ds_389::path,
+                creates => $repl_init_done,
                 require => [
-                  File["/etc/dirsrv/slapd-${name}/hub_${replica}_init.ldif"],
+                  Anchor["${name}_replication_suppliers"],
                   Exec["Create replication agreement for hub ${replica}: ${name}"],
                 ],
               }
@@ -257,40 +362,74 @@ define ds_389::replication(
       if $consumers {
         $consumers.each |$replica| {
           if $replica != $name and $replica != $::fqdn {
-            file { "/etc/dirsrv/slapd-${name}/consumer_${replica}.ldif":
-              ensure  => file,
-              mode    => '0440',
-              owner   => $user,
-              group   => $group,
-              content => template('ds_389/replication_agreement.erb'),
-              require => Anchor["${name}_replication_hubs"],
-            }
-            exec { "Create replication agreement for consumer ${replica}: ${name}":
-              command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/consumer_${replica}.ldif ; touch /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
-              path    => '/usr/bin:/bin',
-              creates => "/etc/dirsrv/slapd-${name}/consumer_${replica}.done",
+            $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
+            $repl_enable_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "replication enable",
+              "--suffix \'${suffix}\'",
+              "--role=consumer",
+              "--replica-id=${id}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "&& touch ${repl_enable_done}",
+            ], ' ')
+
+            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
+            $repl_agreement_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt create",
+              "--suffix=\'${suffix}\'",
+              "--host=\'${replica}\'",
+              "--port=${replica_port}",
+              "--conn-protocol=${replica_transport}",
+              "--bind-dn=\'${_bind_dn}\'",
+              "--bind-passwd=\'${replication_pass}\'",
+              "--bind-method=SIMPLE",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_agreement_done}",
+            ], ' ')
+
+            exec { "Enable replication for consumer ${replica}: ${name}":
+              command => $repl_enable_command,
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
               require => [
-                File["/etc/dirsrv/slapd-${name}/consumer_${replica}.ldif"],
-                Exec["Set up replication: ${name}"],
+                Anchor["${name}_replication_hubs"],
+                Exec["Add replication user: ${name}"],
               ],
+            }
+            -> exec { "Create replication agreement for consumer ${replica}: ${name}":
+              command => $repl_agreement_command,
+              path    => $ds_389::path,
+              creates => $repl_agreement_done,
             }
 
             if $init_consumers {
-              file { "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif":
-                ensure  => file,
-                mode    => '0440',
-                owner   => $user,
-                group   => $group,
-                content => template('ds_389/replication_init.erb'),
-                require => Anchor["${name}_replication_consumers"],
-              }
+              $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
+              $repl_init_command = join([
+              "dsconf",
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              "repl-agmt init",
+              "--suffix=\'${suffix}\'",
+              "\'${name} to ${replica} agreement\'",
+              "&& touch ${repl_init_done}",
+              ], ' ')
+
               exec { "Initialize consumer ${replica}: ${name}":
-                command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif ; touch /etc/dirsrv/slapd-${name}/consumer_${replica}_init.done", # lint:ignore:140chars
-                path    => '/usr/bin:/bin',
-                creates => "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done",
+                command => $repl_init_command,
+                path    => $ds_389::path,
+                creates => $repl_init_done,
                 require => [
-                  File["/etc/dirsrv/slapd-${name}/consumer_${replica}_init.ldif"],
-                  Exec["Create replication agreement for consumer ${replica}: ${name}"],
+                  Anchor["${name}_replication_consumers"],
+                  Exec["Create replication agreement for supplier ${replica}: ${name}"],
                 ],
               }
             }
@@ -303,24 +442,30 @@ define ds_389::replication(
   if $excluded_attributes {
     $attribute_list = join($excluded_attributes, ' ')
   }
-  file { "/etc/dirsrv/slapd-${name}/replication.ldif":
+
+  # Add replication user.
+  file { "/etc/dirsrv/slapd-${name}/replication-user.ldif":
     ensure  => file,
     mode    => '0440',
     owner   => $user,
     group   => $group,
-    content => template('ds_389/replication.erb'),
+    content => epp('ds_389/replication-user.epp',{
+      bind_dn          => $_bind_dn,
+      replication_pass => $replication_pass,
+      replication_user => $replication_user,
+    }),
   }
-  exec { "Set up replication: ${name}":
-    command => "ldapmodify -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/replication.ldif ; touch /etc/dirsrv/slapd-${name}/replication.done", # lint:ignore:140chars
+  -> exec { "Add replication user: ${name}":
+    command => "ldapadd -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/replication-user.ldif && touch /etc/dirsrv/slapd-${name}/replication-user.done", # lint:ignore:140chars
     path    => '/usr/bin:/bin',
-    creates => "/etc/dirsrv/slapd-${name}/replication.done",
+    creates => "/etc/dirsrv/slapd-${name}/replication-user.done",
     require => [
-      File["/etc/dirsrv/slapd-${name}/replication.ldif"],
       Ds_389::Ssl[$name],
     ],
   }
+
   anchor { "${name}_replication_suppliers":
-    require => Exec["Set up replication: ${name}"],
+    require => Exec["Add replication user: ${name}"],
   }
   anchor { "${name}_replication_hubs":
     require => Anchor["${name}_replication_suppliers"],
