@@ -13,6 +13,7 @@
 #     server_id    => 'specdirectory',
 #   }
 #
+# @param create_suffix Set this parameter to `True` to create a generic root node entry for the suffix in the database.
 # @param root_dn The root dn to ensure. Required.
 # @param root_dn_pass The root dn password to ensure. Required.
 # @param cert_db_pass The certificate db password to ensure. Required.
@@ -34,6 +35,7 @@
 # @param base_load_ldifs A hash of ldif add files to load after all other config files have been added. Optional.
 #
 define ds_389::instance(
+  Boolean $create_suffix = true,
   String                            $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
   Variant[String,Sensitive[String]] $cert_db_pass,
@@ -57,12 +59,41 @@ define ds_389::instance(
   include ::ds_389
 
   $instance_path = "/etc/dirsrv/slapd-${server_id}"
+  $instance_template = "/etc/dirsrv/template-${name}.inf"
+
+  # Create instance template.
+  file { $instance_template:
+    ensure  => file,
+    mode    => '0400',
+    owner   => $user,
+    group   => $group,
+    content => epp("${module_name}/instance.epp",{
+      create_suffix => $create_suffix,
+      group         => $group,
+      root_dn       => $root_dn,
+      root_dn_pass  => $root_dn_pass,
+      server_host   => $server_host,
+      server_id     => $server_id,
+      server_port   => $server_port,
+      suffix        => $suffix,
+      user          => $user,
+    }),
+  }
+
+  # Create a new instance from template file.
   exec { "setup ds: ${server_id}":
-    command => "${::ds_389::params::setup_ds} --silent General.FullMachineName=${server_host} General.SuiteSpotGroup=${group} General.SuiteSpotUserID=${user} slapd.InstallLdifFile=none slapd.RootDN=\"${root_dn}\" slapd.RootDNPwd=${root_dn_pass} slapd.ServerIdentifier=${server_id} slapd.ServerPort=${server_port} slapd.Suffix=${suffix}", # lint:ignore:140chars
+    command => "dscreate from-file ${instance_template}",
     path    => '/usr/sbin:/usr/bin:/sbin:/bin',
     creates => $instance_path,
+    require => File[$instance_template],
     notify  => Exec["stop ${server_id} to create new token"],
   }
+  ~> exec { "remove default cert DB: ${server_id}":
+    command     => "rm -f ${$instance_path}/cert9.db ${$instance_path}/key4.db",
+    path        => '/usr/bin:/bin',
+    refreshonly => true,
+  }
+
   if $::ds_389::params::service_type == 'systemd' {
     $service_stop_command = "/bin/systemctl stop dirsrv@${server_id}"
     $service_restart_command = "/bin/systemctl restart dirsrv@${server_id}"
@@ -71,6 +102,7 @@ define ds_389::instance(
     $service_stop_command = "service dirsrv stop ${server_id}"
     $service_restart_command = "service dirsrv restart ${server_id}"
   }
+
   exec { "stop ${server_id} to create new token":
     command     => "${service_stop_command} ; sleep 2",
     refreshonly => true,
