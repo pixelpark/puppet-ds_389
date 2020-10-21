@@ -35,11 +35,11 @@
 # @param base_load_ldifs A hash of ldif add files to load after all other config files have been added. Optional.
 #
 define ds_389::instance(
-  Boolean $create_suffix = true,
+  String                            $suffix,
   String                            $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
   Variant[String,Sensitive[String]] $cert_db_pass,
-  String                            $suffix,
+  Boolean $create_suffix = true,
   String                            $group                 = $::ds_389::group,
   String                            $user                  = $::ds_389::user,
   String                            $server_id             = $::hostname,

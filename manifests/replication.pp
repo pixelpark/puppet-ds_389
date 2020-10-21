@@ -126,13 +126,13 @@ define ds_389::replication(
           if $replica != $name and $replica != $::fqdn {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "replication enable",
+              'replication enable',
               "--suffix \'${suffix}\'",
-              "--role=consumer",
+              '--role=consumer',
               "--replica-id=${id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
@@ -141,18 +141,18 @@ define ds_389::replication(
 
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
             $repl_agreement_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt create",
+              'repl-agmt create',
               "--suffix=\'${suffix}\'",
               "--host=\'${replica}\'",
               "--port=${replica_port}",
               "--conn-protocol=${replica_transport}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
-              "--bind-method=SIMPLE",
+              '--bind-method=SIMPLE',
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
@@ -174,11 +174,11 @@ define ds_389::replication(
             if $init_consumers {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
               $repl_init_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt init",
+              'repl-agmt init',
               "--suffix=\'${suffix}\'",
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_init_done}",
@@ -213,13 +213,13 @@ define ds_389::replication(
 
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_enable.done"
             $repl_enable_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "replication enable",
+              'replication enable',
               "--suffix \'${suffix}\'",
-              "--role=master",
+              '--role=master',
               "--replica-id=${id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
@@ -228,18 +228,18 @@ define ds_389::replication(
 
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_agreement.done"
             $repl_agreement_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt create",
+              'repl-agmt create',
               "--suffix=\'${suffix}\'",
               "--host=\'${replica}\'",
               "--port=${replica_port}",
               "--conn-protocol=${replica_transport}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
-              "--bind-method=SIMPLE",
+              '--bind-method=SIMPLE',
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
@@ -261,11 +261,11 @@ define ds_389::replication(
             if $init_suppliers {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.done"
               $repl_init_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt init",
+              'repl-agmt init',
               "--suffix=\'${suffix}\'",
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_init_done}",
@@ -288,13 +288,13 @@ define ds_389::replication(
           if $replica != $name and $replica != $::fqdn {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_enable.done"
             $repl_enable_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "replication enable",
+              'replication enable',
               "--suffix \'${suffix}\'",
-              "--role=hub",
+              '--role=hub',
               "--replica-id=${id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
@@ -303,18 +303,18 @@ define ds_389::replication(
 
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_agreement.done"
             $repl_agreement_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt create",
+              'repl-agmt create',
               "--suffix=\'${suffix}\'",
               "--host=\'${replica}\'",
               "--port=${replica_port}",
               "--conn-protocol=${replica_transport}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
-              "--bind-method=SIMPLE",
+              '--bind-method=SIMPLE',
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
@@ -336,11 +336,11 @@ define ds_389::replication(
             if $init_hubs {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_init.done"
               $repl_init_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt init",
+              'repl-agmt init',
               "--suffix=\'${suffix}\'",
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_init_done}",
@@ -364,13 +364,13 @@ define ds_389::replication(
           if $replica != $name and $replica != $::fqdn {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "replication enable",
+              'replication enable',
               "--suffix \'${suffix}\'",
-              "--role=consumer",
+              '--role=consumer',
               "--replica-id=${id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
@@ -379,18 +379,18 @@ define ds_389::replication(
 
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
             $repl_agreement_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt create",
+              'repl-agmt create',
               "--suffix=\'${suffix}\'",
               "--host=\'${replica}\'",
               "--port=${replica_port}",
               "--conn-protocol=${replica_transport}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
-              "--bind-method=SIMPLE",
+              '--bind-method=SIMPLE',
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
@@ -413,11 +413,11 @@ define ds_389::replication(
             if $init_consumers {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
               $repl_init_command = join([
-              "dsconf",
+              'dsconf',
               "-D \'${root_dn}\'",
               "-w \'${root_dn_pass}\'",
               "${protocol}://${server_host}:${server_port}",
-              "repl-agmt init",
+              'repl-agmt init',
               "--suffix=\'${suffix}\'",
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_init_done}",
