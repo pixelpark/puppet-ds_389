@@ -94,7 +94,7 @@ define ds_389::instance(
     refreshonly => true,
   }
 
-  if $::ds_389::params::service_type == 'systemd' {
+  if $::ds_389::service_type == 'systemd' {
     $service_stop_command = "/bin/systemctl stop dirsrv@${server_id}"
     $service_restart_command = "/bin/systemctl restart dirsrv@${server_id}"
   }
@@ -138,20 +138,20 @@ define ds_389::instance(
     }
     concat { "${server_id}_cert_bundle":
       mode   => '0600',
-      path   => "${::ds_389::params::ssl_dir}/${server_id}-bundle.pem",
+      path   => "${::ds_389::ssl_dir}/${server_id}-bundle.pem",
       notify => Exec["Create pkcs12 cert: ${server_id}"],
     }
 
     # create pkcs12 cert
     exec { "Create pkcs12 cert: ${server_id}":
-      command     => "openssl pkcs12 -export -password pass:${cert_db_pass} -name ${server_host} -in ${::ds_389::params::ssl_dir}/${server_id}-bundle.pem -out ${::ds_389::params::ssl_dir}/${server_id}.p12", # lint:ignore:140chars
+      command     => "openssl pkcs12 -export -password pass:${cert_db_pass} -name ${server_host} -in ${::ds_389::ssl_dir}/${server_id}-bundle.pem -out ${::ds_389::ssl_dir}/${server_id}.p12", # lint:ignore:140chars
       path        => '/usr/bin:/bin',
       refreshonly => true,
       notify      => Exec["Create cert DB: ${server_id}"],
     }
 
     exec { "Create cert DB: ${server_id}":
-      command     => "pk12util -i ${::ds_389::params::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
+      command     => "pk12util -i ${::ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
       path        => '/usr/bin:/bin',
       refreshonly => true,
       before      => Exec["Add trust for server cert: ${server_id}"],
@@ -307,7 +307,7 @@ define ds_389::instance(
   }
   # - rehash certs
   exec { "Rehash cacertdir: ${server_id}":
-    command     => "${::ds_389::params::cacert_rehash} ${::ds_389::cacerts_path}",
+    command     => "${::ds_389::cacert_rehash} ${::ds_389::cacerts_path}",
     path        => '/usr/sbin:/usr/bin:/sbin:/bin',
     refreshonly => true,
     notify      => Exec["restart ${server_id} to pick up new token"],

@@ -1,0 +1,6 @@
+---
+ds_389::cacert_rehash: 'openssl rehash'
+ds_389::limits_config_dir: '/etc/sysconfig'
+ds_389::nsstools_package_name: 'nss-tools'
+ds_389::ssl_dir: '/etc/pki/tls/certs'
+ds_389::user_shell: '/sbin/nologin'

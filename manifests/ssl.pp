@@ -36,8 +36,8 @@ define ds_389::ssl(
 ) {
   include ::ds_389
 
-  $ssl_version_min_support = $::ds_389::params::ssl_version_min_support
-  if $::ds_389::params::service_type == 'systemd' {
+  $ssl_version_min_support = $::ds_389::ssl_version_min_support
+  if $::ds_389::service_type == 'systemd' {
     $service_restart_command = "systemctl restart dirsrv@${name}"
   }
   else {

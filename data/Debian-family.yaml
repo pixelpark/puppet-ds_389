@@ -1,0 +1,6 @@
+---
+ds_389::cacert_rehash: 'openssl rehash'
+ds_389::limits_config_dir: '/etc/default'
+ds_389::nsstools_package_name: 'libnss3-tools'
+ds_389::ssl_dir: '/etc/ssl'
+ds_389::user_shell: '/bin/false'

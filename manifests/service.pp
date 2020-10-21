@@ -12,7 +12,7 @@ define ds_389::service(
   Boolean $service_enable = true,
 ) {
   include ::ds_389
-  $service_type = $::ds_389::params::service_type
+  $service_type = $::ds_389::service_type
   if $service_type == 'systemd' {
     service { "dirsrv@${name}":
       ensure     => $service_ensure,

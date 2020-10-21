@@ -7,28 +7,36 @@
 # @example
 #   include ds_389
 #
-# @param package_name Name of the 389 ds package to install. Default: '389-ds-base'
-# @param package_ensure 389 ds package state. Default 'installed'
-# @param user User account 389 ds should run as. Default: 'dirsrv'
-# @param group Group account 389 ds user should belong to. Default: 'dirsrv'
 # @param cacerts_path Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
-# @param home_dir Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
-# @param instances A hash of ds_389::instance resources. Optional.
 # @param dnf_module_name The name of the DNF module that should be enabled on RHEL. Optional.
 # @param dnf_module_version The version of the DNF module that should be enabled on RHEL. Optional.
+# @param group Group account 389 ds user should belong to. Default: 'dirsrv'
+# @param home_dir Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
+# @param instances A hash of ds_389::instance resources. Optional.
+# @param package_ensure 389 ds package state. Default 'installed'
+# @param package_name Name of the 389 ds package to install. Default: '389-ds-base'
+# @param service_type The service manager that should be used.
+# @param user User account 389 ds should run as. Default: 'dirsrv'
 #
 class ds_389 (
-  Variant[String,Array] $package_name  = $::ds_389::params::package_name,
-  String               $package_ensure = 'installed',
-  String               $user           = 'dirsrv',
-  String               $group          = 'dirsrv',
-  Stdlib::Absolutepath $cacerts_path   = '/etc/openldap/cacerts',
-  Stdlib::Absolutepath $home_dir       = '/usr/share/dirsrv',
-  String $path = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-  Optional[Hash]       $instances      = undef,
-  Optional[String]     $dnf_module_name = $::ds_389::params::dnf_module_name,
-  Optional[String]     $dnf_module_version = $::ds_389::params::dnf_module_version,
-) inherits ds_389::params {
+  Stdlib::Absolutepath $cacerts_path,
+  String $cacert_rehash,
+  String $group,
+  Stdlib::Absolutepath $home_dir,
+  Hash $instances,
+  Stdlib::Absolutepath $limits_config_dir,
+  String $nsstools_package_name,
+  String $package_ensure,
+  Variant[String,Array] $package_name,
+  String $path,
+  String $service_type,
+  Stdlib::Absolutepath $ssl_dir,
+  Boolean $ssl_version_min_support,
+  String $user,
+  String $user_shell,
+  Optional[String] $dnf_module_name = undef,
+  Optional[String] $dnf_module_version = undef,
+) {
 
   class { '::ds_389::install': }
   if $instances {

@@ -31,7 +31,7 @@ class ds_389::install {
     ],
   })
 
-  package { $::ds_389::params::nsstools_package_name:
+  package { $::ds_389::nsstools_package_name:
     ensure => 'installed',
   }
 
@@ -43,14 +43,14 @@ class ds_389::install {
     ensure  => present,
     system  => true,
     home    => $::ds_389::home_dir,
-    shell   => $::ds_389::params::user_shell,
+    shell   => $::ds_389::user_shell,
     gid     => $::ds_389::group,
     require => Group[$::ds_389::group],
   }
-  if $::ds_389::params::service_type == 'systemd' {
+  if $::ds_389::service_type == 'systemd' {
     ini_setting { 'dirsrv ulimit':
       ensure  => present,
-      path    => "${::ds_389::params::limits_config_dir}/dirsrv.systemd",
+      path    => "${::ds_389::limits_config_dir}/dirsrv.systemd",
       section => 'Service',
       setting => 'LimitNOFILE',
       value   => '8192',
@@ -60,7 +60,7 @@ class ds_389::install {
   else {
     file_line { 'dirsrv ulimit':
       ensure  => present,
-      path    => "${::ds_389::params::limits_config_dir}/dirsrv",
+      path    => "${::ds_389::limits_config_dir}/dirsrv",
       line    => 'ulimit -n 8192',
       require => Package[$::ds_389::package_name],
     }

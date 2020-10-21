@@ -1,0 +1,4 @@
+---
+# Add '389-ds-base-legacy-tools' to $package_name to install old toolset.
+ds_389::dnf_module_name: '389-ds'
+ds_389::dnf_module_version: '1.4'
