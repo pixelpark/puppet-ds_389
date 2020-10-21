@@ -37,11 +37,11 @@ class ds_389 (
   Optional[String] $dnf_module_name = undef,
   Optional[String] $dnf_module_version = undef,
 ) {
+  class { 'ds_389::install': }
 
-  class { '::ds_389::install': }
   if $instances {
     $instances.each |$instance_name, $params| {
-      ::ds_389::instance { $instance_name:
+      ds_389::instance { $instance_name:
         root_dn           => $params['root_dn'],
         suffix            => $params['suffix'],
         cert_db_pass      => $params['cert_db_pass'],
@@ -60,7 +60,7 @@ class ds_389 (
         modify_ldifs      => $params['modify_ldifs'],
         add_ldifs         => $params['add_ldifs'],
         base_load_ldifs   => $params['base_load_ldifs'],
-        require           => Class['::ds_389::install'],
+        require           => Class['ds_389::install'],
       }
     }
   }

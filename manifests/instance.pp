@@ -13,50 +13,50 @@
 #     server_id    => 'specdirectory',
 #   }
 #
-# @param create_suffix Set this parameter to `True` to create a generic root node entry for the suffix in the database.
-# @param root_dn The root dn to ensure. Required.
-# @param root_dn_pass The root dn password to ensure. Required.
-# @param cert_db_pass The certificate db password to ensure. Required.
-# @param suffix The LDAP suffix to use. Required.
-# @param group The group for the instance. Default: $::ds_389::group
-# @param user The user for the instance. Default: $::ds_389::user
-# @param server_id The server identifier for the instance. Default: $::hostname
-# @param server_host The fqdn for the instance. Default: $::fqdn
-# @param server_port The port to use for non-SSL traffic. Default: 389
-# @param server_ssl_port The port to use for SSL traffic. Default: 636
-# @param minssf The minimum security strength for connections. Default: 0
-# @param subject_alt_names An array of subject alt names, if using self-signed certificates. Optional.
-# @param replication A replication config hash. See replication.pp. Optional.
-# @param ssl An ssl config hash. See ssl.pp. Optional.
-# @param ssl_version_min The minimum TLS version the instance should support. Optional.
-# @param schema_extensions A hash of schemas to ensure. See schema.pp. Optional.
-# @param modify_ldifs A hash of ldif modify files. See modify.pp. Optional. Optional.
 # @param add_ldifs A hash of ldif add files. See add.pp. Optional.
 # @param base_load_ldifs A hash of ldif add files to load after all other config files have been added. Optional.
+# @param cert_db_pass The certificate db password to ensure. Required.
+# @param create_suffix Set this parameter to `True` to create a generic root node entry for the suffix in the database.
+# @param group The group for the instance. Default: $::ds_389::group
+# @param minssf The minimum security strength for connections. Default: 0
+# @param modify_ldifs A hash of ldif modify files. See modify.pp. Optional. Optional.
+# @param replication A replication config hash. See replication.pp. Optional.
+# @param root_dn_pass The root dn password to ensure. Required.
+# @param root_dn The root dn to ensure. Required.
+# @param schema_extensions A hash of schemas to ensure. See schema.pp. Optional.
+# @param server_host The fqdn for the instance. Default: $::fqdn
+# @param server_id The server identifier for the instance. Default: $::hostname
+# @param server_port The port to use for non-SSL traffic. Default: 389
+# @param server_ssl_port The port to use for SSL traffic. Default: 636
+# @param ssl An ssl config hash. See ssl.pp. Optional.
+# @param ssl_version_min The minimum TLS version the instance should support. Optional.
+# @param subject_alt_names An array of subject alt names, if using self-signed certificates. Optional.
+# @param suffix The LDAP suffix to use. Required.
+# @param user The user for the instance. Default: $::ds_389::user
 #
-define ds_389::instance(
-  String                            $suffix,
-  String                            $root_dn,
-  Variant[String,Sensitive[String]] $root_dn_pass,
+define ds_389::instance (
   Variant[String,Sensitive[String]] $cert_db_pass,
+  String $root_dn,
+  Variant[String,Sensitive[String]] $root_dn_pass,
+  String $suffix,
   Boolean $create_suffix = true,
-  String                            $group                 = $::ds_389::group,
-  String                            $user                  = $::ds_389::user,
-  String                            $server_id             = $::hostname,
-  String                            $server_host           = $::fqdn,
-  Integer                           $server_port           = 389,
-  Integer                           $server_ssl_port       = 636,
-  Integer                           $minssf                = 0,
-  Optional[Array]                   $subject_alt_names     = undef,
-  Optional[Hash]                    $replication           = undef,
-  Optional[Hash]                    $ssl                   = undef,
-  Optional[String]                  $ssl_version_min       = undef,
-  Optional[Hash]                    $schema_extensions     = undef,
-  Optional[Hash]                    $modify_ldifs          = undef,
-  Optional[Hash]                    $add_ldifs             = undef,
-  Optional[Hash]                    $base_load_ldifs       = undef,
+  String $group = $::ds_389::group,
+  Integer $minssf = 0,
+  String $server_host = $::fqdn,
+  String $server_id = $::hostname,
+  Integer $server_port = 389,
+  Integer $server_ssl_port = 636,
+  String $user = $::ds_389::user,
+  Optional[Hash] $add_ldifs = undef,
+  Optional[Hash] $base_load_ldifs = undef,
+  Optional[Hash] $modify_ldifs = undef,
+  Optional[Hash] $replication = undef,
+  Optional[Hash] $schema_extensions = undef,
+  Optional[Hash] $ssl = undef,
+  Optional[String] $ssl_version_min = undef,
+  Optional[Array] $subject_alt_names = undef,
 ) {
-  include ::ds_389
+  include ds_389
 
   $instance_path = "/etc/dirsrv/slapd-${server_id}"
   $instance_template = "/etc/dirsrv/template-${name}.inf"
@@ -90,11 +90,11 @@ define ds_389::instance(
   }
   ~> exec { "remove default cert DB: ${server_id}":
     command     => "rm -f ${$instance_path}/cert9.db ${$instance_path}/key4.db",
-    path        => '/usr/bin:/bin',
+    path        => $ds_389::path,
     refreshonly => true,
   }
 
-  if $::ds_389::service_type == 'systemd' {
+  if $ds_389::service_type == 'systemd' {
     $service_stop_command = "/bin/systemctl stop dirsrv@${server_id}"
     $service_restart_command = "/bin/systemctl restart dirsrv@${server_id}"
   }
@@ -106,9 +106,10 @@ define ds_389::instance(
   exec { "stop ${server_id} to create new token":
     command     => "${service_stop_command} ; sleep 2",
     refreshonly => true,
-    path        => '/usr/sbin:/usr/bin:/sbin:/bin',
+    path        => $ds_389::path,
     before      => File["${instance_path}/pin.txt"],
   }
+
   file { "${instance_path}/pin.txt":
     ensure  => file,
     mode    => '0440',
@@ -118,7 +119,8 @@ define ds_389::instance(
     require => Exec["setup ds: ${server_id}"],
     notify  => Exec["restart ${server_id} to pick up new token"],
   }
-  # if we have existing certs, create cert db and import certs
+
+  # If we have existing certs, create cert db and import certs.
   if $ssl {
     # concat bundle
     concat::fragment { "${server_id}_cert":
@@ -138,28 +140,28 @@ define ds_389::instance(
     }
     concat { "${server_id}_cert_bundle":
       mode   => '0600',
-      path   => "${::ds_389::ssl_dir}/${server_id}-bundle.pem",
+      path   => "${ds_389::ssl_dir}/${server_id}-bundle.pem",
       notify => Exec["Create pkcs12 cert: ${server_id}"],
     }
 
-    # create pkcs12 cert
     exec { "Create pkcs12 cert: ${server_id}":
       command     => "openssl pkcs12 -export -password pass:${cert_db_pass} -name ${server_host} -in ${::ds_389::ssl_dir}/${server_id}-bundle.pem -out ${::ds_389::ssl_dir}/${server_id}.p12", # lint:ignore:140chars
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => Exec["Create cert DB: ${server_id}"],
     }
 
     exec { "Create cert DB: ${server_id}":
       command     => "pk12util -i ${::ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       before      => Exec["Add trust for server cert: ${server_id}"],
     }
+
     $ssl['ca_cert_names'].each |$index, $cert_name| {
       exec { "Add trust for CA${index}: ${server_id}":
         command => "certutil -M -n \"${cert_name}\" -t CT,, -d ${instance_path}",
-        path    => '/usr/bin:/bin',
+        path    => $ds_389::path,
         unless  => "certutil -L -d ${instance_path} | grep \"${cert_name}\" | grep \"CT\"",
         require => Exec["Create cert DB: ${server_id}"],
         notify  => Exec["Export CA cert ${index}: ${server_id}"],
@@ -168,11 +170,11 @@ define ds_389::instance(
       exec { "Export CA cert ${index}: ${server_id}":
         cwd     => $instance_path,
         command => "certutil -d ${instance_path} -L -n \"${cert_name}\" -a > ${server_id}CA${index}.pem",
-        path    => '/usr/bin:/bin',
+        path    => $ds_389::path,
         creates => "${instance_path}/${server_id}CA${index}.pem",
       }
       # - copy ca certs to openldap
-      file { "${::ds_389::cacerts_path}/${server_id}CA${index}.pem":
+      file { "${ds_389::cacerts_path}/${server_id}CA${index}.pem":
         ensure  => file,
         source  => "${instance_path}/${server_id}CA${index}.pem",
         require => Exec["Export CA cert ${index}: ${server_id}"],
@@ -183,13 +185,13 @@ define ds_389::instance(
     $ssl_cert_name = $ssl['cert_name']
     exec { "Add trust for server cert: ${server_id}":
       command => "certutil -M -n \"${ssl['cert_name']}\" -t u,u,u -d ${instance_path}",
-      path    => '/usr/bin:/bin',
+      path    => $ds_389::path,
       unless  => "certutil -L -d ${instance_path} | grep \"${ssl['cert_name']}\" | grep \"u,u,u\"",
       notify  => Exec["Export server cert: ${server_id}"],
     }
   }
 
-  # otherwise gen certs and add to db
+  # Otherwise gen certs and add to db.
   else {
     if $subject_alt_names {
       $san_string = join($subject_alt_names, ',')
@@ -198,43 +200,48 @@ define ds_389::instance(
     else {
       $sans = undef
     }
-    # - create noise file
+
+    # Create noise file.
     $temp_noise_file = "/tmp/noisefile-${server_id}"
     $temp_pass_file = "/tmp/passfile-${server_id}"
     $rand_int = fqdn_rand(32)
     exec { "Generate noise file: ${server_id}":
       command     => "echo ${rand_int} | sha256sum | awk \'{print \$1}\' > ${temp_noise_file}",
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       subscribe   => Exec["stop ${server_id} to create new token"],
       notify      => Exec["Generate password file: ${server_id}"],
     }
-    # - create pwd file
+
+    # Create pwd file.
     exec { "Generate password file: ${server_id}":
       command     => "echo ${root_dn_pass} > ${temp_pass_file}",
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => Exec["Create cert DB: ${server_id}"],
     }
-    # - create cert db
+
+    # Create cert db.
     exec { "Create cert DB: ${server_id}":
       command     => "certutil -N -d ${instance_path} -f ${temp_pass_file}",
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => Exec["Generate key pair: ${server_id}"],
     }
-    # - generate key pair
+
+    # Generate key pair.
     exec { "Generate key pair: ${server_id}":
       command     => "certutil -G -d ${instance_path} -g 4096 -z ${temp_noise_file} -f ${temp_pass_file}",
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => Exec["Make ca cert and add to database: ${server_id}"],
     }
-    # - make certs and add to database
+
+    # Make certs and add to database.
     exec { "Make ca cert and add to database: ${server_id}":
       cwd         => $instance_path,
       command     => "certutil -S -n \"${server_id}CA\" -s \"cn=${server_id}CA,dc=${server_host}\" -x -t \"CT,,\" -v 120 -d ${instance_path} -k rsa -z ${temp_noise_file} -f ${temp_pass_file} ; sleep 2", # lint:ignore:140chars
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => [
         Exec["Make server cert and add to database: ${server_id}"],
@@ -242,18 +249,20 @@ define ds_389::instance(
         Exec["Add trust for CA: ${server_id}"],
       ],
     }
+
     exec { "Add trust for CA: ${server_id}":
       command => "certutil -M -n \"${server_id}CA\" -t CT,, -d ${instance_path}",
-      path    => '/usr/bin:/bin',
+      path    => $ds_389::path,
       unless  => "certutil -L -d ${instance_path} | grep \"${server_id}CA\" | grep \"CT\"",
       notify  => Exec["Export CA cert: ${server_id}"],
     }
-    # - make server cert and add to database
+
+    # Make server cert and add to database.
     $ssl_cert_name = "${server_id}Cert"
     exec { "Make server cert and add to database: ${server_id}":
       cwd         => $instance_path,
       command     => "certutil -S -n \"${ssl_cert_name}\" -m 101 -s \"cn=${server_host}\" -c \"${server_id}CA\" -t \"u,u,u\" -v 120 -d ${instance_path} -k rsa -z ${temp_noise_file} -f ${temp_pass_file} ${sans} ; sleep 2", # lint:ignore:140chars
-      path        => '/usr/bin:/bin',
+      path        => $ds_389::path,
       refreshonly => true,
       notify      => [
         Exec["Set permissions on database directory: ${server_id}"],
@@ -261,67 +270,73 @@ define ds_389::instance(
         Exec["Add trust for server cert: ${server_id}"],
       ],
     }
+
     exec { "Add trust for server cert: ${server_id}":
       command => "certutil -M -n \"${ssl_cert_name}\" -t u,u,u -d ${instance_path}",
-      path    => '/usr/bin:/bin',
+      path    => $ds_389::path,
       unless  => "certutil -L -d ${instance_path} | grep \"${ssl_cert_name}\" | grep \"u,u,u\"",
       notify  => Exec["Export server cert: ${server_id}"],
     }
-    # - set perms on database directory
+
+    # Set perms on database directory.
     exec { "Set permissions on database directory: ${server_id}":
       command     => "/bin/chown ${user}:${group} ${instance_path}",
+      path        => $ds_389::path,
       refreshonly => true,
     }
-    # - export ca cert
+
+    # Export ca cert.
     exec { "Export CA cert: ${server_id}":
       cwd     => $instance_path,
       command => "certutil -d ${instance_path} -L -n \"${server_id}CA\" -a > ${server_id}CA.pem",
-      path    => '/usr/bin:/bin',
+      path    => $ds_389::path,
       creates => "${instance_path}/${server_id}CA.pem",
     }
-    # - copy ca cert to openldap
-    file { "${::ds_389::cacerts_path}/${server_id}CA.pem":
+
+    # Copy ca cert to openldap.
+    file { "${ds_389::cacerts_path}/${server_id}CA.pem":
       ensure  => file,
       source  => "${instance_path}/${server_id}CA.pem",
       require => Exec["Export CA cert: ${server_id}"],
       notify  => Exec["Rehash cacertdir: ${server_id}"],
     }
-    # - remove temp files (pwd and noise)
+
+    # Remove temp files (pwd and noise).
     exec { "Clean up temp files: ${server_id}":
       command     => "/bin/rm -f ${temp_noise_file} ${temp_pass_file}",
+      path        => $ds_389::path,
       refreshonly => true,
     }
   }
-  # - export server cert
+
+  # Export server cert.
   exec { "Export server cert: ${server_id}":
     cwd     => $instance_path,
     command => "certutil -d ${instance_path} -L -n \"${ssl_cert_name}\" -a > ${server_id}Cert.pem",
-    path    => '/usr/bin:/bin',
+    path    => $ds_389::path,
     creates => "${instance_path}/${server_id}Cert.pem",
   }
-  file { "${::ds_389::cacerts_path}/${server_id}Cert.pem":
-    ensure  => file,
-    source  => "${instance_path}/${server_id}Cert.pem",
-    require => Exec["Export server cert: ${server_id}"],
-    notify  => Exec["Rehash cacertdir: ${server_id}"],
+  -> file { "${::ds_389::cacerts_path}/${server_id}Cert.pem":
+    ensure => file,
+    source => "${instance_path}/${server_id}Cert.pem",
   }
-  # - rehash certs
-  exec { "Rehash cacertdir: ${server_id}":
+
+  # Rehash certs.
+  ~> exec { "Rehash cacertdir: ${server_id}":
     command     => "${::ds_389::cacert_rehash} ${::ds_389::cacerts_path}",
-    path        => '/usr/sbin:/usr/bin:/sbin:/bin',
+    path        => $ds_389::path,
     refreshonly => true,
-    notify      => Exec["restart ${server_id} to pick up new token"],
   }
-  exec { "restart ${server_id} to pick up new token":
+  ~> exec { "restart ${server_id} to pick up new token":
     command     => "${service_restart_command} ; sleep 2",
-    path        => '/usr/sbin:/usr/bin:/sbin:/bin',
+    path        => $ds_389::path,
     refreshonly => true,
   }
 
-  # schema extensions
+  # Add schema extensions.
   if $schema_extensions {
     $schema_extensions.each |$filename, $source| {
-      ::ds_389::schema { $filename:
+      ds_389::schema { $filename:
         server_id => $server_id,
         user      => $user,
         group     => $group,
@@ -332,8 +347,8 @@ define ds_389::instance(
     }
   }
 
-  # ldif ssl
-  ::ds_389::ssl { $server_id:
+  # Configure SSL.
+  ds_389::ssl { $server_id:
     cert_name       => $ssl_cert_name,
     root_dn         => $root_dn,
     root_dn_pass    => $root_dn_pass,
@@ -346,10 +361,10 @@ define ds_389::instance(
     notify          => Service["dirsrv@${server_id}"],
   }
 
-  # service
-  ::ds_389::service { $server_id: }
+  # Setup system service for this instance.
+  ds_389::service { $server_id: }
 
-  # if we're setting a minimum ssf, pass starttls flag to ldapadd/modify
+  # If we're setting a minimum ssf, pass starttls flag to ldapadd/modify
   if $minssf > 0 {
     $_starttls = true
   }
@@ -357,9 +372,9 @@ define ds_389::instance(
     $_starttls = false
   }
 
-  # ldif replication
+  # Setup replication.
   if $replication {
-    ::ds_389::replication { $server_id:
+    ds_389::replication { $server_id:
       bind_dn             => $replication['bind_dn'],
       replication_pass    => $replication['replication_pass'],
       replication_user    => $replication['replication_user'],
@@ -395,7 +410,7 @@ define ds_389::instance(
   # ldif modify
   if $modify_ldifs {
     $modify_ldifs.each |$filename, $source| {
-      ::ds_389::modify { $filename:
+      ds_389::modify { $filename:
         server_id    => $server_id,
         root_dn      => $root_dn,
         root_dn_pass => $root_dn_pass,
@@ -417,7 +432,7 @@ define ds_389::instance(
   # ldif add
   if $add_ldifs {
     $add_ldifs.each |$filename, $source| {
-      ::ds_389::add { $filename:
+      ds_389::add { $filename:
         server_id    => $server_id,
         root_dn      => $root_dn,
         root_dn_pass => $root_dn_pass,
@@ -439,7 +454,7 @@ define ds_389::instance(
   # ldif base_load
   if $base_load_ldifs {
     $base_load_ldifs.each |$filename, $source| {
-      ::ds_389::add { $filename:
+      ds_389::add { $filename:
         server_id    => $server_id,
         root_dn      => $root_dn,
         root_dn_pass => $root_dn_pass,

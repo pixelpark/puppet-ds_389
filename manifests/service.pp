@@ -4,15 +4,16 @@
 #
 # @summary Manages the service for and is generally intended to be called from a 389 ds instance.
 #
-# @param service_ensure The state the service should be in. Default: 'running'
 # @param service_enable Whether the service should be enabled. Default: true
+# @param service_ensure The state the service should be in. Default: 'running'
 #
-define ds_389::service(
-  String  $service_ensure = 'running',
+define ds_389::service (
   Boolean $service_enable = true,
+  String $service_ensure = 'running',
 ) {
-  include ::ds_389
-  $service_type = $::ds_389::service_type
+  include ds_389
+
+  $service_type = $ds_389::service_type
   if $service_type == 'systemd' {
     service { "dirsrv@${name}":
       ensure     => $service_ensure,

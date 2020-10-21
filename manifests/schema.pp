@@ -10,18 +10,18 @@
 #     source    => 'puppet:///path/to/file.ldif',
 #   }
 #
+# @param group The group of the created ldif file. Default: $::ds_389::group
 # @param server_id The 389 ds instance name. Required.
 # @param source The source path to use for the ldif file. Required.
 # @param user The owner of the created ldif file. Default: $::ds_389::user
-# @param group The group of the created ldif file. Default: $::ds_389::group
 #
-define ds_389::schema(
+define ds_389::schema (
   String $server_id,
   String $source,
-  String $user      = $::ds_389::user,
-  String $group     = $::ds_389::group,
+  String $group = $ds_389::group,
+  String $user = $ds_389::user,
 ) {
-  include ::ds_389
+  include ds_389
 
   file { "/etc/dirsrv/slapd-${server_id}/schema/${name}.ldif":
     ensure => file,

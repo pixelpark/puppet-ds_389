@@ -32,35 +32,35 @@
 #     group        => 'custom_group',
 #   }
 #
-# @param server_id The 389 ds instance name. Required.
-# @param root_dn The bind DN to use when calling ldapadd. Required.
-# @param root_dn_pass The password to use when calling ldapadd. Required.
 # @param content The content value to use for the ldif file. Required, unless providing the source.
-# @param source The source path to use for the ldif file. Required, unless providing the content.
-# @param server_host The host to use when calling ldapadd. Default: $::fqdn
-# @param server_port The port to use when calling ldapadd. Default: 389
+# @param group The group of the created ldif file. Default: $::ds_389::group
 # @param protocol The protocol to use when calling ldapadd. Default: 'ldap'
+# @param root_dn_pass The password to use when calling ldapadd. Required.
+# @param root_dn The bind DN to use when calling ldapadd. Required.
+# @param server_host The host to use when calling ldapadd. Default: $::fqdn
+# @param server_id The 389 ds instance name. Required.
+# @param server_port The port to use when calling ldapadd. Default: 389
+# @param source The source path to use for the ldif file. Required, unless providing the content.
 # @param starttls Whether to use StartTLS when calling ldapadd. Default: false
 # @param user The owner of the created ldif file. Default: $::ds_389::user
-# @param group The group of the created ldif file. Default: $::ds_389::group
 #
-define ds_389::add(
-  String                            $server_id,
-  String                            $root_dn,
+define ds_389::add (
+  String $server_id,
+  String $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
-  Optional[String]                  $content      = undef,
-  Optional[String]                  $source       = undef,
-  String                            $server_host  = $::fqdn,
-  Integer                           $server_port  = 389,
-  Enum['ldap','ldaps']              $protocol     = 'ldap',
-  Boolean                           $starttls     = false,
-  String                            $user         = $::ds_389::user,
-  String                            $group        = $::ds_389::group,
+  Optional[String] $content = undef,
+  Optional[String] $source = undef,
+  String $server_host = $::fqdn,
+  Integer $server_port = 389,
+  Enum['ldap','ldaps'] $protocol = 'ldap',
+  Boolean $starttls = false,
+  String $user = $ds_389::user,
+  String $group = $ds_389::group,
 ) {
-  include ::ds_389
+  include ds_389
 
   if !$content and !$source {
-    fail('ds_389::add requires a value for either content or source')
+    fail('ds_389::add requires a value for either $content or $source')
   }
 
   if $starttls {
@@ -78,10 +78,9 @@ define ds_389::add(
     content => $content,
     source  => $source,
   }
-  exec { "Add ldif ${name}: ${server_id}":
+  -> exec { "Add ldif ${name}: ${server_id}":
     command => "ldapadd -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${server_id}/${name}.ldif ; touch /etc/dirsrv/slapd-${server_id}/${name}.done", # lint:ignore:140chars
-    path    => '/usr/bin:/bin',
+    path    => $ds_389::path,
     creates => "/etc/dirsrv/slapd-${server_id}/${name}.done",
-    require => File["/etc/dirsrv/slapd-${server_id}/${name}.ldif"],
   }
 }
