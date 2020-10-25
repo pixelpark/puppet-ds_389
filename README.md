@@ -314,7 +314,7 @@ Please use the GitHub issues functionality to report any bugs or requests for ne
 
 Contributions must pass all existing tests, new features should provide additional unit/acceptance tests.
 
-### License
+## License
 
 Copyright 2020 Frank Wall
 
