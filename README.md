@@ -24,6 +24,7 @@
     - [Adding new LDIF data](#adding-new-ldif-data)
     - [Adding baseline LDIF data](#adding-baseline-ldif-data)
 1. [Reference](#reference)
+1. [Limitations](#limitations)
 1. [Development](#development)
     - [Contributing](#contributing)
     - [Fork](#fork)
@@ -301,95 +302,9 @@ Note that while you can declare these via the `ds_389::add` define, puppet's res
 
 Classes and parameters are documented in [REFERENCE.md](REFERENCE.md).
 
-### Classes
+## Limitations
 
-#### Public classes
-
-* `ds_389`: Main class, manages the installation and configuration of 389-ds-base.
-
-#### Private classes
-
-* `ds_389::install`: Installs 389-ds-base.
-* `ds_389::params`: Sets parameters according to platform.
-
-#### Defined types
-
-* `ds_389::instance`: The primary defined type. Creates and manages a 389 DS instance.
-* `ds_389::add`: Adds ldif data via ldapadd to a 389 DS instance.
-* `ds_389::modify`: Modifies ldif data via ldapmodify for a 389 DS instance.
-
-The following defines are typically called from an instance.
-
-* `ds_389::replication`: Sets up replication for a 389 DS instance.
-* `ds_389::schema`: Adds a schema extension to a 389 DS instance.
-* `ds_389::service`: Manages the service for a 389 DS instance.
-* `ds_389::ssl`: Enables SSL for a 389 DS instance.
-
-### Tasks
-* `ds_389::reinit_consumer`: Reinitializes replication on a node.
-
-### Parameters
-
-#### ds_389::modify
-* `server_id`: The 389 ds instance name. _Required._
-* `content`: The file content to use for the ldif file. _Required, unless providing the source._
-* `source`: The source path to use for the ldif file. _Required, unless providing the content._
-* `root_dn`: The bind DN to use when calling ldapmodify. _Required._
-* `root_dn_pass`: The password to use when calling ldapmodify. _Required._
-* `server_host`: The host to use when calling ldapmodify. _Default: $::fqdn_
-* `server_port`: The port to use when calling ldapmodify. _Default: 389_
-* `protocol`: The protocol to use when calling ldapmodify. _Default: 'ldap'_
-* `starttls`: Whether to use StartTLS when calling ldapmodify. _Default: false_
-* `user`: The owner of the created ldif file. *Default: $::ds_389::user*
-* `group`: The group of the created ldif file. *Default: $::ds_389::group*
-
-#### ds_389::replication
-* `replication_pass`: The bind dn password of the replication user. _Required._
-* `root_dn`: The root dn for configuring replication. _Required._
-* `root_dn_pass`: The root dn password for configuring replication. _Required._
-* `role`: Replication role. Either 'supplier', 'hub', or 'consumer'. _Required._
-* `suffix`: The LDAP suffix to use. _Required._
-* `replication_user`: The name of the replication user. _Default: 'Replication Manager'_
-* `server_host`: The host to use when calling ldapmodify. _Default: $::fqdn_
-* `server_port`: The port to use when calling ldapmodify. _Default: 389_
-* `protocol`: The protocol to use when calling ldapmodify. _Default: 'ldap'_
-* `starttls`: Whether to use StartTLS when calling ldapmodify. _Default: false_
-* `replica_port`: The port to use for replication. _Default: 389_
-* `replica_transport`: The transport type to use for replication. _Default: LDAP_
-* `user`: The owner of the created ldif file. *Default: $::ds_389::user*
-* `group`: The group of the created ldif file. *Default: $::ds_389::group*
-* `id`: The replica id. _Optional unless declaring a supplier._
-* `purge_delay`: Time in seconds state information stored in replica entries is retained. _Default: 604800_
-* `bind_dn`: The bind dn of the replication user. _Optional._
-* `suppliers`: An array of supplier names to ensure. _Optional._
-* `hubs`: An array of hub names to ensure. _Optional._
-* `consumers`: An array of consumer names to ensure. _Optional._
-* `excluded_attributes`: An array of attributes to exclude from replication. _Optional._
-* `init_suppliers`: Whether to initialize replication for suppliers. _Default: false_
-* `init_hubs`: Whether to initialize replication for hubs. _Default: false_
-* `init_consumers`: Whether to initialize replication for consumers. _Default: false_
-
-#### ds_389::schema
-* `server_id`: The 389 ds instance name. _Required._
-* `source`: The source path to use for the ldif file. _Required._
-* `user`: The owner of the created ldif file. *Default: $::ds_389::user*
-* `group`: The group of the created ldif file. *Default: $::ds_389::group*
-
-#### ds_389::service
-* `service_ensure`: The state the service should be in. _Default: 'running'_
-* `service_enable`: Whether the service should be enabled. _Default: true_
-
-#### ds_389::ssl
-* `cert_name`: The nickname of the SSL cert to use. _Required._
-* `root_dn`: The bind DN to use when calling ldapmodify. _Required._
-* `root_dn_pass`: The password to use when calling ldapmodify. _Required._
-* `server_host`: The host to use when calling ldapmodify. _Default: $::fqdn_
-* `server_port`: The port to use when calling ldapmodify. _Default: 389_
-* `server_ssl_port`: The port to use for SSL traffic. _Default: 636_
-* `user`: The owner of the created ldif file. *Default: $::ds_389::user*
-* `group`: The group of the created ldif file. *Default: $::ds_389::group*
-* `minssf`: The minimum security strength for connections. _Default: 0_
-* `ssl_version_min`: The minimum TLS version to allow. _Default: 'TLS1.1'_
+This module requires 389-ds version 1.4 or later. If you rely on older versions of 389-ds, you may consider using [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389) (which is no longer under active development) until you are ready to migrate to an up-to-date version.
 
 ## Development
 
