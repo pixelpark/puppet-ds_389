@@ -1,12 +1,12 @@
 {
-  "name": "spacepants-ds_389",
+  "name": "fraenki-ds_389",
   "version": "1.1.7",
-  "author": "Paul Bailey",
+  "author": "markt.de",
   "summary": "Module for installing and managing 389 Directory Server",
   "license": "Apache-2.0",
-  "source": "https://github.com/spacepants/puppet-ds_389.git",
-  "project_page": "https://github.com/spacepants/puppet-ds_389",
-  "issues_url": "https://github.com/spacepants/puppet-ds_389/issues",
+  "source": "https://github.com/markt-de/puppet-ds_389.git",
+  "project_page": "https://github.com/markt-de/puppet-ds_389",
+  "issues_url": "https://github.com/markt-de/puppet-ds_389/issues",
   "dependencies": [
     {
       "name": "puppetlabs-concat",
@@ -52,6 +52,12 @@
       "name": "puppet",
       "version_requirement": ">= 6.0.0 < 7.0.0"
     }
+  ],
+  "tags": [
+    "389ds",
+    "ldap",
+    "ldaps",
+    "port389"
   ],
   "pdk-version": "1.18.1",
   "template-url": "pdk-default#1.18.1",
