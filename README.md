@@ -13,6 +13,7 @@
 4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 5. [Limitations - OS compatibility, etc.](#limitations)
 6. [Development - Guide for contributing to the module](#development)
+7. [License](#license)
 
 ## Description
 
@@ -446,3 +447,8 @@ Pull requests welcome. Please see the contributing guidelines below.
 4. Make the test pass.
 
 5. Push to your fork and submit a pull request.
+
+### License
+
+Copyright 2020 Frank Wall
+Copyright 2019 Paul Bailey
