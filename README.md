@@ -317,4 +317,5 @@ Contributions must pass all existing tests, new features should provide addition
 ### License
 
 Copyright 2020 Frank Wall
+
 Copyright 2019 Paul Bailey
