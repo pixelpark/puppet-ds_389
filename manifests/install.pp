@@ -1,7 +1,5 @@
-# ds_389::install
-#
-# This class is called from ds_389 for installation.
-#
+# @summary Install packages, setup user/group and runtime environment for 389 DS.
+# @api private
 class ds_389::install {
   file { '/etc/dirsrv':
     ensure => directory,

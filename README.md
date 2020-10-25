@@ -1,48 +1,55 @@
-# 389 Directory Server module for Puppet
+# puppet-ds_389
 
-[![Build Status](https://travis-ci.org/spacepants/puppet-ds_389.svg?branch=master)](https://travis-ci.org/spacepants/puppet-ds_389)
+[![Build Status](https://travis-ci.org/markt-de/puppet-ds_389.png?branch=master)](https://travis-ci.org/markt-de/puppet-ds_389)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/fraenki/ds_389.svg)](https://forge.puppetlabs.com/fraenki/ds_389)
+[![Puppet Forge](https://img.shields.io/puppetforge/f/fraenki/ds_389.svg)](https://forge.puppetlabs.com/fraenki/ds_389)
+
 
 #### Table of Contents
 
-1. [Description](#description)
-2. [Setup - The basics of getting started with ds_389](#setup)
-    * [What ds_389 affects](#what-ds_389-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with ds_389](#beginning-with-ds_389)
-3. [Usage - Configuration options and additional functionality](#usage)
-4. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
-5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
-7. [License](#license)
+1. [Overview](#overview)
+1. [Requirements](#requirements)
+1. [Usage](#usage)
+    - [Basic usage](#basic-usage)
+    - [Instances](#instances)
+    - [Initialize suffix](#initialize-suffix)
+    - [SSL](#ssl)
+    - [Replication overview](#replication-overview)
+    - [Replication consumer](#replication-consumer)
+    - [Replication hub](#replication-hub)
+    - [Replication supplier](#replication-supplier)
+    - [Initializing replication](#initializing-replication)
+    - [Schema extensions](#schema-extensions)
+    - [Modifying existing LDIF data](#modifying-existing-ldif-data)
+    - [Adding new LDIF data](#adding-new-ldif-data)
+    - [Adding baseline LDIF data](#adding-baseline-ldif-data)
+1. [Reference](#reference)
+1. [Development](#development)
+    - [Contributing](#contributing)
+    - [Fork](#fork)
+1. [License](#license)
 
-## Description
+## Overview
 
-This module allows you to install and manage [389 Directory Server](http://directory.fedoraproject.org/), create and bootstrap 389 DS instances, configure SSL, replication, schema extensions and even load LDIF data.
+This module allows you to install and manage [389 Directory Server](https://www.port389.org/), create and bootstrap 389 DS instances, configure SSL, replication, schema extensions and even load LDIF data.
 
-SSL is enabled by default. If you already have an SSL cert you can provide the cert, key, and CA bundle, and they'll be imported into your instance. Otherwise, it'll generate self-signed certificates. Replication is supported for consumers, hubs, and suppliers (both master and multi-master), and there's a Puppet task to reinitialize replication.
+SSL is enabled by default. If you already have an SSL cert you can provide the cert, key, and CA bundle, and they will be imported into your instance. Otherwise, it will generate self-signed certificates. Replication is supported for consumers, hubs, and suppliers (both master and multi-master), and there is a Puppet task to reinitialize replication.
 
-## Setup
+## Requirements
 
-### What ds_389 affects
+This module requires 389-ds version 1.4 or later. Older versions are incompatible.
 
-* Ensures the 389-ds-base and NSS tools packages are installed
-* Increases file descriptors for 389 DS to 8192
-* Ensures a user and group for the daemon
-* Ensures a service for any 389 DS instances created
+## Usage
 
-### Beginning with ds_389  
-
-#### Examples
-
-##### Basic example
+### Basic usage
 
 ```puppet
-include ::ds_389
+include ds_389
 ```
 
 At a bare minimum, the module ensures that the 389 DS base package and NSS tools are installed, and increases the file descriptors for 389 DS.
 
-You'll probably also want to create a 389 DS instance, though, which you can do by declaring a `ds_389::instance` resource:
+You will probably also want to create a 389 DS instance, though, which you can do by declaring a `ds_389::instance` resource:
 
 ```puppet
 ds_389::instance { 'example':
@@ -50,11 +57,9 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
 }
 ```
-
-## Usage
 
 ### Instances
 
@@ -62,9 +67,13 @@ The primary resource for configuring 389 DS is the `ds_389::instance` define.
 
 In our previous example, we created an instance with the server ID set to the hostname of the node. For a node with a hostname of `foo`, this would create an instance at `/etc/dirsrv/slapd-foo` that listens on the default ports of 389 and 636 (for SSL).
 
-#### SSL
+### Initialize suffix
 
-If you have existing SSL certificates you'd like to use, you'd pass them in to the instance with the `ssl` parameter. It expects a hash with paths (either local file paths on the node or a puppet:/// path) for the PEM files for your certificate, key, and CA bundle. It also requires the certificate nickname for the cert and every CA in the bundle. (`pk12util` sets the nickname for the certificate to the friendly name of the cert in the pkcs12 bundle, and the nickname for each ca cert to "${the common name(cn) of the ca cert subject} - ${the organization(o) of the cert issuer}".)
+When creating new instances, it is possible to initialize the specified suffix by using the `$create_suffix` parameter. The new instance will create a generic root node entry for the suffix in the database. This is most useful when bootstrapping a new LDAP.
+
+### SSL
+
+If you have existing SSL certificates you would like to use, you could pass them in to the instance with the `ssl` parameter. It expects a hash with paths (either local file paths on the node or a puppet:/// path) for the PEM files for your certificate, key, and CA bundle. It also requires the certificate nickname for the cert and every CA in the bundle. (`pk12util` sets the nickname for the certificate to the friendly name of the cert in the pkcs12 bundle, and the nickname for each ca cert to "${the common name(cn) of the ca cert subject} - ${the organization(o) of the cert issuer}".)
 
 To require StartTLS for non-SSL connections, you can pass in the `minssf` param to specify the minimum required encryption.
 
@@ -74,7 +83,7 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
   minssf       => 128,
   ssl          => {
     'cert_path'      => 'puppet:///path/to/ssl_cert.pem',
@@ -89,11 +98,11 @@ ds_389::instance { 'example':
 }
 ```
 
-#### Replication
+### Replication overview
 
-If you need to set up replication, you'd pass in the replication config via the `replication` parameter. At a minimum, it expects a hash with the replication bind dn, replication bind dn password, and replication role (either 'consumer', 'hub', or 'supplier').
+If you need to set up replication, you could pass in the replication config via the `replication` parameter. At a minimum, it expects a hash with the replication bind dn, replication bind dn password, and replication role (either 'consumer', 'hub', or 'supplier').
 
-##### Consumer
+### Replication consumer
 
 For a consumer, with our previous example:
 
@@ -103,7 +112,7 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
   replication  => {
     'replication_pass' => 'secret',
     'role'             => 'consumer',
@@ -113,7 +122,7 @@ ds_389::instance { 'example':
 
 This would ensure that the replica bind dn and credentials are present in the instance.
 
-##### Hub
+### Replication hub
 
 For a hub, you can also pass in any consumers for the hub as an array of server IDs, and the replication agreement will be created and added to the instance.
 
@@ -123,7 +132,7 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
   replication  => {
     'replication_pass' => 'secret',
     'role'             => 'hub',
@@ -135,9 +144,9 @@ ds_389::instance { 'example':
 }
 ```
 
-##### Supplier
+### Replication supplier
 
-For a supplier, you can pass in consumers, and also any hubs or other suppliers (if running in multi-master) that should be present in the instance. You'll also need to provide the replica ID for the supplier.
+For a supplier, you can pass in consumers, and also any hubs or other suppliers (if running in multi-master) that should be present in the instance. You will also need to provide the replica ID for the supplier.
 
 ```puppet
 ds_389::instance { 'example':
@@ -145,7 +154,7 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
   replication  => {
     'replication_pass' => 'secret',
     'role'             => 'hub',
@@ -165,7 +174,7 @@ ds_389::instance { 'example':
 }
 ```
 
-##### Initializing replication
+### Initializing replication
 
 Once replication has been configured on all of the desired nodes, you can initialize replication for consumers, hubs, and/or other suppliers by passing the appropriate parameters.
 
@@ -175,7 +184,7 @@ ds_389::instance { 'example':
   root_dn_pass => 'supersecret',
   suffix       => 'dc=example,dc=com',
   cert_db_pass => 'secret',
-  server_id    => $::hostname,
+  server_id    => $facts['networking']['hostname'],
   replication  => {
     'replication_pass' => 'secret',
     'role'             => 'hub',
@@ -198,9 +207,9 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also initialize (or reinitialize) replication with the [Puppet task](#tasks).
+You can also initialize (or reinitialize) replication with the [Puppet task](#reference).
 
-#### Schema extensions
+### Schema extensions
 
 If you need to add any schema extensions, you can can pass those in with the `schema_extensions` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). Note that schema filenames are typically prefixed with a number that indicates the desired schema load order.
 
@@ -216,9 +225,9 @@ ds_389::instance { 'example':
 }
 ```
 
-#### Modifying existing LDIF data
+### Modifying existing LDIF data
 
-If you need to modify any of the default ldif data, (typically configs) you can do so via the `modify_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). The ldif file is created and passed to ldapmodify to load it into the instance.
+If you need to modify any of the default ldif data (typically configs), you can do so via the `modify_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). The ldif file is created and passed to ldapmodify to load it into the instance.
 
 ```puppet
 ds_389::instance { 'example':
@@ -243,9 +252,9 @@ ds_389::modify { 'example_ldif_modify':
 }
 ```
 
-#### Adding new LDIF data
+### Adding new LDIF data
 
-If you need to add any new ldif data, (typically configs) you can do so via the `add_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). These function similarly to the modify_ldifs param, but are passed to ldapadd instead of ldapmodify.
+If you need to add any new ldif data (typically configs), you can do so via the `add_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). These function similarly to the modify_ldifs param, but are passed to ldapadd instead of ldapmodify.
 
 ```puppet
 ds_389::instance { 'example':
@@ -259,7 +268,7 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also declare those separately, by calling their define directly, but you'll need to provide the server id of the instance as well as the root dn and password.
+You can also declare those separately, by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password.
 
 ```puppet
 ds_389::add { 'example_ldif_add':
@@ -270,7 +279,7 @@ ds_389::add { 'example_ldif_add':
 }
 ```
 
-#### Adding baseline LDIF data
+### Adding baseline LDIF data
 
 If you need to load baseline ldif data that runs after any other ldif configuration changes, you can pass those in via the `base_load_ldifs` parameter.
 
@@ -289,6 +298,8 @@ ds_389::instance { 'example':
 Note that while you can declare these via the `ds_389::add` define, puppet's resource load ordering may potentially result in it attempting to add the ldif before a configuration change that it requires.
 
 ## Reference
+
+Classes and parameters are documented in [REFERENCE.md](REFERENCE.md).
 
 ### Classes
 
@@ -319,36 +330,6 @@ The following defines are typically called from an instance.
 
 ### Parameters
 
-#### ds_389
-* `package_name`: Name of the 389 ds package to install. _Default: '389-ds-base'_
-* `package_ensure`: 389 ds package state. _Default 'installed'_
-* `user`: User account 389 ds should run as. _Default: 'dirsrv'_
-* `group`: Group account 389 ds user should belong to. _Default: 'dirsrv'_
-* `cacerts_path`: Target directory the 389 ds certs should be exported to. _Default: '/etc/openldap/cacerts'_
-* `home_dir`: Home directory for the 389 ds user account. _Default: '/usr/share/dirsrv'_
-* `instances`: A hash of ds_389::instance resources. _Optional._
-
-#### ds_389::instance
-* `root_dn`: The root dn to ensure. _Required._
-* `root_dn_pass`: The root dn password to ensure. _Required._
-* `cert_db_pass`: The certificate db password to ensure. _Required._
-* `suffix`: The LDAP suffix to use. _Required._
-* `group`: The group for the instance. *Default: $::ds_389::group*
-* `user`: The user for the instance. *Default: $::ds_389::user*
-* `server_id`: The server identifier for the instance. _Default: $::hostname_
-* `server_host`: The fqdn for the instance. _Default: $::fqdn_
-* `server_port`: The port to use for non-SSL traffic. _Default: 389_
-* `server_ssl_port`: The port to use for SSL traffic. _Default: 636_
-* `minssf`: The minimum security strength for connections. _Default: 0_
-* `subject_alt_names`: An array of subject alt names, if using self-signed certificates. _Optional._
-* `replication`: A replication config hash. See replication.pp. _Optional._
-* `ssl`: An ssl config hash. See ssl.pp. _Optional._
-* `ssl_version_min`: The minimum TLS version the instance should support. _Optional._
-* `schema_extensions`: A hash of schemas to ensure. See schema.pp. _Optional._
-* `modify_ldifs`: A hash of ldif modify files. See modify.pp. Optional. _Optional._
-* `add_ldifs`: A hash of ldif add files. See add.pp. _Optional._
-* `base_load_ldifs`: A hash of ldif add files to load after all other config files have been added. _Optional._
-
 #### ds_389::modify
 * `server_id`: The 389 ds instance name. _Required._
 * `content`: The file content to use for the ldif file. _Required, unless providing the source._
@@ -359,19 +340,6 @@ The following defines are typically called from an instance.
 * `server_port`: The port to use when calling ldapmodify. _Default: 389_
 * `protocol`: The protocol to use when calling ldapmodify. _Default: 'ldap'_
 * `starttls`: Whether to use StartTLS when calling ldapmodify. _Default: false_
-* `user`: The owner of the created ldif file. *Default: $::ds_389::user*
-* `group`: The group of the created ldif file. *Default: $::ds_389::group*
-
-#### ds_389::add
-* `server_id`: The 389 ds instance name. _Required._
-* `content`: The file content to use for the ldif file. _Required, unless providing the source._
-* `source`: The source path to use for the ldif file. _Required, unless providing the content._
-* `root_dn`: The bind DN to use when calling ldapadd. _Required._
-* `root_dn_pass`: The password to use when calling ldapadd. _Required._
-* `server_host`: The host to use when calling ldapadd. _Default: $::fqdn_
-* `server_port`: The port to use when calling ldapadd. _Default: 389_
-* `protocol`: The protocol to use when calling ldapadd. _Default: 'ldap'_
-* `starttls`: Whether to use StartTLS when calling ldapadd. _Default: false_
 * `user`: The owner of the created ldif file. *Default: $::ds_389::user*
 * `group`: The group of the created ldif file. *Default: $::ds_389::group*
 
@@ -423,30 +391,13 @@ The following defines are typically called from an instance.
 * `minssf`: The minimum security strength for connections. _Default: 0_
 * `ssl_version_min`: The minimum TLS version to allow. _Default: 'TLS1.1'_
 
-## Limitations
-
-This module is currently tested and working on RedHat and CentOS 6, and 7, Debian 8, and 9, Ubuntu 14.04, and 16.04 systems.
-
 ## Development
-
-This module was developed with [PDK](https://puppet.com/docs/pdk/1.0/index.html).
-
-Pull requests welcome. Please see the contributing guidelines below.
 
 ### Contributing
 
-1. Fork the repo.
+Please use the GitHub issues functionality to report any bugs or requests for new features. Feel free to fork and submit pull requests for potential contributions.
 
-2. Run the tests. We only take pull requests with passing tests, and
-   it's great to know that you have a clean slate.
-
-3. Add a test for your change. Only refactoring and documentation
-   changes require no new tests. If you are adding functionality
-   or fixing a bug, please add a test.
-
-4. Make the test pass.
-
-5. Push to your fork and submit a pull request.
+Contributions must pass all existing tests, new features should provide additional unit/acceptance tests.
 
 ### License
 

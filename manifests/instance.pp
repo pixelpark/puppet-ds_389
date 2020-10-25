@@ -1,7 +1,3 @@
-# ds_389::instance
-#
-# Manages a 389 ds instance.
-#
 # @summary Manages a 389 ds instance.
 #
 # @example A basic instance with required params.
@@ -13,26 +9,65 @@
 #     server_id    => 'specdirectory',
 #   }
 #
-# @param add_ldifs A hash of ldif add files. See add.pp. Optional.
-# @param base_load_ldifs A hash of ldif add files to load after all other config files have been added. Optional.
-# @param cert_db_pass The certificate db password to ensure. Required.
-# @param create_suffix Set this parameter to `True` to create a generic root node entry for the suffix in the database.
-# @param group The group for the instance. Default: $::ds_389::group
-# @param minssf The minimum security strength for connections. Default: 0
-# @param modify_ldifs A hash of ldif modify files. See modify.pp. Optional. Optional.
-# @param replication A replication config hash. See replication.pp. Optional.
-# @param root_dn_pass The root dn password to ensure. Required.
-# @param root_dn The root dn to ensure. Required.
-# @param schema_extensions A hash of schemas to ensure. See schema.pp. Optional.
-# @param server_host The fqdn for the instance. Default: $::fqdn
-# @param server_id The server identifier for the instance. Default: $::hostname
-# @param server_port The port to use for non-SSL traffic. Default: 389
-# @param server_ssl_port The port to use for SSL traffic. Default: 636
-# @param ssl An ssl config hash. See ssl.pp. Optional.
-# @param ssl_version_min The minimum TLS version the instance should support. Optional.
-# @param subject_alt_names An array of subject alt names, if using self-signed certificates. Optional.
-# @param suffix The LDAP suffix to use. Required.
-# @param user The user for the instance. Default: $::ds_389::user
+# @param add_ldifs
+#   A hash of ldif add files. See add.pp. Optional.
+#
+# @param base_load_ldifs
+#   A hash of ldif add files to load after all other config files have been added. Optional.
+#
+# @param cert_db_pass
+#   The certificate db password to ensure. Required.
+#
+# @param create_suffix
+#   Set this parameter to `True` to create a generic root node entry for the suffix in the database.
+#
+# @param group
+#   The group for the instance. Default: $ds_389::group
+#
+# @param minssf
+#   The minimum security strength for connections. Default: 0
+#
+# @param modify_ldifs
+#   A hash of ldif modify files. See modify.pp. Optional. Optional.
+#
+# @param replication
+#   A replication config hash. See replication.pp. Optional.
+#
+# @param root_dn_pass
+#   The root dn password to ensure. Required.
+#
+# @param root_dn
+#   The root dn to ensure. Required.
+#
+# @param schema_extensions
+#   A hash of schemas to ensure. See schema.pp. Optional.
+#
+# @param server_host
+#   The fqdn for the instance. Default: $::fqdn
+#
+# @param server_id
+#   The server identifier for the instance. Default: $::hostname
+#
+# @param server_port
+#   The port to use for non-SSL traffic. Default: 389
+#
+# @param server_ssl_port
+#   The port to use for SSL traffic. Default: 636
+#
+# @param ssl
+#   An ssl config hash. See ssl.pp. Optional.
+#
+# @param ssl_version_min
+#   The minimum TLS version the instance should support. Optional.
+#
+# @param subject_alt_names
+#   An array of subject alt names, if using self-signed certificates. Optional.
+#
+# @param suffix
+#   The LDAP suffix to use. Required.
+#
+# @param user
+#   The user for the instance. Default: $ds_389::user
 #
 define ds_389::instance (
   Variant[String,Sensitive[String]] $cert_db_pass,

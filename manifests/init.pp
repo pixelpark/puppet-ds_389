@@ -1,22 +1,37 @@
-# ds_389
-#
-# Installs and manages 389 Directory Server
-#
-# @summary Installs and manages 389 Directory Server
+# @summary Manages and configures the 389 Directory Server
 #
 # @example
 #   include ds_389
 #
-# @param cacerts_path Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
-# @param dnf_module_name The name of the DNF module that should be enabled on RHEL. Optional.
-# @param dnf_module_version The version of the DNF module that should be enabled on RHEL. Optional.
-# @param group Group account 389 ds user should belong to. Default: 'dirsrv'
-# @param home_dir Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
-# @param instances A hash of ds_389::instance resources. Optional.
-# @param package_ensure 389 ds package state. Default 'installed'
-# @param package_name Name of the 389 ds package to install. Default: '389-ds-base'
-# @param service_type The service manager that should be used.
-# @param user User account 389 ds should run as. Default: 'dirsrv'
+# @param cacerts_path
+#   Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
+#
+# @param dnf_module_name
+#   The name of the DNF module that should be enabled on RHEL. Optional.
+#
+# @param dnf_module_version
+#   The version of the DNF module that should be enabled on RHEL. Optional.
+#
+# @param group
+#   Group account 389 ds user should belong to. Default: 'dirsrv'
+#
+# @param home_dir
+#   Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
+#
+# @param instances
+#   A hash of ds_389::instance resources. Optional.
+#
+# @param package_ensure
+#   389 ds package state. Default 'installed'
+#
+# @param package_name
+#   Name of the 389 ds package to install. Default: '389-ds-base'
+#
+# @param service_type
+#   The service manager that should be used.
+#
+# @param user
+#   User account 389 ds should run as. Default: 'dirsrv'
 #
 class ds_389 (
   Stdlib::Absolutepath $cacerts_path,

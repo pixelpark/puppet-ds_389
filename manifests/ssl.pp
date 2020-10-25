@@ -1,8 +1,4 @@
-# ds_389::ssl
-#
-# Manages ssl for and is intended to be called by a 389 ds instance.
-#
-# @summary Manages ssl for and is intended to be called by a 389 ds instance.
+# @summary Manages SSL for a 389 ds instance.
 #
 # @example
 #   ds_389::ssl { 'foo':
@@ -11,16 +7,35 @@
 #     root_dn_pass => 'supersecure',
 #   }
 #
-# @param cert_name The nickname of the SSL cert to use. Required.
-# @param group The group of the created ldif file. Default: $::ds_389::group
-# @param minssf The minimum security strength for connections. Default: 0
-# @param root_dn_pass The password to use when calling ldapmodify. Required.
-# @param root_dn The bind DN to use when calling ldapmodify. Required.
-# @param server_host The host to use when calling ldapmodify. Default: $::fqdn
-# @param server_port The port to use when calling ldapmodify. Default: 389
-# @param server_ssl_port The port to use for SSL traffic. Default: 636
-# @param ssl_version_min The minimum TLS version to allow. Default: 'TLS1.1'
-# @param user The owner of the created ldif file. Default: $::ds_389::user
+# @param cert_name
+#   The nickname of the SSL cert to use. Required.
+#
+# @param group
+#   The group of the created ldif file. Default: $ds_389::group
+#
+# @param minssf
+#   The minimum security strength for connections. Default: 0
+#
+# @param root_dn_pass
+#   The password to use when calling ldapmodify. Required.
+#
+# @param root_dn
+#   The bind DN to use when calling ldapmodify. Required.
+#
+# @param server_host
+#   The host to use when calling ldapmodify. Default: $::fqdn
+#
+# @param server_port
+#   The port to use when calling ldapmodify. Default: 389
+#
+# @param server_ssl_port
+#   The port to use for SSL traffic. Default: 636
+#
+# @param ssl_version_min
+#   The minimum TLS version to allow. Default: 'TLS1.1'
+#
+# @param user
+#   The owner of the created ldif file. Default: $ds_389::user
 #
 define ds_389::ssl (
   String $cert_name,

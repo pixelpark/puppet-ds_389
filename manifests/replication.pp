@@ -1,28 +1,24 @@
-# ds_389::replication
-#
-# Sets up replication for a 389 ds instance.
-#
 # @summary Sets up replication for a 389 ds instance.
 #
 # @example A basic consumer with required params.
 #   ds_389::replication { 'consumer1':
-#     bind_dn      => 'cn=Replication Manager,cn=config',
-#     bind_dn_pass => 'supersecret',
-#     root_dn      => 'cn=Directory Manager',
-#     root_dn_pass => 'supersecure',
-#     role         => 'consumer',
-#     suffix       => 'dc=example,dc=com',
+#     bind_dn          => 'cn=Replication Manager,cn=config',
+#     replication_pass => 'supersecret',
+#     root_dn          => 'cn=Directory Manager',
+#     root_dn_pass     => 'supersecure',
+#     role             => 'consumer',
+#     suffix           => 'dc=example,dc=com',
 #   }
 #
 # @example A basic hub with 2 consumers.
 #   ds_389::replication { 'hub1':
-#     bind_dn      => 'cn=Replication Manager,cn=config',
-#     bind_dn_pass => 'supersecret',
-#     root_dn      => 'cn=Directory Manager',
-#     root_dn_pass => 'supersecure',
-#     role         => 'hub',
-#     suffix       => 'dc=example,dc=com',
-#     consumers    => [
+#     bind_dn          => 'cn=Replication Manager,cn=config',
+#     replication_pass => 'supersecret',
+#     root_dn          => 'cn=Directory Manager',
+#     root_dn_pass     => 'supersecure',
+#     role             => 'hub',
+#     suffix           => 'dc=example,dc=com',
+#     consumers        => [
 #       'consumer1',
 #       'consumer2',
 #     ],
@@ -30,42 +26,87 @@
 #
 # @example A basic supplier in multi-master mode with 2 other suppliers and initializing replication.
 #   ds_389::replication { 'supplier1':
-#     bind_dn        => 'cn=Replication Manager,cn=config',
-#     bind_dn_pass   => 'supersecret',
-#     root_dn        => 'cn=Directory Manager',
-#     root_dn_pass   => 'supersecure',
-#     role           => 'supplier',
-#     suffix         => 'dc=example,dc=com',
-#     init_suppliers => true,
-#     suppliers      => [
+#     bind_dn          => 'cn=Replication Manager,cn=config',
+#     replication_pass => 'supersecret',
+#     root_dn          => 'cn=Directory Manager',
+#     root_dn_pass     => 'supersecure',
+#     role             => 'supplier',
+#     suffix           => 'dc=example,dc=com',
+#     init_suppliers   => true,
+#     suppliers        => [
 #       'supplier1',
 #       'supplier2',
 #     ],
 #   }
 #
-# @param bind_dn_pass The bind dn password of the replication user. Required.
-# @param bind_dn The bind dn of the replication user. Required.
-# @param consumers An array of consumer names to ensure. Optional.
-# @param excluded_attributes An array of attributes to exclude from replication. Optional.
-# @param group The group of the created ldif file. Default: $ds_389::group
-# @param hubs An array of hub names to ensure. Optional.
-# @param id The replica id. Optional unless declaring a supplier.
-# @param init_consumers Whether to initialize replication for consumers. Default: false
-# @param init_hubs Whether to initialize replication for hubs. Default: false
-# @param init_suppliers Whether to initialize replication for suppliers. Default: false
-# @param protocol The protocol to use when calling ldapmodify. Default: 'ldap'
-# @param purge_delay Time in seconds state information stored in replica entries is retained. Default: 604800
-# @param replica_port The port to use for replication. Default: 389
-# @param replica_transport The transport type to use for replication. Default: 'LDAP'
-# @param role Replication role. Either 'supplier', 'hub', or 'consumer'. Required.
-# @param root_dn_pass The root dn password for configuring replication. Required.
-# @param root_dn The root dn for configuring replication. Required.
-# @param server_host The host to use when calling ldapmodify. Default: $fqdn
-# @param server_port The port to use when calling ldapmodify. Default: 389
-# @param starttls Whether to use StartTLS when calling ldapmodify. Default: false
-# @param suffix The LDAP suffix to use. Required.
-# @param suppliers An array of supplier names to ensure. Optional.
-# @param user The owner of the created ldif file. Default: $ds_389::user
+# @param bind_dn
+#   The bind dn of the replication user. Required.
+#
+# @param consumers
+#   An array of consumer names to ensure. Optional.
+#
+# @param excluded_attributes
+#   An array of attributes to exclude from replication. Optional.
+#
+# @param group
+#   The group of the created ldif file. Default: $ds_389::group
+#
+# @param hubs
+#   An array of hub names to ensure. Optional.
+#
+# @param id
+#   The replica id. Optional unless declaring a supplier.
+#
+# @param init_consumers
+#   Whether to initialize replication for consumers. Default: false
+#
+# @param init_hubs
+#   Whether to initialize replication for hubs. Default: false
+#
+# @param init_suppliers
+#   Whether to initialize replication for suppliers. Default: false
+#
+# @param protocol
+#   The protocol to use when calling ldapmodify. Default: 'ldap'
+#
+# @param purge_delay
+#   Time in seconds state information stored in replica entries is retained. Default: 604800
+#
+# @param replica_port
+#   The port to use for replication. Default: 389
+#
+# @param replica_transport
+#   The transport type to use for replication. Default: 'LDAP'
+#
+# @param replication_pass
+#   The password of the replication user. Required.
+#
+# @param role
+#   Replication role. Either 'supplier', 'hub', or 'consumer'. Required.
+#
+# @param root_dn_pass
+#   The root dn password for configuring replication. Required.
+#
+# @param root_dn
+#   The root dn for configuring replication. Required.
+#
+# @param server_host
+#   The host to use when calling ldapmodify. Default: $fqdn
+#
+# @param server_port
+#   The port to use when calling ldapmodify. Default: 389
+#
+# @param starttls
+#   Whether to use StartTLS when calling ldapmodify. Default: false
+#
+# @param suffix
+#   The LDAP suffix to use. Required.
+#
+# @param suppliers
+#   An array of supplier names to ensure. Optional.
+#
+# @param user
+#   The owner of the created ldif file. Default: $ds_389::user
 #
 define ds_389::replication (
   Variant[String,Sensitive[String]] $replication_pass,

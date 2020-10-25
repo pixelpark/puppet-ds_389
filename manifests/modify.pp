@@ -1,7 +1,3 @@
-# ds_389::modify
-#
-# Adds an ldif modify file to a 389 ds instance.
-#
 # @summary Adds an ldif modify file to a 389 ds instance.
 #
 # @example Adding an ldif modify file with required params.
@@ -32,17 +28,38 @@
 #     group        => 'custom_group',
 #   }
 #
-# @param content The content value to use for the ldif file. Required, unless providing the source.
-# @param group The group of the created ldif file. Default: $ds_389::group
-# @param protocol The protocol to use when calling ldapmodify. Default: 'ldap'
-# @param root_dn_pass The password to use when calling ldapmodify. Required.
-# @param root_dn The bind DN to use when calling ldapmodify. Required.
-# @param server_host The host to use when calling ldapmodify. Default: $::fqdn
-# @param server_id The 389 ds instance name. Required.
-# @param server_port The port to use when calling ldapmodify. Default: 389
-# @param source The source path to use for the ldif file. Required, unless providing the content.
-# @param starttls Whether to use StartTLS when calling ldapmodify. Default: false
-# @param user The owner of the created ldif file. Default: $ds_389::user
+# @param content
+#   The content value to use for the ldif file. Required, unless providing the source.
+#
+# @param group
+#   The group of the created ldif file. Default: $ds_389::group
+#
+# @param protocol
+#   The protocol to use when calling ldapmodify. Default: 'ldap'
+#
+# @param root_dn_pass
+#   The password to use when calling ldapmodify. Required.
+#
+# @param root_dn
+#   The bind DN to use when calling ldapmodify. Required.
+#
+# @param server_host
+#   The host to use when calling ldapmodify. Default: $::fqdn
+#
+# @param server_id
+#   The 389 ds instance name. Required.
+#
+# @param server_port
+#   The port to use when calling ldapmodify. Default: 389
+#
+# @param source
+#   The source path to use for the ldif file. Required, unless providing the content.
+#
+# @param starttls
+#   Whether to use StartTLS when calling ldapmodify. Default: false
+#
+# @param user
+#   The owner of the created ldif file. Default: $ds_389::user
 #
 define ds_389::modify (
   String $server_id,

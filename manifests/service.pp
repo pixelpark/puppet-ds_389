@@ -1,11 +1,10 @@
-# ds_389::service
+# @summary Manages the service for a 389 ds instance.
 #
-# Manages the service for and is generally intended to be called from a 389 ds instance.
+# @param service_enable
+#   Whether the service should be enabled. Default: true
 #
-# @summary Manages the service for and is generally intended to be called from a 389 ds instance.
-#
-# @param service_enable Whether the service should be enabled. Default: true
-# @param service_ensure The state the service should be in. Default: 'running'
+# @param service_ensure
+#   The state the service should be in. Default: 'running'
 #
 define ds_389::service (
   Boolean $service_enable = true,
