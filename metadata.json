@@ -25,40 +25,25 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "8",
-        "7",
-        "6"
+        "8"
       ]
     },
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "8",
-        "7",
-        "6"
+        "8"
       ]
     },
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
-        "8",
-        "9"
+        "10"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "16.04",
-        "14.04"
-      ]
-    },
-    {
-      "operatingsystem": "Amazon",
-      "operatingsystemrelease": [
-        "2016.03",
-        "2016.09",
-        "2017.03",
-        "2017.09"
+        "20.04"
       ]
     }
   ],
