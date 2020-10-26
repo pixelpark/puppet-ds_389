@@ -7,12 +7,12 @@ class ds_389::install {
 
   exec { 'Create ldap cacerts directory':
     command => "mkdir -p ${::ds_389::cacerts_path}",
-    creates => $::ds_389::cacerts_path,
+    creates => $ds_389::cacerts_path,
     path    => $ds_389::path,
   }
 
   # Enable required dnf module on RHEL/CentOS 8.
-  if (($::osfamily == 'RedHat') and ($::operatingsystemmajrelease == '8')) {
+  if (($facts['os']['family'] == 'RedHat') and ($facts['os']['release']['major'] == '8')) {
     package { $ds_389::dnf_module_name:
       ensure      => $ds_389::dnf_module_version,
       enable_only => true,

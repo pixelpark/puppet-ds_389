@@ -22,7 +22,7 @@
 #   Set this parameter to `True` to create a generic root node entry for the suffix in the database.
 #
 # @param group
-#   The group for the instance. Default: $ds_389::group
+#   The group for the instance. Default: `$ds_389::group`
 #
 # @param minssf
 #   The minimum security strength for connections. Default: 0
@@ -43,10 +43,10 @@
 #   A hash of schemas to ensure. See schema.pp. Optional.
 #
 # @param server_host
-#   The fqdn for the instance. Default: $::fqdn
+#   The fqdn for the instance. Default: `$facts['networking']['fqdn']`
 #
 # @param server_id
-#   The server identifier for the instance. Default: $::hostname
+#   The server identifier for the instance. Default: `$facts['networking']['hostname']`
 #
 # @param server_port
 #   The port to use for non-SSL traffic. Default: 389
@@ -75,13 +75,13 @@ define ds_389::instance (
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $suffix,
   Boolean $create_suffix = true,
-  String $group = $::ds_389::group,
+  String $group = $ds_389::group,
   Integer $minssf = 0,
-  String $server_host = $::fqdn,
-  String $server_id = $::hostname,
+  String $server_host = $facts['networking']['fqdn'],
+  String $server_id = $facts['networking']['hostname'],
   Integer $server_port = 389,
   Integer $server_ssl_port = 636,
-  String $user = $::ds_389::user,
+  String $user = $ds_389::user,
   Optional[Hash] $add_ldifs = undef,
   Optional[Hash] $base_load_ldifs = undef,
   Optional[Hash] $modify_ldifs = undef,

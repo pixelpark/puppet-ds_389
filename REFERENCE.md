@@ -213,7 +213,7 @@ Default value: ``undef``
 
 Data type: `String`
 
-The group of the created ldif file. Default: $::ds_389::group
+The group of the created ldif file. Default: `$ds_389::group`
 
 Default value: `$ds_389::group`
 
@@ -241,9 +241,9 @@ The bind DN to use when calling ldapadd. Required.
 
 Data type: `String`
 
-The host to use when calling ldapadd. Default: $::fqdn
+The host to use when calling ldapadd. Default: `$facts['networking']['fqdn']`
 
-Default value: `$::fqdn`
+Default value: `$facts['networking']['fqdn']`
 
 ##### `server_id`
 
@@ -279,7 +279,7 @@ Default value: ``false``
 
 Data type: `String`
 
-The owner of the created ldif file. Default: $::ds_389::user
+The owner of the created ldif file. Default: `$ds_389::user`
 
 Default value: `$ds_389::user`
 
@@ -339,9 +339,9 @@ Default value: ``true``
 
 Data type: `String`
 
-The group for the instance. Default: $ds_389::group
+The group for the instance. Default: `$ds_389::group`
 
-Default value: `$::ds_389::group`
+Default value: `$ds_389::group`
 
 ##### `minssf`
 
@@ -391,17 +391,17 @@ Default value: ``undef``
 
 Data type: `String`
 
-The fqdn for the instance. Default: $::fqdn
+The fqdn for the instance. Default: `$facts['networking']['fqdn']`
 
-Default value: `$::fqdn`
+Default value: `$facts['networking']['fqdn']`
 
 ##### `server_id`
 
 Data type: `String`
 
-The server identifier for the instance. Default: $::hostname
+The server identifier for the instance. Default: `$facts['networking']['hostname']`
 
-Default value: `$::hostname`
+Default value: `$facts['networking']['hostname']`
 
 ##### `server_port`
 
@@ -455,7 +455,7 @@ Data type: `String`
 
 The user for the instance. Default: $ds_389::user
 
-Default value: `$::ds_389::user`
+Default value: `$ds_389::user`
 
 ### `ds_389::modify`
 
@@ -516,9 +516,9 @@ Default value: ``undef``
 
 Data type: `String`
 
-The group of the created ldif file. Default: $ds_389::group
+The group of the created ldif file. Default: `$ds_389::group`
 
-Default value: `$::ds_389::group`
+Default value: `$ds_389::group`
 
 ##### `protocol`
 
@@ -544,9 +544,9 @@ The bind DN to use when calling ldapmodify. Required.
 
 Data type: `String`
 
-The host to use when calling ldapmodify. Default: $::fqdn
+The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 
-Default value: `$::fqdn`
+Default value: `$facts['networking']['fqdn']`
 
 ##### `server_id`
 
@@ -582,9 +582,9 @@ Default value: ``false``
 
 Data type: `String`
 
-The owner of the created ldif file. Default: $ds_389::user
+The owner of the created ldif file. Default: `$ds_389::user`
 
-Default value: `$::ds_389::user`
+Default value: `$ds_389::user`
 
 ### `ds_389::replication`
 
@@ -674,7 +674,7 @@ Data type: `String`
 
 The group of the created ldif file. Default: $ds_389::group
 
-Default value: `$::ds_389::group`
+Default value: `$ds_389::group`
 
 ##### `hubs`
 
@@ -778,7 +778,7 @@ Data type: `String`
 
 The host to use when calling ldapmodify. Default: $fqdn
 
-Default value: `$::fqdn`
+Default value: `$facts['networking']['fqdn']`
 
 ##### `server_port`
 
@@ -955,9 +955,9 @@ The bind DN to use when calling ldapmodify. Required.
 
 Data type: `String`
 
-The host to use when calling ldapmodify. Default: $::fqdn
+The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 
-Default value: `$::fqdn`
+Default value: `$facts['networking']['fqdn']`
 
 ##### `server_port`
 

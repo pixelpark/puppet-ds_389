@@ -32,7 +32,7 @@
 #   The content value to use for the ldif file. Required, unless providing the source.
 #
 # @param group
-#   The group of the created ldif file. Default: $ds_389::group
+#   The group of the created ldif file. Default: `$ds_389::group`
 #
 # @param protocol
 #   The protocol to use when calling ldapmodify. Default: 'ldap'
@@ -44,7 +44,7 @@
 #   The bind DN to use when calling ldapmodify. Required.
 #
 # @param server_host
-#   The host to use when calling ldapmodify. Default: $::fqdn
+#   The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 #
 # @param server_id
 #   The 389 ds instance name. Required.
@@ -59,18 +59,18 @@
 #   Whether to use StartTLS when calling ldapmodify. Default: false
 #
 # @param user
-#   The owner of the created ldif file. Default: $ds_389::user
+#   The owner of the created ldif file. Default: `$ds_389::user`
 #
 define ds_389::modify (
   String $server_id,
   String $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
-  String $group = $::ds_389::group,
+  String $group = $ds_389::group,
   Enum['ldap','ldaps'] $protocol = 'ldap',
-  String $server_host = $::fqdn,
+  String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Boolean $starttls = false,
-  String $user = $::ds_389::user,
+  String $user = $ds_389::user,
   Optional[String] $content = undef,
   Optional[String] $source = undef,
 ) {

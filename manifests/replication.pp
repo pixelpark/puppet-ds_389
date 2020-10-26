@@ -115,7 +115,7 @@ define ds_389::replication (
   Enum['supplier','hub','consumer'] $role,
   String $suffix,
   Optional[String] $bind_dn = undef,
-  String $group = $::ds_389::group,
+  String $group = $ds_389::group,
   Boolean $init_consumers = false,
   Boolean $init_hubs = false,
   Boolean $init_suppliers = false,
@@ -124,7 +124,7 @@ define ds_389::replication (
   Integer $replica_port = 389,
   Enum['LDAP','SSL','TLS'] $replica_transport = 'LDAP',
   String $replication_user = 'Replication Manager',
-  String $server_host = $::fqdn,
+  String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Boolean $starttls = false,
   String $user = $ds_389::user,
@@ -164,7 +164,7 @@ define ds_389::replication (
 
       if $consumers {
         $consumers.each |$replica| {
-          if $replica != $name and $replica != $::fqdn {
+          if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -250,7 +250,7 @@ define ds_389::replication (
 
       if $suppliers {
         $suppliers.each |$replica| {
-          if $replica != $name and $replica != $::fqdn {
+          if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
 
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_enable.done"
             $repl_enable_command = join([
@@ -326,7 +326,7 @@ define ds_389::replication (
       }
       if $hubs {
         $hubs.each |$replica| {
-          if $replica != $name and $replica != $::fqdn {
+          if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -402,7 +402,7 @@ define ds_389::replication (
       }
       if $consumers {
         $consumers.each |$replica| {
-          if $replica != $name and $replica != $::fqdn {
+          if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',

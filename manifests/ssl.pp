@@ -23,7 +23,7 @@
 #   The bind DN to use when calling ldapmodify. Required.
 #
 # @param server_host
-#   The host to use when calling ldapmodify. Default: $::fqdn
+#   The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 #
 # @param server_port
 #   The port to use when calling ldapmodify. Default: 389
@@ -43,7 +43,7 @@ define ds_389::ssl (
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $group = $ds_389::group,
   Integer $minssf = 0,
-  String $server_host = $::fqdn,
+  String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Integer $server_ssl_port = 636,
   String $ssl_version_min = 'TLS1.1',
