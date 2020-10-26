@@ -25,6 +25,8 @@
     - [Adding baseline LDIF data](#adding-baseline-ldif-data)
 1. [Reference](#reference)
 1. [Limitations](#limitations)
+    - [Supported versions](#supported-versions)
+    - [Migrating from spacepants module](#migrating-from-spacepants-module)
 1. [Development](#development)
     - [Contributing](#contributing)
     - [Fork](#fork)
@@ -304,7 +306,13 @@ Classes and parameters are documented in [REFERENCE.md](REFERENCE.md).
 
 ## Limitations
 
+### Supported versions
+
 This module requires 389-ds version 1.4 or later. If you rely on older versions of 389-ds, you may consider using [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389) (which is no longer under active development) until you are ready to migrate to an up-to-date version.
+
+### Migrating from spacepants module
+
+Version 2.x of this module contains migration tasks for users of [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389). They will ensure that the replication status of suppliers, hubs and consumers is preserved.
 
 ## Development
 

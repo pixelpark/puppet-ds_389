@@ -198,6 +198,23 @@ define ds_389::replication (
               "&& touch ${repl_agreement_done}",
             ], ' ')
 
+            # NOTE: This ensures that the status is not lost when migrating from
+            # spacepants/puppet-ds_389 to this module. This migration path will
+            # be removed in a later version.
+            exec { "Migrate replication status for consumer ${replica}: ${name}":
+              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
+              onlyif  => "test -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done",
+              require => [
+                Exec["Add replication user: ${name}"],
+              ],
+              before  => [
+                Exec["Enable replication for consumer ${replica}: ${name}"],
+                Exec["Create replication agreement for consumer ${replica}: ${name}"],
+              ],
+            }
+
             exec { "Enable replication for consumer ${replica}: ${name}":
               command => $repl_enable_command,
               path    => $ds_389::path,
@@ -285,6 +302,23 @@ define ds_389::replication (
               "&& touch ${repl_agreement_done}",
             ], ' ')
 
+            # NOTE: This ensures that the status is not lost when migrating from
+            # spacepants/puppet-ds_389 to this module. This migration path will
+            # be removed in a later version.
+            exec { "Migrate replication status for supplier ${replica}: ${name}":
+              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/supplier_${replica}.done", # lint:ignore:140chars
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
+              onlyif  => "test -f /etc/dirsrv/slapd-${name}/supplier_${replica}.done",
+              require => [
+                Exec["Add replication user: ${name}"],
+              ],
+              before  => [
+                Exec["Enable replication for supplier ${replica}: ${name}"],
+                Exec["Create replication agreement for supplier ${replica}: ${name}"],
+              ],
+            }
+
             exec { "Enable replication for supplier ${replica}: ${name}":
               command => $repl_enable_command,
               path    => $ds_389::path,
@@ -359,6 +393,23 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # NOTE: This ensures that the status is not lost when migrating from
+            # spacepants/puppet-ds_389 to this module. This migration path will
+            # be removed in a later version.
+            exec { "Migrate replication status for hub ${replica}: ${name}":
+              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/hub_${replica}.done",
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
+              onlyif  => "test -f /etc/dirsrv/slapd-${name}/hub_${replica}.done",
+              require => [
+                Exec["Add replication user: ${name}"],
+              ],
+              before  => [
+                Exec["Enable replication for hub ${replica}: ${name}"],
+                Exec["Create replication agreement for hub ${replica}: ${name}"],
+              ],
+            }
 
             exec { "Enable replication for hub ${replica}: ${name}":
               command => $repl_enable_command,
@@ -435,6 +486,23 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # NOTE: This ensures that the status is not lost when migrating from
+            # spacepants/puppet-ds_389 to this module. This migration path will
+            # be removed in a later version.
+            exec { "Migrate replication status for consumer ${replica}: ${name}":
+              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
+              path    => $ds_389::path,
+              creates => $repl_enable_done,
+              onlyif  => "test -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done",
+              require => [
+                Exec["Add replication user: ${name}"],
+              ],
+              before  => [
+                Exec["Enable replication for consumer ${replica}: ${name}"],
+                Exec["Create replication agreement for consumer ${replica}: ${name}"],
+              ],
+            }
 
             exec { "Enable replication for consumer ${replica}: ${name}":
               command => $repl_enable_command,
