@@ -1,10 +1,10 @@
 dn: cn=encryption,cn=config
 changetype: modify
-<%- if @ssl_version_min_support -%>
+<%- if $ssl_version_min_support { -%>
 replace: sslVersionMin
-sslVersionMin: <%= @ssl_version_min %>
+sslVersionMin: <%= $ssl_version_min %>
 -
-<% end -%>
+<% } -%>
 replace: nsSSLClientAuth
 nsSSLClientAuth: off
 -
@@ -18,7 +18,7 @@ dn: cn=RSA,cn=encryption,cn=config
 changetype: add
 objectclass: top
 objectclass: nsEncryptionModule
-nsSSLPersonalitySSL: <%= @cert_name %>
+nsSSLPersonalitySSL: <%= $cert_name %>
 nsSSLActivation: on
 nsSSLToken: internal (software)
 cn: RSA
@@ -29,7 +29,7 @@ replace: nsslapd-security
 nsslapd-security: on
 -
 replace: nsslapd-minssf
-nsslapd-minssf: <%= @minssf %>
+nsslapd-minssf: <%= $minssf %>
 -
 replace: nsslapd-secureport
-nsslapd-securePort: <%= @server_ssl_port%>
+nsslapd-securePort: <%= $server_ssl_port %>

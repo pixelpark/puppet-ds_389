@@ -64,7 +64,13 @@ define ds_389::ssl (
     owner   => $user,
     group   => $group,
     mode    => '0440',
-    content => template('ds_389/ssl.erb'),
+    content => epp('ds_389/ssl.epp',{
+      cert_name               => $cert_name,
+      minssf                  => $minssf,
+      server_ssl_port         => $server_ssl_port,
+      ssl_version_min         => $ssl_version_min,
+      ssl_version_min_support => $ssl_version_min_support,
+    }),
   }
   -> exec { "Import ssl ldif: ${name}":
     command => "ldapmodify -xH ldap://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/ssl.ldif ; touch /etc/dirsrv/slapd-${name}/ssl.done", # lint:ignore:140chars

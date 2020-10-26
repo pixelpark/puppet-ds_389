@@ -11,7 +11,7 @@
 # @example Adding an ldif file when using a template.
 #   ds_389::add { 'add_example_2':
 #     server_id    => 'foo',
-#     content      => template('profiles/template.ldif.erb'),
+#     content      => epp('profiles/template.ldif.epp'),
 #     root_dn      => 'cn=Directory Manager',
 #     root_dn_pass => 'supersecure',
 #   }

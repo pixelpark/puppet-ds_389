@@ -176,7 +176,7 @@ ds_389::add { 'add_example_1':
 ```puppet
 ds_389::add { 'add_example_2':
   server_id    => 'foo',
-  content      => template('profiles/template.ldif.erb'),
+  content      => epp('profiles/template.ldif.epp'),
   root_dn      => 'cn=Directory Manager',
   root_dn_pass => 'supersecure',
 }
@@ -479,7 +479,7 @@ ds_389::modify { 'modify_example_1':
 ```puppet
 ds_389::modify { 'modify_example_2':
   server_id    => 'foo',
-  content      => template('profiles/template.ldif.erb'),
+  content      => epp('profiles/template.ldif.epp'),
   root_dn      => 'cn=Directory Manager',
   root_dn_pass => 'supersecure',
 }
