@@ -6,7 +6,7 @@ class ds_389::install {
   }
 
   exec { 'Create ldap cacerts directory':
-    command => "mkdir -p ${::ds_389::cacerts_path}",
+    command => "mkdir -p ${ds_389::cacerts_path}",
     creates => $ds_389::cacerts_path,
     path    => $ds_389::path,
   }
@@ -32,7 +32,7 @@ class ds_389::install {
   })
 
   package { $ds_389::nsstools_package_name:
-    ensure => 'installed',
+    ensure => 'present',
   }
 
   group { $ds_389::group:

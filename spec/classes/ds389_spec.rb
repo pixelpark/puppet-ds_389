@@ -7,21 +7,20 @@ describe 'ds_389' do
 
       context 'without any parameters' do
         it { is_expected.to compile }
-        it { is_expected.to contain_class('ds_389::params') }
         it { is_expected.to contain_class('ds_389::install') }
 
         it { is_expected.to contain_file('/etc/dirsrv').with_ensure('directory') }
 
         it {
           is_expected.to contain_exec('Create ldap cacerts directory').with(
-            command: '/bin/mkdir -p /etc/openldap/cacerts',
+            command: 'mkdir -p /etc/openldap/cacerts',
             creates: '/etc/openldap/cacerts',
           )
         }
 
         it {
           is_expected.to contain_package('389-ds-base').with(
-            ensure: 'installed',
+            ensure: 'present',
           ).that_requires(
             [
               'File[/etc/dirsrv]',
@@ -41,7 +40,7 @@ describe 'ds_389' do
         when 'Debian'
           it {
             is_expected.to contain_package('libnss3-tools').with(
-              ensure: 'installed',
+              ensure: 'present',
             )
           }
 
@@ -56,7 +55,7 @@ describe 'ds_389' do
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_ini_setting('dirsrv ulimit').with(
                 ensure: 'present',
@@ -66,7 +65,6 @@ describe 'ds_389' do
                 value: '8192',
               ).that_requires('Package[389-ds-base]')
             }
-
           else
             it {
               is_expected.to contain_file_line('dirsrv ulimit').with(
@@ -80,7 +78,7 @@ describe 'ds_389' do
         when 'RedHat'
           it {
             is_expected.to contain_package('nss-tools').with(
-              ensure: 'installed',
+              ensure: 'present',
             )
           }
 
@@ -95,7 +93,7 @@ describe 'ds_389' do
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_ini_setting('dirsrv ulimit').with(
                 ensure: 'present',
@@ -105,7 +103,6 @@ describe 'ds_389' do
                 value: '8192',
               ).that_requires('Package[389-ds-base]')
             }
-
           else
             it {
               is_expected.to contain_file_line('dirsrv ulimit').with(
@@ -130,19 +127,18 @@ describe 'ds_389' do
         end
 
         it { is_expected.to compile }
-        it { is_expected.to contain_class('ds_389::params') }
         it { is_expected.to contain_class('ds_389::install') }
 
         it {
           is_expected.to contain_exec('Create ldap cacerts directory').with(
-            command: '/bin/mkdir -p /custom/cacerts/path',
+            command: 'mkdir -p /custom/cacerts/path',
             creates: '/custom/cacerts/path',
           )
         }
 
         it {
           is_expected.to contain_package('389-ds-custom').with(
-            ensure: 'installed',
+            ensure: 'present',
           ).that_requires(
             [
               'File[/etc/dirsrv]',

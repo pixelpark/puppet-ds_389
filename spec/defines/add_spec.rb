@@ -8,7 +8,7 @@ describe 'ds_389::add' do
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
-          fqdn: 'foo.example.com',
+          networking: { fqdn: 'foo.example.com' },
         )
       end
 
@@ -36,7 +36,7 @@ describe 'ds_389::add' do
         it {
           is_expected.to contain_exec('Add ldif specadd: specdirectory').with(
             command: 'ldapadd -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/specadd.ldif ; touch /etc/dirsrv/slapd-specdirectory/specadd.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specadd.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/specadd.ldif]')
         }
@@ -67,7 +67,7 @@ describe 'ds_389::add' do
         it {
           is_expected.to contain_exec('Add ldif specadd: specdirectory').with(
             command: 'ldapadd -ZxH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/specadd.ldif ; touch /etc/dirsrv/slapd-specdirectory/specadd.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specadd.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/specadd.ldif]')
         }
@@ -99,7 +99,7 @@ describe 'ds_389::add' do
         it {
           is_expected.to contain_exec('Add ldif specadd: specdirectory').with(
             command: 'ldapadd -xH ldaps://foo.example.com:636 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/specadd.ldif ; touch /etc/dirsrv/slapd-specdirectory/specadd.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specadd.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/specadd.ldif]')
         }
@@ -133,7 +133,7 @@ describe 'ds_389::add' do
         it {
           is_expected.to contain_exec('Add ldif specadd: specdirectory').with(
             command: 'ldapadd -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/specadd.ldif ; touch /etc/dirsrv/slapd-specdirectory/specadd.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specadd.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/specadd.ldif]')
         }

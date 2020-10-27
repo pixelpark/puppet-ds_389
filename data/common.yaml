@@ -3,7 +3,7 @@ ds_389::cacerts_path: '/etc/openldap/cacerts'
 ds_389::group: 'dirsrv'
 ds_389::home_dir: '/usr/share/dirsrv'
 ds_389::instances: {}
-ds_389::package_ensure: 'installed'
+ds_389::package_ensure: 'present'
 ds_389::package_name: '389-ds-base'
 ds_389::path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'
 ds_389::service_type: 'systemd'

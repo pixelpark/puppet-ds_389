@@ -150,7 +150,7 @@ nsslapd-securePort: 1636
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
-          fqdn: 'foo.example.com',
+          networking: { fqdn: 'foo.example.com' },
         )
       end
 
@@ -168,7 +168,7 @@ nsslapd-securePort: 1636
         it {
           is_expected.to contain_exec('Import ssl ldif: specdirectory').with(
             command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/ssl.ldif ; touch /etc/dirsrv/slapd-specdirectory/ssl.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/ssl.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/ssl.ldif]').that_notifies(
             'Exec[Restart specdirectory to enable SSL]',
@@ -178,7 +178,7 @@ nsslapd-securePort: 1636
         case os_facts[:osfamily]
         when 'Debian'
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
                 ensure: 'file',
@@ -192,7 +192,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
                 command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -210,14 +210,14 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
                 command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
           end
         when 'RedHat'
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
                 ensure: 'file',
@@ -231,7 +231,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
                 command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -249,7 +249,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
                 command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -280,7 +280,7 @@ nsslapd-securePort: 1636
         it {
           is_expected.to contain_exec('Import ssl ldif: ldap01').with(
             command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-ldap01/ssl.ldif ; touch /etc/dirsrv/slapd-ldap01/ssl.done', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-ldap01/ssl.done',
           ).that_requires('File[/etc/dirsrv/slapd-ldap01/ssl.ldif]').that_notifies(
             'Exec[Restart ldap01 to enable SSL]',
@@ -290,7 +290,7 @@ nsslapd-securePort: 1636
         case os_facts[:osfamily]
         when 'Debian'
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
                 ensure: 'file',
@@ -304,7 +304,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
                 command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -322,14 +322,14 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
                 command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
           end
         when 'RedHat'
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
                 ensure: 'file',
@@ -343,7 +343,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
                 command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -361,7 +361,7 @@ nsslapd-securePort: 1636
             it {
               is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
                 command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/usr/bin:/usr/sbin:/bin:/sbin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }

@@ -86,7 +86,7 @@ exit 0
         case os_facts[:osfamily]
         when 'Debian'
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_service('dirsrv@specdirectory').with(
                 ensure: 'running',
@@ -115,7 +115,7 @@ exit 0
           end
         when 'RedHat'
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_service('dirsrv@specdirectory').with(
                 ensure: 'running',
@@ -161,7 +161,7 @@ exit 0
         case os_facts[:osfamily]
         when 'Debian'
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_service('dirsrv@ldap01').with(
                 ensure: 'stopped',
@@ -190,7 +190,7 @@ exit 0
           end
         when 'RedHat'
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_service('dirsrv@ldap01').with(
                 ensure: 'stopped',

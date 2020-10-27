@@ -94,7 +94,7 @@ define ds_389::instance (
   include ds_389
 
   $instance_path = "/etc/dirsrv/slapd-${server_id}"
-  $instance_template = "/etc/dirsrv/template-${name}.inf"
+  $instance_template = "/etc/dirsrv/template-${server_id}.inf"
 
   # Create instance template.
   file { $instance_template:
@@ -118,7 +118,7 @@ define ds_389::instance (
   # Create a new instance from template file.
   exec { "setup ds: ${server_id}":
     command => "dscreate from-file ${instance_template}",
-    path    => '/usr/sbin:/usr/bin:/sbin:/bin',
+    path    => $ds_389::path,
     creates => $instance_path,
     require => File[$instance_template],
     notify  => Exec["stop ${server_id} to create new token"],
@@ -130,8 +130,8 @@ define ds_389::instance (
   }
 
   if $ds_389::service_type == 'systemd' {
-    $service_stop_command = "/bin/systemctl stop dirsrv@${server_id}"
-    $service_restart_command = "/bin/systemctl restart dirsrv@${server_id}"
+    $service_stop_command = "systemctl stop dirsrv@${server_id}"
+    $service_restart_command = "systemctl restart dirsrv@${server_id}"
   }
   else {
     $service_stop_command = "service dirsrv stop ${server_id}"
@@ -180,14 +180,14 @@ define ds_389::instance (
     }
 
     exec { "Create pkcs12 cert: ${server_id}":
-      command     => "openssl pkcs12 -export -password pass:${cert_db_pass} -name ${server_host} -in ${::ds_389::ssl_dir}/${server_id}-bundle.pem -out ${::ds_389::ssl_dir}/${server_id}.p12", # lint:ignore:140chars
+      command     => "openssl pkcs12 -export -password pass:${cert_db_pass} -name ${server_host} -in ${ds_389::ssl_dir}/${server_id}-bundle.pem -out ${ds_389::ssl_dir}/${server_id}.p12", # lint:ignore:140chars
       path        => $ds_389::path,
       refreshonly => true,
       notify      => Exec["Create cert DB: ${server_id}"],
     }
 
     exec { "Create cert DB: ${server_id}":
-      command     => "pk12util -i ${::ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
+      command     => "pk12util -i ${ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
       path        => $ds_389::path,
       refreshonly => true,
       before      => Exec["Add trust for server cert: ${server_id}"],
@@ -315,7 +315,7 @@ define ds_389::instance (
 
     # Set perms on database directory.
     exec { "Set permissions on database directory: ${server_id}":
-      command     => "/bin/chown ${user}:${group} ${instance_path}",
+      command     => "chown ${user}:${group} ${instance_path}",
       path        => $ds_389::path,
       refreshonly => true,
     }
@@ -338,7 +338,7 @@ define ds_389::instance (
 
     # Remove temp files (pwd and noise).
     exec { "Clean up temp files: ${server_id}":
-      command     => "/bin/rm -f ${temp_noise_file} ${temp_pass_file}",
+      command     => "rm -f ${temp_noise_file} ${temp_pass_file}",
       path        => $ds_389::path,
       refreshonly => true,
     }
@@ -351,14 +351,14 @@ define ds_389::instance (
     path    => $ds_389::path,
     creates => "${instance_path}/${server_id}Cert.pem",
   }
-  -> file { "${::ds_389::cacerts_path}/${server_id}Cert.pem":
+  -> file { "${ds_389::cacerts_path}/${server_id}Cert.pem":
     ensure => file,
     source => "${instance_path}/${server_id}Cert.pem",
   }
 
   # Rehash certs.
   ~> exec { "Rehash cacertdir: ${server_id}":
-    command     => "${::ds_389::cacert_rehash} ${::ds_389::cacerts_path}",
+    command     => "${ds_389::cacert_rehash} ${ds_389::cacerts_path}",
     path        => $ds_389::path,
     refreshonly => true,
   }

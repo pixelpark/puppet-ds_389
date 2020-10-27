@@ -174,7 +174,7 @@ define ds_389::replication (
               'replication enable',
               "--suffix \'${suffix}\'",
               '--role=consumer',
-              "--replica-id=${id}",
+              "--replica-id=${_id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
               "&& touch ${repl_enable_done}",
@@ -278,7 +278,7 @@ define ds_389::replication (
               'replication enable',
               "--suffix \'${suffix}\'",
               '--role=master',
-              "--replica-id=${id}",
+              "--replica-id=${_id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
               "&& touch ${repl_enable_done}",
@@ -370,7 +370,7 @@ define ds_389::replication (
               'replication enable',
               "--suffix \'${suffix}\'",
               '--role=hub',
-              "--replica-id=${id}",
+              "--replica-id=${_id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
               "&& touch ${repl_enable_done}",
@@ -463,7 +463,7 @@ define ds_389::replication (
               'replication enable',
               "--suffix \'${suffix}\'",
               '--role=consumer',
-              "--replica-id=${id}",
+              "--replica-id=${_id}",
               "--bind-dn=\'${_bind_dn}\'",
               "--bind-passwd=\'${replication_pass}\'",
               "&& touch ${repl_enable_done}",
@@ -538,7 +538,7 @@ define ds_389::replication (
                 creates => $repl_init_done,
                 require => [
                   Anchor["${name}_replication_consumers"],
-                  Exec["Create replication agreement for supplier ${replica}: ${name}"],
+                  Exec["Create replication agreement for consumer ${replica}: ${name}"],
                 ],
               }
             }
@@ -566,7 +566,7 @@ define ds_389::replication (
   }
   -> exec { "Add replication user: ${name}":
     command => "ldapadd -${_opts} ${protocol}://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/replication-user.ldif && touch /etc/dirsrv/slapd-${name}/replication-user.done", # lint:ignore:140chars
-    path    => '/usr/bin:/bin',
+    path    => $ds_389::path,
     creates => "/etc/dirsrv/slapd-${name}/replication-user.done",
     require => [
       Ds_389::Ssl[$name],

@@ -10,7 +10,7 @@ describe 'ds_389::instance' do
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
-          fqdn: 'foo.example.com',
+          networking: { fqdn: 'foo.example.com' },
         )
       end
 
@@ -44,34 +44,34 @@ describe 'ds_389::instance' do
         when 'Debian'
           it {
             is_expected.to contain_exec('setup ds: specdirectory').with(
-              command: 'setup-ds --silent General.FullMachineName=foo.example.com General.SuiteSpotGroup=dirsrv General.SuiteSpotUserID=dirsrv slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=specdirectory slapd.ServerPort=389 slapd.Suffix=dc=example,dc=com', # rubocop:disable LineLength
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory',
             )
           }
 
           it {
             is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-              command: 'c_rehash /etc/openldap/cacerts',
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'openssl rehash /etc/openldap/cacerts',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: '/bin/systemctl stop dirsrv@specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl stop dirsrv@specdirectory ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
             }
 
             it {
               is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: '/bin/systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -79,7 +79,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('stop specdirectory to create new token').with(
                 command: 'service dirsrv stop specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
             }
@@ -87,7 +87,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('restart specdirectory to pick up new token').with(
                 command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -95,33 +95,33 @@ describe 'ds_389::instance' do
         when 'RedHat'
           it {
             is_expected.to contain_exec('setup ds: specdirectory').with(
-              command: 'setup-ds.pl --silent General.FullMachineName=foo.example.com General.SuiteSpotGroup=dirsrv General.SuiteSpotUserID=dirsrv slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=specdirectory slapd.ServerPort=389 slapd.Suffix=dc=example,dc=com', # rubocop:disable LineLength
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory',
             )
           }
           it {
             is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-              command: 'cacertdir_rehash /etc/openldap/cacerts',
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'openssl rehash /etc/openldap/cacerts',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: '/bin/systemctl stop dirsrv@specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl stop dirsrv@specdirectory ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
             }
 
             it {
               is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: '/bin/systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -129,7 +129,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('stop specdirectory to create new token').with(
                 command: 'service dirsrv stop specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
             }
@@ -137,7 +137,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('restart specdirectory to pick up new token').with(
                 command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -148,7 +148,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate noise file: specdirectory').with(
             command: %r{echo \d+ | sha256sum | awk '{print $1}' > /tmp/noisefile-specdirectory},
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_subscribes_to('Exec[stop specdirectory to create new token]').that_notifies(
             'Exec[Generate password file: specdirectory]',
@@ -158,7 +158,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate password file: specdirectory').with(
             command: 'echo supersecure > /tmp/passfile-specdirectory',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Create cert DB: specdirectory]')
         }
@@ -166,7 +166,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Create cert DB: specdirectory').with(
             command: 'certutil -N -d /etc/dirsrv/slapd-specdirectory -f /tmp/passfile-specdirectory',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Generate key pair: specdirectory]')
         }
@@ -174,7 +174,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate key pair: specdirectory').with(
             command: 'certutil -G -d /etc/dirsrv/slapd-specdirectory -g 4096 -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Make ca cert and add to database: specdirectory]')
         }
@@ -183,7 +183,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Make ca cert and add to database: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
             command: 'certutil -S -n "specdirectoryCA" -s "cn=specdirectoryCA,dc=foo.example.com" -x -t "CT,," -v 120 -d /etc/dirsrv/slapd-specdirectory -k rsa -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory ; sleep 2', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
             [
@@ -197,7 +197,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Add trust for CA: specdirectory').with(
             command: 'certutil -M -n "specdirectoryCA" -t CT,, -d /etc/dirsrv/slapd-specdirectory',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "specdirectoryCA" | grep "CT"',
           ).that_notifies('Exec[Export CA cert: specdirectory]')
         }
@@ -206,7 +206,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Make server cert and add to database: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
             command: 'certutil -S -n "specdirectoryCert" -m 101 -s "cn=foo.example.com" -c "specdirectoryCA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-specdirectory -k rsa -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory  ; sleep 2', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
             [
@@ -220,14 +220,14 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Add trust for server cert: specdirectory').with(
             command: 'certutil -M -n "specdirectoryCert" -t u,u,u -d /etc/dirsrv/slapd-specdirectory',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "specdirectoryCert" | grep "u,u,u"',
           ).that_notifies('Exec[Export server cert: specdirectory]')
         }
 
         it {
           is_expected.to contain_exec('Set permissions on database directory: specdirectory').with(
-            command: '/bin/chown dirsrv:dirsrv /etc/dirsrv/slapd-specdirectory',
+            command: 'chown dirsrv:dirsrv /etc/dirsrv/slapd-specdirectory',
             refreshonly: true,
           )
         }
@@ -236,7 +236,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Export CA cert: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
             command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "specdirectoryCA" -a > specdirectoryCA.pem',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specdirectoryCA.pem',
           )
         }
@@ -252,7 +252,7 @@ describe 'ds_389::instance' do
 
         it {
           is_expected.to contain_exec('Clean up temp files: specdirectory').with(
-            command: '/bin/rm -f /tmp/noisefile-specdirectory /tmp/passfile-specdirectory',
+            command: 'rm -f /tmp/noisefile-specdirectory /tmp/passfile-specdirectory',
             refreshonly: true,
           )
         }
@@ -261,7 +261,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Export server cert: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
             command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "specdirectoryCert" -a > specdirectoryCert.pem',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specdirectoryCert.pem',
           )
         }
@@ -356,14 +356,14 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('Create pkcs12 cert: specdirectory').with(
                 command: 'openssl pkcs12 -export -password pass:secret -name foo.example.com -in /etc/ssl/specdirectory-bundle.pem -out /etc/ssl/specdirectory.p12',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_notifies('Exec[Create cert DB: specdirectory]')
             }
             it {
               is_expected.to contain_exec('Create cert DB: specdirectory').with(
                 command: 'pk12util -i /etc/ssl/specdirectory.p12 -d /etc/dirsrv/slapd-specdirectory -W secret -K supersecure',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -377,14 +377,14 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('Create pkcs12 cert: specdirectory').with(
                 command: 'openssl pkcs12 -export -password pass:secret -name foo.example.com -in /etc/pki/tls/certs/specdirectory-bundle.pem -out /etc/pki/tls/certs/specdirectory.p12',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_notifies('Exec[Create cert DB: specdirectory]')
             }
             it {
               is_expected.to contain_exec('Create cert DB: specdirectory').with(
                 command: 'pk12util -i /etc/pki/tls/certs/specdirectory.p12 -d /etc/dirsrv/slapd-specdirectory -W secret -K supersecure',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -393,7 +393,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for CA0: specdirectory').with(
               command: 'certutil -M -n "Spec Intermediate Certificate" -t CT,, -d /etc/dirsrv/slapd-specdirectory',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "Spec Intermediate Certificate" | grep "CT"',
             ).that_requires('Exec[Create cert DB: specdirectory]').that_notifies('Exec[Export CA cert 0: specdirectory]')
           }
@@ -401,7 +401,7 @@ describe 'ds_389::instance' do
             is_expected.to contain_exec('Export CA cert 0: specdirectory').with(
               cwd: '/etc/dirsrv/slapd-specdirectory',
               command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "Spec Intermediate Certificate" -a > specdirectoryCA0.pem',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/specdirectoryCA0.pem',
             )
           }
@@ -415,7 +415,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for CA1: specdirectory').with(
               command: 'certutil -M -n "Spec Root Certificate" -t CT,, -d /etc/dirsrv/slapd-specdirectory',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "Spec Root Certificate" | grep "CT"',
             ).that_requires('Exec[Create cert DB: specdirectory]').that_notifies('Exec[Export CA cert 1: specdirectory]')
           }
@@ -423,7 +423,7 @@ describe 'ds_389::instance' do
             is_expected.to contain_exec('Export CA cert 1: specdirectory').with(
               cwd: '/etc/dirsrv/slapd-specdirectory',
               command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "Spec Root Certificate" -a > specdirectoryCA1.pem',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/specdirectoryCA1.pem',
             )
           }
@@ -436,7 +436,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for server cert: specdirectory').with(
               command: 'certutil -M -n "Spec Certificate" -t u,u,u -d /etc/dirsrv/slapd-specdirectory',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "Spec Certificate" | grep "u,u,u"',
             ).that_notifies('Exec[Export server cert: specdirectory]')
           }
@@ -631,7 +631,7 @@ describe 'ds_389::instance' do
 
           it {
             is_expected.to contain_exec('Set permissions on database directory: specdirectory').with(
-              command: '/bin/chown custom_user:custom_group /etc/dirsrv/slapd-specdirectory',
+              command: 'chown custom_user:custom_group /etc/dirsrv/slapd-specdirectory',
               refreshonly: true,
             )
           }
@@ -658,16 +658,16 @@ describe 'ds_389::instance' do
           when 'Debian'
             it {
               is_expected.to contain_exec('setup ds: specdirectory').with(
-                command: 'setup-ds --silent General.FullMachineName=foo.example.com General.SuiteSpotGroup=custom_group General.SuiteSpotUserID=custom_user slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=specdirectory slapd.ServerPort=389 slapd.Suffix=dc=example,dc=com', # rubocop:disable LineLength
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory',
               )
             }
 
             it {
               is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-                command: 'c_rehash /custom/cacerts/path',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'openssl rehash /custom/cacerts/path',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -675,16 +675,16 @@ describe 'ds_389::instance' do
           when 'RedHat'
             it {
               is_expected.to contain_exec('setup ds: specdirectory').with(
-                command: 'setup-ds.pl --silent General.FullMachineName=foo.example.com General.SuiteSpotGroup=custom_group General.SuiteSpotUserID=custom_user slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=specdirectory slapd.ServerPort=389 slapd.Suffix=dc=example,dc=com', # rubocop:disable LineLength
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory',
               )
             }
 
             it {
               is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-                command: 'cacertdir_rehash /custom/cacerts/path',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'openssl rehash /custom/cacerts/path',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -743,34 +743,34 @@ describe 'ds_389::instance' do
         when 'Debian'
           it {
             is_expected.to contain_exec('setup ds: ldap01').with(
-              command: 'setup-ds --silent General.FullMachineName=ldap.test.org General.SuiteSpotGroup=custom_group General.SuiteSpotUserID=custom_user slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=ldap01 slapd.ServerPort=1389 slapd.Suffix=dc=test,dc=org', # rubocop:disable LineLength
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'dscreate from-file /etc/dirsrv/template-ldap01.inf',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-ldap01',
             )
           }
 
           it {
             is_expected.to contain_exec('Rehash cacertdir: ldap01').with(
-              command: 'c_rehash /etc/openldap/cacerts',
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'openssl rehash /etc/openldap/cacerts',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '8', '9', '16.04'
+          when '10', '20.04'
             it {
               is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: '/bin/systemctl stop dirsrv@ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl stop dirsrv@ldap01 ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
 
             it {
               is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: '/bin/systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -778,7 +778,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('stop ldap01 to create new token').with(
                 command: 'service dirsrv stop ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -786,7 +786,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('restart ldap01 to pick up new token').with(
                 command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -794,34 +794,34 @@ describe 'ds_389::instance' do
         when 'RedHat'
           it {
             is_expected.to contain_exec('setup ds: ldap01').with(
-              command: 'setup-ds.pl --silent General.FullMachineName=ldap.test.org General.SuiteSpotGroup=custom_group General.SuiteSpotUserID=custom_user slapd.InstallLdifFile=none slapd.RootDN="cn=Directory Manager" slapd.RootDNPwd=supersecure slapd.ServerIdentifier=ldap01 slapd.ServerPort=1389 slapd.Suffix=dc=test,dc=org', # rubocop:disable LineLength
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'dscreate from-file /etc/dirsrv/template-ldap01.inf',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-ldap01',
             )
           }
 
           it {
             is_expected.to contain_exec('Rehash cacertdir: ldap01').with(
-              command: 'cacertdir_rehash /etc/openldap/cacerts',
-              path: '/usr/sbin:/usr/bin:/sbin:/bin',
+              command: 'openssl rehash /etc/openldap/cacerts',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
 
           case os_facts[:operatingsystemmajrelease]
-          when '7'
+          when '8'
             it {
               is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: '/bin/systemctl stop dirsrv@ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl stop dirsrv@ldap01 ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
 
             it {
               is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: '/bin/systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -829,7 +829,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('stop ldap01 to create new token').with(
                 command: 'service dirsrv stop ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -837,7 +837,7 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('restart ldap01 to pick up new token').with(
                 command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/usr/sbin:/usr/bin:/sbin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -848,7 +848,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate noise file: ldap01').with(
             command: %r{echo \d+ | sha256sum | awk '{print $1}' > /tmp/noisefile-ldap01},
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_subscribes_to('Exec[stop ldap01 to create new token]').that_notifies(
             'Exec[Generate password file: ldap01]',
@@ -858,7 +858,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate password file: ldap01').with(
             command: 'echo supersecure > /tmp/passfile-ldap01',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Create cert DB: ldap01]')
         }
@@ -866,7 +866,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Create cert DB: ldap01').with(
             command: 'certutil -N -d /etc/dirsrv/slapd-ldap01 -f /tmp/passfile-ldap01',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Generate key pair: ldap01]')
         }
@@ -874,7 +874,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Generate key pair: ldap01').with(
             command: 'certutil -G -d /etc/dirsrv/slapd-ldap01 -g 4096 -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies('Exec[Make ca cert and add to database: ldap01]')
         }
@@ -883,7 +883,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Make ca cert and add to database: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
             command: 'certutil -S -n "ldap01CA" -s "cn=ldap01CA,dc=ldap.test.org" -x -t "CT,," -v 120 -d /etc/dirsrv/slapd-ldap01 -k rsa -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01 ; sleep 2',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
             [
@@ -897,7 +897,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Add trust for CA: ldap01').with(
             command: 'certutil -M -n "ldap01CA" -t CT,, -d /etc/dirsrv/slapd-ldap01',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "ldap01CA" | grep "CT"',
           ).that_notifies('Exec[Export CA cert: ldap01]')
         }
@@ -906,7 +906,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Make server cert and add to database: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
             command: 'certutil -S -n "ldap01Cert" -m 101 -s "cn=ldap.test.org" -c "ldap01CA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-ldap01 -k rsa -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01 -8 ldap01.test.org,ldap02.test.org ; sleep 2', # rubocop:disable LineLength
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
             [
@@ -920,14 +920,14 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Add trust for server cert: ldap01').with(
             command: 'certutil -M -n "ldap01Cert" -t u,u,u -d /etc/dirsrv/slapd-ldap01',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "ldap01Cert" | grep "u,u,u"',
           ).that_notifies('Exec[Export server cert: ldap01]')
         }
 
         it {
           is_expected.to contain_exec('Set permissions on database directory: ldap01').with(
-            command: '/bin/chown custom_user:custom_group /etc/dirsrv/slapd-ldap01',
+            command: 'chown custom_user:custom_group /etc/dirsrv/slapd-ldap01',
             refreshonly: true,
           )
         }
@@ -936,7 +936,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Export CA cert: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
             command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "ldap01CA" -a > ldap01CA.pem',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-ldap01/ldap01CA.pem',
           )
         }
@@ -952,7 +952,7 @@ describe 'ds_389::instance' do
 
         it {
           is_expected.to contain_exec('Clean up temp files: ldap01').with(
-            command: '/bin/rm -f /tmp/noisefile-ldap01 /tmp/passfile-ldap01',
+            command: 'rm -f /tmp/noisefile-ldap01 /tmp/passfile-ldap01',
             refreshonly: true,
           )
         }
@@ -961,7 +961,7 @@ describe 'ds_389::instance' do
           is_expected.to contain_exec('Export server cert: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
             command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "ldap01Cert" -a > ldap01Cert.pem',
-            path: '/usr/bin:/bin',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-ldap01/ldap01Cert.pem',
           )
         }
@@ -1066,14 +1066,14 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('Create pkcs12 cert: ldap01').with(
                 command: 'openssl pkcs12 -export -password pass:secret -name ldap.test.org -in /etc/ssl/ldap01-bundle.pem -out /etc/ssl/ldap01.p12',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_notifies('Exec[Create cert DB: ldap01]')
             }
             it {
               is_expected.to contain_exec('Create cert DB: ldap01').with(
                 command: 'pk12util -i /etc/ssl/ldap01.p12 -d /etc/dirsrv/slapd-ldap01 -W secret -K supersecure',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -1087,14 +1087,14 @@ describe 'ds_389::instance' do
             it {
               is_expected.to contain_exec('Create pkcs12 cert: ldap01').with(
                 command: 'openssl pkcs12 -export -password pass:secret -name ldap.test.org -in /etc/pki/tls/certs/ldap01-bundle.pem -out /etc/pki/tls/certs/ldap01.p12',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               ).that_notifies('Exec[Create cert DB: ldap01]')
             }
             it {
               is_expected.to contain_exec('Create cert DB: ldap01').with(
                 command: 'pk12util -i /etc/pki/tls/certs/ldap01.p12 -d /etc/dirsrv/slapd-ldap01 -W secret -K supersecure',
-                path: '/usr/bin:/bin',
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 refreshonly: true,
               )
             }
@@ -1103,7 +1103,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for CA0: ldap01').with(
               command: 'certutil -M -n "Spec Intermediate Certificate" -t CT,, -d /etc/dirsrv/slapd-ldap01',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "Spec Intermediate Certificate" | grep "CT"',
             ).that_requires('Exec[Create cert DB: ldap01]').that_notifies('Exec[Export CA cert 0: ldap01]')
           }
@@ -1111,7 +1111,7 @@ describe 'ds_389::instance' do
             is_expected.to contain_exec('Export CA cert 0: ldap01').with(
               cwd: '/etc/dirsrv/slapd-ldap01',
               command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "Spec Intermediate Certificate" -a > ldap01CA0.pem',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-ldap01/ldap01CA0.pem',
             )
           }
@@ -1125,7 +1125,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for CA1: ldap01').with(
               command: 'certutil -M -n "Spec Root Certificate" -t CT,, -d /etc/dirsrv/slapd-ldap01',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "Spec Root Certificate" | grep "CT"',
             ).that_requires('Exec[Create cert DB: ldap01]').that_notifies('Exec[Export CA cert 1: ldap01]')
           }
@@ -1133,7 +1133,7 @@ describe 'ds_389::instance' do
             is_expected.to contain_exec('Export CA cert 1: ldap01').with(
               cwd: '/etc/dirsrv/slapd-ldap01',
               command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "Spec Root Certificate" -a > ldap01CA1.pem',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-ldap01/ldap01CA1.pem',
             )
           }
@@ -1146,7 +1146,7 @@ describe 'ds_389::instance' do
           it {
             is_expected.to contain_exec('Add trust for server cert: ldap01').with(
               command: 'certutil -M -n "Spec Certificate" -t u,u,u -d /etc/dirsrv/slapd-ldap01',
-              path: '/usr/bin:/bin',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "Spec Certificate" | grep "u,u,u"',
             ).that_notifies('Exec[Export server cert: ldap01]')
           }
@@ -1195,9 +1195,9 @@ describe 'ds_389::instance' do
             ).that_requires('Ds_389::Ssl[ldap01]')
           }
 
-          it { is_expected.to contain_exec('Set up replication: ldap01') }
-          it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/replication.ldif') }
-          it { is_expected.to contain_anchor('ldap01_replication_suppliers').that_requires('Exec[Set up replication: ldap01]') }
+          it { is_expected.to contain_exec('Add replication user: ldap01') }
+          it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/replication-user.ldif') }
+          it { is_expected.to contain_anchor('ldap01_replication_suppliers').that_requires('Exec[Add replication user: ldap01]') }
           it { is_expected.to contain_anchor('ldap01_replication_hubs').that_requires('Anchor[ldap01_replication_suppliers]') }
           it { is_expected.to contain_anchor('ldap01_replication_consumers').that_requires('Anchor[ldap01_replication_hubs]') }
         end

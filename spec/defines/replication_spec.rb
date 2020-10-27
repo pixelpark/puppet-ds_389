@@ -14,7 +14,6 @@ describe 'ds_389::replication' do
   # content blocks
   let(:consumer_default) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -24,24 +23,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=example,dc=com
-nsDS5ReplicaType: 2
-nsDS5Flags: 0
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaId: 65535
 '
   end
 
   let(:consumer_custom) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -51,24 +37,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=test,dc=org
-nsDS5ReplicaType: 2
-nsDS5Flags: 0
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaId: 65535
 '
   end
 
   let(:hub_default) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -78,32 +51,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=changelog5,cn=config
-changetype: add
-objectClass: top
-objectClass: extensibleObject
-cn: changelog5
-nsslapd-changelogdir: /var/lib/dirsrv/slapd-specdirectory/changelogdb
-
-dn: cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=example,dc=com
-nsDS5ReplicaType: 2
-nsDS5Flags: 1
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaPurgeDelay: 604800
-nsDS5ReplicaId: 65535
 '
   end
 
   let(:hub_custom) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -113,32 +65,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=changelog5,cn=config
-changetype: add
-objectClass: top
-objectClass: extensibleObject
-cn: changelog5
-nsslapd-changelogdir: /var/lib/dirsrv/slapd-specdirectory/changelogdb
-
-dn: cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=test,dc=org
-nsDS5ReplicaType: 2
-nsDS5Flags: 1
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaPurgeDelay: 604800
-nsDS5ReplicaId: 65535
 '
   end
 
   let(:supplier_default) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -148,32 +79,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=changelog5,cn=config
-changetype: add
-objectClass: top
-objectClass: extensibleObject
-cn: changelog5
-nsslapd-changelogdir: /var/lib/dirsrv/slapd-specdirectory/changelogdb
-
-dn: cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=example,dc=com
-nsDS5ReplicaType: 3
-nsDS5Flags: 1
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaPurgeDelay: 604800
-nsDS5ReplicaId: 1
 '
   end
 
   let(:supplier_custom) do
     'dn: cn=Replication Manager,cn=config
-changetype: add
 objectClass: inetorgperson
 objectClass: person
 objectClass: top
@@ -183,32 +93,11 @@ sn: Manager
 userPassword: supersecret
 passwordExpirationTime: 20380119031407Z
 nsIdleTimeout: 0
-
-dn: cn=changelog5,cn=config
-changetype: add
-objectClass: top
-objectClass: extensibleObject
-cn: changelog5
-nsslapd-changelogdir: /var/lib/dirsrv/slapd-specdirectory/changelogdb
-
-dn: cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
-objectClass: top
-objectClass: nsDS5replica
-objectClass: extensibleObject
-cn: replica
-nsDS5ReplicaRoot: dc=test,dc=org
-nsDS5ReplicaType: 3
-nsDS5Flags: 1
-nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
-nsDS5ReplicaPurgeDelay: 604800
-nsDS5ReplicaId: 100
 '
   end
 
   let(:consumer1_agreement) do
     'dn: cn=specdirectory to consumer1 agreement,cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to consumer1 agreement
@@ -225,7 +114,6 @@ description: replication agreement from specdirectory to consumer1
 
   let(:consumer1_agreement_custom) do
     'dn: cn=specdirectory to consumer1 agreement,cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to consumer1 agreement
@@ -242,7 +130,6 @@ description: replication agreement from specdirectory to consumer1
 
   let(:hub1_agreement) do
     'dn: cn=specdirectory to hub1 agreement,cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to hub1 agreement
@@ -259,7 +146,6 @@ description: replication agreement from specdirectory to hub1
 
   let(:hub1_agreement_custom) do
     'dn: cn=specdirectory to hub1 agreement,cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to hub1 agreement
@@ -276,7 +162,6 @@ description: replication agreement from specdirectory to hub1
 
   let(:supplier1_agreement) do
     'dn: cn=specdirectory to supplier1 agreement,cn=replica,cn="dc=example,dc=com",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to supplier1 agreement
@@ -293,7 +178,6 @@ description: replication agreement from specdirectory to supplier1
 
   let(:supplier1_agreement_custom) do
     'dn: cn=specdirectory to supplier1 agreement,cn=replica,cn="dc=test,dc=org",cn=mapping tree,cn=config
-changetype: add
 objectClass: top
 objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to supplier1 agreement
@@ -360,7 +244,7 @@ nsDS5BeginReplicaRefresh: start
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
-          fqdn: 'foo.example.com',
+          networking: { fqdn: 'foo.example.com' },
         )
       end
 
@@ -379,7 +263,7 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication-user.ldif').with(
               ensure: 'file',
               mode: '0440',
               owner: 'dirsrv',
@@ -388,14 +272,14 @@ nsDS5BeginReplicaRefresh: start
             )
           }
           it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
 
-          it { is_expected.to contain_anchor('specdirectory_replication_suppliers').that_requires('Exec[Set up replication: specdirectory]') }
+          it { is_expected.to contain_anchor('specdirectory_replication_suppliers').that_requires('Exec[Add replication user: specdirectory]') }
           it { is_expected.to contain_anchor('specdirectory_replication_hubs').that_requires('Anchor[specdirectory_replication_suppliers]') }
           it { is_expected.to contain_anchor('specdirectory_replication_consumers').that_requires('Anchor[specdirectory_replication_hubs]') }
         end
@@ -421,7 +305,7 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication-user.ldif').with(
               ensure: 'file',
               mode: '0440',
               owner: 'custom_user',
@@ -430,11 +314,11 @@ nsDS5BeginReplicaRefresh: start
             )
           }
           it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -ZxH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -ZxH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
         end
       end
@@ -455,7 +339,7 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication-user.ldif').with(
               ensure: 'file',
               mode: '0440',
               owner: 'dirsrv',
@@ -464,39 +348,35 @@ nsDS5BeginReplicaRefresh: start
             )
           }
           it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for consumer specdirectory: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'dirsrv',
-              group: 'dirsrv',
-              content: consumer1_agreement,
-            )
-          }
-          it {
-            is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1.done',
+            is_expected.to contain_exec('Enable replication for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=consumer --replica-id=65535 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done',
             ).that_requires(
               [
-                'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif]',
-                'Exec[Set up replication: specdirectory]',
+                'Exec[Add replication user: specdirectory]',
               ],
             )
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
+          it {
+            is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt create --suffix='dc=example,dc=com' --host='consumer1' --port=389 --conn-protocol=LDAP --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
+            )
+          }
+
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           context 'when initializing consumers' do
@@ -512,27 +392,16 @@ nsDS5BeginReplicaRefresh: start
               }
             end
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
             it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: consumer1_init,
-              )
-            }
-            it {
               is_expected.to contain_exec('Initialize consumer consumer1: specdirectory').with(
-                command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done', # rubocop:disable LineLength
-                path: '/usr/bin:/bin',
+                command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt init --suffix='dc=example,dc=com' 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done", # rubocop:disable LineLength
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
               ).that_requires(
                 [
-                  'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif]',
-                  'Exec[Set up replication: specdirectory]',
+                  'Exec[Create replication agreement for consumer consumer1: specdirectory]',
                 ],
               )
             }
@@ -561,7 +430,7 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication-user.ldif').with(
               ensure: 'file',
               mode: '0440',
               owner: 'custom_user',
@@ -570,34 +439,35 @@ nsDS5BeginReplicaRefresh: start
             )
           }
           it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -xH ldaps://ldap.test.org:1636 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -xH ldaps://ldap.test.org:1636 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for consumer specdirectory: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: consumer1_agreement_custom,
+            is_expected.to contain_exec('Enable replication for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 replication enable --suffix 'dc=test,dc=org' --role=consumer --replica-id=65535 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: 'ldapmodify -xH ldaps://ldap.test.org:1636 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif]')
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 repl-agmt create --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
+            )
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           context 'when initializing consumers' do
@@ -619,27 +489,16 @@ nsDS5BeginReplicaRefresh: start
               }
             end
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
             it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'custom_user',
-                group: 'custom_group',
-                content: consumer1_init_custom,
-              )
-            }
-            it {
               is_expected.to contain_exec('Initialize consumer consumer1: specdirectory').with(
-                command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done', # rubocop:disable LineLength
-                path: '/usr/bin:/bin',
+                command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt init --suffix='dc=test,dc=org' 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done", # rubocop:disable LineLength
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
               ).that_requires(
                 [
-                  'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif]',
-                  'Exec[Set up replication: specdirectory]',
+                  'Exec[Create replication agreement for consumer consumer1: specdirectory]',
                 ],
               )
             }
@@ -666,7 +525,7 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication-user.ldif').with(
               ensure: 'file',
               mode: '0440',
               owner: 'dirsrv',
@@ -675,91 +534,79 @@ nsDS5BeginReplicaRefresh: start
             )
           }
           it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for supplier specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for hub specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for consumer specdirectory: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'dirsrv',
-              group: 'dirsrv',
-              content: supplier1_agreement,
+            is_expected.to contain_exec('Enable replication for supplier supplier1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=master --replica-id=1 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for supplier supplier1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif ; touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1.done',
-            ).that_requires(
-              [
-                'File[/etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif]',
-                'Exec[Set up replication: specdirectory]',
-              ],
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt create --suffix='dc=example,dc=com' --host='supplier1' --port=389 --conn-protocol=LDAP --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done',
             )
           }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'dirsrv',
-              group: 'dirsrv',
-              content: hub1_agreement,
+            is_expected.to contain_exec('Enable replication for hub hub1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=hub --replica-id=1 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for hub hub1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/hub_hub1.ldif ; touch /etc/dirsrv/slapd-specdirectory/hub_hub1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1.done',
-            ).that_requires(
-              [
-                'File[/etc/dirsrv/slapd-specdirectory/hub_hub1.ldif]',
-                'Exec[Set up replication: specdirectory]',
-              ],
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt create --suffix='dc=example,dc=com' --host='hub1' --port=389 --conn-protocol=LDAP --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done',
             )
           }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'dirsrv',
-              group: 'dirsrv',
-              content: consumer1_agreement,
+            is_expected.to contain_exec('Enable replication for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=consumer --replica-id=1 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1.done',
-            ).that_requires(
-              [
-                'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif]',
-                'Exec[Set up replication: specdirectory]',
-              ],
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt create --suffix='dc=example,dc=com' --host='consumer1' --port=389 --conn-protocol=LDAP --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
             )
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           context 'when initializing suppliers' do
@@ -778,36 +625,21 @@ nsDS5BeginReplicaRefresh: start
               }
             end
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
             it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: supplier1_init,
-              )
-            }
-            it {
               is_expected.to contain_exec('Initialize supplier supplier1: specdirectory').with(
-                command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done', # rubocop:disable LineLength
-                path: '/usr/bin:/bin',
+                command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt init --suffix='dc=example,dc=com' 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done", # rubocop:disable LineLength
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done',
               ).that_requires(
                 [
-                  'File[/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif]',
-                  'Exec[Set up replication: specdirectory]',
+                  'Exec[Create replication agreement for supplier supplier1: specdirectory]',
                 ],
               )
             }
@@ -829,36 +661,21 @@ nsDS5BeginReplicaRefresh: start
               }
             end
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
             it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: hub1_init,
-              )
-            }
-            it {
               is_expected.to contain_exec('Initialize hub hub1: specdirectory').with(
-                command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/hub_hub1_init.done', # rubocop:disable LineLength
-                path: '/usr/bin:/bin',
+                command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt init --suffix='dc=example,dc=com' 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_init.done", # rubocop:disable LineLength
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_init.done',
               ).that_requires(
                 [
-                  'File[/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif]',
-                  'Exec[Set up replication: specdirectory]',
+                  'Exec[Create replication agreement for hub hub1: specdirectory]',
                 ],
               )
             }
@@ -880,36 +697,21 @@ nsDS5BeginReplicaRefresh: start
               }
             end
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-            it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
             it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
 
             it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: consumer1_init,
-              )
-            }
-            it {
               is_expected.to contain_exec('Initialize consumer consumer1: specdirectory').with(
-                command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done', # rubocop:disable LineLength
-                path: '/usr/bin:/bin',
+                command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt init --suffix='dc=example,dc=com' 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done", # rubocop:disable LineLength
+                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
                 creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
               ).that_requires(
                 [
-                  'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif]',
-                  'Exec[Set up replication: specdirectory]',
+                  'Exec[Create replication agreement for consumer consumer1: specdirectory]',
                 ],
               )
             }
@@ -940,91 +742,77 @@ nsDS5BeginReplicaRefresh: start
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/replication.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: supplier_custom,
-            )
-          }
-          it {
-            is_expected.to contain_exec('Set up replication: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication.ldif ; touch /etc/dirsrv/slapd-specdirectory/replication.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/replication.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication.ldif]')
+            is_expected.to contain_exec('Add replication user: specdirectory').with(
+              command: 'ldapadd -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/replication-user.ldif && touch /etc/dirsrv/slapd-specdirectory/replication-user.done', # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
+            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory.ldif') }
           it { is_expected.not_to contain_exec('Create replication agreement for supplier specdirectory: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: supplier1_agreement_custom,
+            is_expected.to contain_exec('Enable replication for supplier supplier1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=master --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for supplier supplier1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif ; touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1.done',
-            ).that_requires('File[/etc/dirsrv/slapd-specdirectory/supplier_supplier1.ldif]')
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --suffix='dc=test,dc=org' --host='supplier1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done',
+            )
           }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: hub1_agreement_custom,
+            is_expected.to contain_exec('Enable replication for hub hub1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=hub --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for hub hub1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/hub_hub1.ldif ; touch /etc/dirsrv/slapd-specdirectory/hub_hub1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1.done',
-            ).that_requires(
-              [
-                'File[/etc/dirsrv/slapd-specdirectory/hub_hub1.ldif]',
-                'Exec[Set up replication: specdirectory]',
-              ],
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --suffix='dc=test,dc=org' --host='hub1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done',
             )
           }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: consumer1_agreement_custom,
+            is_expected.to contain_exec('Enable replication for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=consumer --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done',
+            ).that_requires(
+              [
+                'Exec[Add replication user: specdirectory]',
+              ],
             )
           }
+
           it {
             is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1.done',
-            ).that_requires(
-              [
-                'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1.ldif]',
-                'Exec[Set up replication: specdirectory]',
-              ],
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
             )
           }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
         end
 
@@ -1050,36 +838,21 @@ nsDS5BeginReplicaRefresh: start
             }
           end
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: supplier1_init_custom,
-            )
-          }
-          it {
             is_expected.to contain_exec('Initialize supplier supplier1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt init --suffix='dc=test,dc=org' 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.done',
             ).that_requires(
               [
-                'File[/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif]',
-                'Exec[Set up replication: specdirectory]',
+                'Exec[Create replication agreement for supplier supplier1: specdirectory]',
               ],
             )
           }
@@ -1107,36 +880,21 @@ nsDS5BeginReplicaRefresh: start
             }
           end
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: hub1_init_custom,
-            )
-          }
-          it {
             is_expected.to contain_exec('Initialize hub hub1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/hub_hub1_init.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt init --suffix='dc=test,dc=org' 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_init.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_init.done',
             ).that_requires(
               [
-                'File[/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif]',
-                'Exec[Set up replication: specdirectory]',
+                'Exec[Create replication agreement for hub hub1: specdirectory]',
               ],
             )
           }
@@ -1164,36 +922,21 @@ nsDS5BeginReplicaRefresh: start
             }
           end
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub specdirectory: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_specdirectory_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize consumer specdirectory: specdirectory') }
 
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/supplier_supplier1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
-          it { is_expected.not_to contain_file('/etc/dirsrv/slapd-specdirectory/hub_hub1_init.ldif') }
           it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
 
           it {
-            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif').with(
-              ensure: 'file',
-              mode: '0440',
-              owner: 'custom_user',
-              group: 'custom_group',
-              content: consumer1_init_custom,
-            )
-          }
-          it {
             is_expected.to contain_exec('Initialize consumer consumer1: specdirectory').with(
-              command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif ; touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done', # rubocop:disable LineLength
-              path: '/usr/bin:/bin',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt init --suffix='dc=test,dc=org' 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
             ).that_requires(
               [
-                'File[/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.ldif]',
-                'Exec[Set up replication: specdirectory]',
+                'Exec[Create replication agreement for consumer consumer1: specdirectory]',
               ],
             )
           }
