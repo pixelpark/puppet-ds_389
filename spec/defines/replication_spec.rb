@@ -332,7 +332,7 @@ nsDS5BeginReplicaRefresh: start
               root_dn_pass: 'supersecure',
               role: 'hub',
               suffix: 'dc=example,dc=com',
-              consumers: %w[consumer1 specdirectory],
+              consumers: ['consumer1', 'specdirectory'],
             }
           end
 
@@ -423,7 +423,7 @@ nsDS5BeginReplicaRefresh: start
               replica_transport: 'SSL',
               user: 'custom_user',
               group: 'custom_group',
-              consumers: %w[consumer1 specdirectory],
+              consumers: ['consumer1', 'specdirectory'],
             }
           end
 
@@ -516,9 +516,9 @@ nsDS5BeginReplicaRefresh: start
               role: 'supplier',
               suffix: 'dc=example,dc=com',
               id: 1,
-              suppliers: %w[supplier1 specdirectory],
-              hubs: %w[hub1 specdirectory],
-              consumers: %w[consumer1 specdirectory],
+              suppliers: ['supplier1', 'specdirectory'],
+              hubs: ['hub1', 'specdirectory'],
+              consumers: ['consumer1', 'specdirectory'],
             }
           end
 
@@ -618,9 +618,9 @@ nsDS5BeginReplicaRefresh: start
                 role: 'supplier',
                 suffix: 'dc=example,dc=com',
                 id: 1,
-                suppliers: %w[supplier1 specdirectory],
-                hubs: %w[hub1 specdirectory],
-                consumers: %w[consumer1 specdirectory],
+                suppliers: ['supplier1', 'specdirectory'],
+                hubs: ['hub1', 'specdirectory'],
+                consumers: ['consumer1', 'specdirectory'],
                 init_suppliers: true,
               }
             end
@@ -654,9 +654,9 @@ nsDS5BeginReplicaRefresh: start
                 role: 'supplier',
                 suffix: 'dc=example,dc=com',
                 id: 1,
-                suppliers: %w[supplier1 specdirectory],
-                hubs: %w[hub1 specdirectory],
-                consumers: %w[consumer1 specdirectory],
+                suppliers: ['supplier1', 'specdirectory'],
+                hubs: ['hub1', 'specdirectory'],
+                consumers: ['consumer1', 'specdirectory'],
                 init_hubs: true,
               }
             end
@@ -690,9 +690,9 @@ nsDS5BeginReplicaRefresh: start
                 role: 'supplier',
                 suffix: 'dc=example,dc=com',
                 id: 1,
-                suppliers: %w[supplier1 specdirectory],
-                hubs: %w[hub1 specdirectory],
-                consumers: %w[consumer1 specdirectory],
+                suppliers: ['supplier1', 'specdirectory'],
+                hubs: ['hub1', 'specdirectory'],
+                consumers: ['consumer1', 'specdirectory'],
                 init_consumers: true,
               }
             end
@@ -733,9 +733,9 @@ nsDS5BeginReplicaRefresh: start
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
-              suppliers: %w[supplier1 specdirectory],
-              hubs: %w[hub1 specdirectory],
-              consumers: %w[consumer1 specdirectory],
+              suppliers: ['supplier1', 'specdirectory'],
+              hubs: ['hub1', 'specdirectory'],
+              consumers: ['consumer1', 'specdirectory'],
             }
           end
 
@@ -831,9 +831,9 @@ nsDS5BeginReplicaRefresh: start
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
-              suppliers: %w[supplier1 specdirectory],
-              hubs: %w[hub1 specdirectory],
-              consumers: %w[consumer1 specdirectory],
+              suppliers: ['supplier1', 'specdirectory'],
+              hubs: ['hub1', 'specdirectory'],
+              consumers: ['consumer1', 'specdirectory'],
               init_suppliers: true,
             }
           end
@@ -873,9 +873,9 @@ nsDS5BeginReplicaRefresh: start
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
-              suppliers: %w[supplier1 specdirectory],
-              hubs: %w[hub1 specdirectory],
-              consumers: %w[consumer1 specdirectory],
+              suppliers: ['supplier1', 'specdirectory'],
+              hubs: ['hub1', 'specdirectory'],
+              consumers: ['consumer1', 'specdirectory'],
               init_hubs: true,
             }
           end
@@ -915,9 +915,9 @@ nsDS5BeginReplicaRefresh: start
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
-              suppliers: %w[supplier1 specdirectory],
-              hubs: %w[hub1 specdirectory],
-              consumers: %w[consumer1 specdirectory],
+              suppliers: ['supplier1', 'specdirectory'],
+              hubs: ['hub1', 'specdirectory'],
+              consumers: ['consumer1', 'specdirectory'],
               init_consumers: true,
             }
           end

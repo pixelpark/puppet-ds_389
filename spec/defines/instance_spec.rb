@@ -656,6 +656,7 @@ describe 'ds_389::instance' do
 
           case os_facts[:osfamily]
           when 'Debian'
+            # rubocop:disable RepeatedExample
             it {
               is_expected.to contain_exec('setup ds: specdirectory').with(
                 command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
@@ -671,7 +672,6 @@ describe 'ds_389::instance' do
                 refreshonly: true,
               )
             }
-
           when 'RedHat'
             it {
               is_expected.to contain_exec('setup ds: specdirectory').with(
@@ -738,7 +738,6 @@ describe 'ds_389::instance' do
           )
         }
 
-        # rubocop:disable RepeatedExample
         case os_facts[:osfamily]
         when 'Debian'
           it {
