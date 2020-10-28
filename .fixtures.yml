@@ -2,7 +2,10 @@
 # See https://github.com/puppetlabs/puppetlabs_spec_helper#using-fixtures for details
 ---
 fixtures:
-  forge_modules:
-    concat: 'puppetlabs/concat'
-    inifile: 'puppetlabs/inifile'
-    stdlib: 'puppetlabs/stdlib'
+  repositories:
+    "concat": "git://github.com/puppetlabs/puppetlabs-concat.git"
+    "facts": "https://github.com/puppetlabs/puppetlabs-facts.git"
+    "inifile": "git://github.com/puppetlabs/puppetlabs-inifile.git"
+    "provision": "https://github.com/puppetlabs/provision.git"
+    "puppet_agent": "https://github.com/puppetlabs/puppetlabs-puppet_agent.git"
+    "stdlib": "git://github.com/puppetlabs/puppetlabs-stdlib.git"
