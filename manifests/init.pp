@@ -30,6 +30,10 @@
 # @param service_type
 #   The service manager that should be used.
 #
+# @param ssl_version_min_support
+#   Obsolete parameter, only kept for compatibility with
+#   spacepants/puppet-ds_389. Will be removed in a later version.
+#
 # @param user
 #   User account 389 ds should run as. Default: 'dirsrv'
 #

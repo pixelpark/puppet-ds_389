@@ -18,26 +18,6 @@ nsSSL3: off
 -
 replace: nsSSL2
 nsSSL2: off
-
-dn: cn=RSA,cn=encryption,cn=config
-changetype: add
-objectclass: top
-objectclass: nsEncryptionModule
-nsSSLPersonalitySSL: foo.example.com
-nsSSLActivation: on
-nsSSLToken: internal (software)
-cn: RSA
-
-dn: cn=config
-changetype: modify
-replace: nsslapd-security
-nsslapd-security: on
--
-replace: nsslapd-minssf
-nsslapd-minssf: 0
--
-replace: nsslapd-secureport
-nsslapd-securePort: 636
 '
   end
 
@@ -52,26 +32,6 @@ nsSSL3: off
 -
 replace: nsSSL2
 nsSSL2: off
-
-dn: cn=RSA,cn=encryption,cn=config
-changetype: add
-objectclass: top
-objectclass: nsEncryptionModule
-nsSSLPersonalitySSL: foo.example.com
-nsSSLActivation: on
-nsSSLToken: internal (software)
-cn: RSA
-
-dn: cn=config
-changetype: modify
-replace: nsslapd-security
-nsslapd-security: on
--
-replace: nsslapd-minssf
-nsslapd-minssf: 0
--
-replace: nsslapd-secureport
-nsslapd-securePort: 636
 '
   end
 
@@ -89,26 +49,6 @@ nsSSL3: off
 -
 replace: nsSSL2
 nsSSL2: off
-
-dn: cn=RSA,cn=encryption,cn=config
-changetype: add
-objectclass: top
-objectclass: nsEncryptionModule
-nsSSLPersonalitySSL: ldap.test.org
-nsSSLActivation: on
-nsSSLToken: internal (software)
-cn: RSA
-
-dn: cn=config
-changetype: modify
-replace: nsslapd-security
-nsslapd-security: on
--
-replace: nsslapd-minssf
-nsslapd-minssf: 128
--
-replace: nsslapd-secureport
-nsslapd-securePort: 1636
 '
   end
 
@@ -123,26 +63,6 @@ nsSSL3: off
 -
 replace: nsSSL2
 nsSSL2: off
-
-dn: cn=RSA,cn=encryption,cn=config
-changetype: add
-objectclass: top
-objectclass: nsEncryptionModule
-nsSSLPersonalitySSL: ldap.test.org
-nsSSLActivation: on
-nsSSLToken: internal (software)
-cn: RSA
-
-dn: cn=config
-changetype: modify
-replace: nsslapd-security
-nsslapd-security: on
--
-replace: nsslapd-minssf
-nsslapd-minssf: 128
--
-replace: nsslapd-secureport
-nsslapd-securePort: 1636
 '
   end
 
@@ -167,7 +87,7 @@ nsslapd-securePort: 1636
 
         it {
           is_expected.to contain_exec('Import ssl ldif: specdirectory').with(
-            command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/ssl.ldif ; touch /etc/dirsrv/slapd-specdirectory/ssl.done', # rubocop:disable LineLength
+            command: 'ldapmodify -xH ldap://foo.example.com:389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-specdirectory/ssl.ldif && touch /etc/dirsrv/slapd-specdirectory/ssl.done', # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/ssl.done',
           ).that_requires('File[/etc/dirsrv/slapd-specdirectory/ssl.ldif]').that_notifies(
@@ -279,7 +199,7 @@ nsslapd-securePort: 1636
 
         it {
           is_expected.to contain_exec('Import ssl ldif: ldap01').with(
-            command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-ldap01/ssl.ldif ; touch /etc/dirsrv/slapd-ldap01/ssl.done', # rubocop:disable LineLength
+            command: 'ldapmodify -xH ldap://ldap.test.org:1389 -D "cn=Directory Manager" -w supersecure -f /etc/dirsrv/slapd-ldap01/ssl.ldif && touch /etc/dirsrv/slapd-ldap01/ssl.done', # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-ldap01/ssl.done',
           ).that_requires('File[/etc/dirsrv/slapd-ldap01/ssl.ldif]').that_notifies(

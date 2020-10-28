@@ -51,7 +51,6 @@ define ds_389::ssl (
 ) {
   include ds_389
 
-  $ssl_version_min_support = $ds_389::ssl_version_min_support
   if $ds_389::service_type == 'systemd' {
     $service_restart_command = "systemctl restart dirsrv@${name}"
   }
@@ -59,25 +58,80 @@ define ds_389::ssl (
     $service_restart_command = "service dirsrv restart ${name}"
   }
 
+  $security_enable_done = "/etc/dirsrv/slapd-${name}/ssl_enable.done"
+  $security_enable_command = join([
+    'dsconf',
+    "-D \'${root_dn}\'",
+    "-w \'${root_dn_pass}\'",
+    "ldap://${server_host}:${server_port}",
+    'config replace',
+    "nsslapd-securePort=${server_ssl_port}",
+    'nsslapd-security=on',
+    "nsslapd-minssf=${minssf}",
+    'nsslapd-SSLclientAuth=off',
+    "&& touch ${security_enable_done}",
+  ], ' ')
+
+  $security_config_done = "/etc/dirsrv/slapd-${name}/ssl_config.done"
+  $security_config_command = join([
+    'dsconf',
+    "-D \'${root_dn}\'",
+    "-w \'${root_dn_pass}\'",
+    "ldap://${server_host}:${server_port}",
+    'security rsa set',
+    '--tls-allow-rsa-certificates on',
+    '--nss-token "internal (software)"',
+    "--nss-cert-name ${cert_name}",
+#   "--tls-protocol-min ${ssl_version_min}",
+    "&& touch ${security_config_done}",
+  ], ' ')
+
+  # NOTE: This ensures that the status is not lost when migrating from
+  # spacepants/puppet-ds_389 to this module. This migration path will
+  # be removed in a later version.
+  exec { "Migrate SSL status: ${name}":
+    command => "touch ${security_enable_done} && touch ${security_config_done}",
+    path    => $ds_389::path,
+    creates => $security_enable_done,
+    onlyif  => "test -f /etc/dirsrv/slapd-${name}/ssl.done",
+    before  => [
+      Exec["Enable security: ${name}"],
+      Exec["Configure security parameters: ${name}"],
+    ],
+  }
+
+  # XXX: Neither sslVersionMin nor --tls-protocol-min work with dsconf, so
+  # we still have to use ldif to configure some parameters.
   file { "/etc/dirsrv/slapd-${name}/ssl.ldif":
     ensure  => file,
     owner   => $user,
     group   => $group,
     mode    => '0440',
     content => epp('ds_389/ssl.epp',{
-      cert_name               => $cert_name,
-      minssf                  => $minssf,
-      server_ssl_port         => $server_ssl_port,
-      ssl_version_min         => $ssl_version_min,
-      ssl_version_min_support => $ssl_version_min_support,
+      ssl_version_min => $ssl_version_min,
     }),
   }
   -> exec { "Import ssl ldif: ${name}":
-    command => "ldapmodify -xH ldap://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/ssl.ldif ; touch /etc/dirsrv/slapd-${name}/ssl.done", # lint:ignore:140chars
+    command => "ldapmodify -xH ldap://${server_host}:${server_port} -D \"${root_dn}\" -w ${root_dn_pass} -f /etc/dirsrv/slapd-${name}/ssl.ldif && touch /etc/dirsrv/slapd-${name}/ssl.done", # lint:ignore:140chars
     path    => $ds_389::path,
     creates => "/etc/dirsrv/slapd-${name}/ssl.done",
+    require => File["/etc/dirsrv/slapd-${name}/ssl.ldif"],
+    notify  => Exec["Restart ${name} to enable SSL"],
   }
-  ~> exec { "Restart ${name} to enable SSL":
+  -> exec { "Enable security: ${name}":
+    command => $security_enable_command,
+    path    => $ds_389::path,
+    creates => $security_enable_done,
+    notify  => Exec["Restart ${name} to enable SSL"],
+  }
+  -> exec { "Configure security parameters: ${name}":
+    command => $security_config_command,
+    path    => $ds_389::path,
+    creates => $security_config_done,
+    notify  => Exec["Restart ${name} to enable SSL"],
+  }
+
+  exec { "Restart ${name} to enable SSL":
     command     => "${service_restart_command} ; sleep 2",
     path        => $ds_389::path,
     refreshonly => true,
