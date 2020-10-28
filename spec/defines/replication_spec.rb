@@ -377,6 +377,14 @@ nsDS5BeginReplicaRefresh: start
             )
           }
 
+          it {
+            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
+              command: 'true',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
 
           context 'when initializing consumers' do
@@ -465,6 +473,14 @@ nsDS5BeginReplicaRefresh: start
               command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 repl-agmt create --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
+            )
+          }
+
+          it {
+            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
+              command: 'true',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
             )
           }
 
@@ -605,6 +621,14 @@ nsDS5BeginReplicaRefresh: start
             )
           }
 
+          it {
+            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
+              command: 'true',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+
           it { is_expected.not_to contain_exec('Initialize supplier supplier1: specdirectory') }
           it { is_expected.not_to contain_exec('Initialize hub hub1: specdirectory') }
           it { is_expected.not_to contain_exec('Initialize consumer consumer1: specdirectory') }
@@ -736,6 +760,7 @@ nsDS5BeginReplicaRefresh: start
               suppliers: ['supplier1', 'specdirectory'],
               hubs: ['hub1', 'specdirectory'],
               consumers: ['consumer1', 'specdirectory'],
+              excluded_attributes: ['authorityRevocationList', 'accountUnlockTime', 'memberof'],
             }
           end
 
@@ -772,6 +797,14 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
+            is_expected.to contain_exec('Update replication agreement for supplier supplier1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to supplier1 agreement'", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+
+          it {
             is_expected.to contain_exec('Enable replication for hub hub1: specdirectory').with(
               command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=hub --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_enable.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
@@ -792,6 +825,14 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
+            is_expected.to contain_exec('Update replication agreement for hub hub1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to hub1 agreement'", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+
+          it {
             is_expected.to contain_exec('Enable replication for consumer consumer1: specdirectory').with(
               command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=consumer --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_enable.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
@@ -808,6 +849,14 @@ nsDS5BeginReplicaRefresh: start
               command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
+            )
+          }
+
+          it {
+            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
             )
           }
 

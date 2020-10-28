@@ -151,6 +151,12 @@ define ds_389::replication (
     $_opts = 'xH'
   }
 
+  if $excluded_attributes {
+    $attribute_list = join($excluded_attributes, ' ')
+  } else {
+    $attribute_list = undef
+  }
+
   case $role {
     'consumer': {
       $type = 2
@@ -165,6 +171,7 @@ define ds_389::replication (
       if $consumers {
         $consumers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
+            # Command to enable replication for the specified suffix.
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -180,6 +187,7 @@ define ds_389::replication (
               "&& touch ${repl_enable_done}",
             ], ' ')
 
+            # Command to create a replication agreement between these hosts.
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
             $repl_agreement_command = join([
               'dsconf',
@@ -197,6 +205,22 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # Command to update parameters of the replication agreement.
+            if ($attribute_list) {
+              $repl_update_command = join([
+                'dsconf',
+                "-D \'${root_dn}\'",
+                "-w \'${root_dn_pass}\'",
+                "${protocol}://${server_host}:${server_port}",
+                'repl-agmt set',
+                "--suffix=\'${suffix}\'",
+                "--frac-list=\'${attribute_list}\'",
+                "\'${name} to ${replica} agreement\'",
+              ], ' ')
+            } else {
+              $repl_update_command = 'true'
+            }
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -227,6 +251,11 @@ define ds_389::replication (
               command => $repl_agreement_command,
               path    => $ds_389::path,
               creates => $repl_agreement_done,
+            }
+            ~> exec { "Update replication agreement for consumer ${replica}: ${name}":
+              command     => $repl_update_command,
+              path        => $ds_389::path,
+              refreshonly => true,
             }
 
             if $init_consumers {
@@ -268,7 +297,7 @@ define ds_389::replication (
       if $suppliers {
         $suppliers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
-
+            # Command to enable replication for the specified suffix.
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -284,6 +313,7 @@ define ds_389::replication (
               "&& touch ${repl_enable_done}",
             ], ' ')
 
+            # Command to create a replication agreement between these hosts.
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_agreement.done"
             $repl_agreement_command = join([
               'dsconf',
@@ -301,6 +331,22 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # Command to update parameters of the replication agreement.
+            if ($attribute_list) {
+              $repl_update_command = join([
+                'dsconf',
+                "-D \'${root_dn}\'",
+                "-w \'${root_dn_pass}\'",
+                "${protocol}://${server_host}:${server_port}",
+                'repl-agmt set',
+                "--suffix=\'${suffix}\'",
+                "--frac-list=\'${attribute_list}\'",
+                "\'${name} to ${replica} agreement\'",
+              ], ' ')
+            } else {
+              $repl_update_command = 'true'
+            }
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -332,6 +378,11 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
+            ~> exec { "Update replication agreement for supplier ${replica}: ${name}":
+              command     => $repl_update_command,
+              path        => $ds_389::path,
+              refreshonly => true,
+            }
 
             if $init_suppliers {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.done"
@@ -361,6 +412,7 @@ define ds_389::replication (
       if $hubs {
         $hubs.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
+            # Command to enable replication for the specified suffix.
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -376,6 +428,7 @@ define ds_389::replication (
               "&& touch ${repl_enable_done}",
             ], ' ')
 
+            # Command to create a replication agreement between these hosts.
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_agreement.done"
             $repl_agreement_command = join([
               'dsconf',
@@ -393,6 +446,22 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # Command to update parameters of the replication agreement.
+            if ($attribute_list) {
+              $repl_update_command = join([
+                'dsconf',
+                "-D \'${root_dn}\'",
+                "-w \'${root_dn_pass}\'",
+                "${protocol}://${server_host}:${server_port}",
+                'repl-agmt set',
+                "--suffix=\'${suffix}\'",
+                "--frac-list=\'${attribute_list}\'",
+                "\'${name} to ${replica} agreement\'",
+              ], ' ')
+            } else {
+              $repl_update_command = 'true'
+            }
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -424,6 +493,11 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
+            ~> exec { "Update replication agreement for hub ${replica}: ${name}":
+              command     => $repl_update_command,
+              path        => $ds_389::path,
+              refreshonly => true,
+            }
 
             if $init_hubs {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_init.done"
@@ -454,6 +528,7 @@ define ds_389::replication (
       if $consumers {
         $consumers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
+            # Command to enable replication for the specified suffix.
             $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
             $repl_enable_command = join([
               'dsconf',
@@ -469,6 +544,7 @@ define ds_389::replication (
               "&& touch ${repl_enable_done}",
             ], ' ')
 
+            # Command to create a replication agreement between these hosts.
             $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
             $repl_agreement_command = join([
               'dsconf',
@@ -486,6 +562,22 @@ define ds_389::replication (
               "\'${name} to ${replica} agreement\'",
               "&& touch ${repl_agreement_done}",
             ], ' ')
+
+            # Command to update parameters of the replication agreement.
+            if ($attribute_list) {
+              $repl_update_command = join([
+                'dsconf',
+                "-D \'${root_dn}\'",
+                "-w \'${root_dn_pass}\'",
+                "${protocol}://${server_host}:${server_port}",
+                'repl-agmt set',
+                "--suffix=\'${suffix}\'",
+                "--frac-list=\'${attribute_list}\'",
+                "\'${name} to ${replica} agreement\'",
+              ], ' ')
+            } else {
+              $repl_update_command = 'true'
+            }
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -518,6 +610,11 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
+            ~> exec { "Update replication agreement for consumer ${replica}: ${name}":
+              command     => $repl_update_command,
+              path        => $ds_389::path,
+              refreshonly => true,
+            }
 
             if $init_consumers {
               $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
@@ -546,10 +643,6 @@ define ds_389::replication (
         }
       }
     }
-  }
-
-  if $excluded_attributes {
-    $attribute_list = join($excluded_attributes, ' ')
   }
 
   # Add replication user.
