@@ -54,6 +54,12 @@ describe 'ds_389' do
             ).that_requires('Group[dirsrv]')
           }
 
+          it {
+            is_expected.not_to contain_package('389-ds').with(
+              provider: 'dnfmodule',
+            )
+          }
+
           case os_facts[:operatingsystemmajrelease]
           when '10', '20.04'
             it {
@@ -94,6 +100,13 @@ describe 'ds_389' do
 
           case os_facts[:operatingsystemmajrelease]
           when '8'
+            it {
+              is_expected.to contain_package('389-ds').with(
+                ensure: '1.4',
+                enable_only: 'true',
+                provider: 'dnfmodule',
+              )
+            }
             it {
               is_expected.to contain_ini_setting('dirsrv ulimit').with(
                 ensure: 'present',
