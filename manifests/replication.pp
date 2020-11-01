@@ -204,7 +204,6 @@ define ds_389::replication (
     'replication set',
     "--suffix=\'${suffix}\'",
     "--repl-purge-delay=\'${purge_delay}\'",
-    "\'${name} to %s agreement\'",
   ], ' ')
 
   $_repl_init_done = "/etc/dirsrv/slapd-${name}/%s_%s_init.done"
@@ -242,7 +241,7 @@ define ds_389::replication (
             $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = sprintf($_repl_update_command, $replica)
+            $repl_update_command = $_repl_update_command
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -274,7 +273,7 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
-            ~> exec { "Update replication agreement for consumer ${replica}: ${name}":
+            ~> exec { "Update replication config for consumer ${replica}: ${name}":
               command     => $repl_update_command,
               path        => $ds_389::path,
               refreshonly => true,
@@ -319,7 +318,7 @@ define ds_389::replication (
             $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = sprintf($_repl_update_command, $replica)
+            $repl_update_command = $_repl_update_command
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -351,7 +350,7 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
-            ~> exec { "Update replication agreement for supplier ${replica}: ${name}":
+            ~> exec { "Update replication config for supplier ${replica}: ${name}":
               command     => $repl_update_command,
               path        => $ds_389::path,
               refreshonly => true,
@@ -385,7 +384,7 @@ define ds_389::replication (
             $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = sprintf($_repl_update_command, $replica)
+            $repl_update_command = $_repl_update_command
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -417,7 +416,7 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
-            ~> exec { "Update replication agreement for hub ${replica}: ${name}":
+            ~> exec { "Update replication config for hub ${replica}: ${name}":
               command     => $repl_update_command,
               path        => $ds_389::path,
               refreshonly => true,
@@ -452,7 +451,7 @@ define ds_389::replication (
             $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = sprintf($_repl_update_command, $replica)
+            $repl_update_command = $_repl_update_command
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -485,7 +484,7 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_agreement_done,
             }
-            ~> exec { "Update replication agreement for consumer ${replica}: ${name}":
+            ~> exec { "Update replication config for consumer ${replica}: ${name}":
               command     => $repl_update_command,
               path        => $ds_389::path,
               refreshonly => true,

@@ -378,8 +378,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -477,8 +477,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 replication set --suffix='dc=test,dc=org' --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 replication set --suffix='dc=test,dc=org' --repl-purge-delay='604800'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -622,8 +622,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -798,8 +798,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for supplier supplier1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999' 'specdirectory to supplier1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for supplier supplier1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -826,8 +826,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for hub hub1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999' 'specdirectory to hub1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for hub hub1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -854,8 +854,8 @@ nsDS5BeginReplicaRefresh: start
           }
 
           it {
-            is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+            is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication set --suffix='dc=test,dc=org' --repl-purge-delay='9999'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
