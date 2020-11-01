@@ -379,7 +379,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: 'true',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt set --suffix='dc=example,dc=com'  --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -478,7 +478,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: 'true',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 repl-agmt set --suffix='dc=test,dc=org'  --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -623,7 +623,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: 'true',
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 repl-agmt set --suffix='dc=example,dc=com'  --repl-purge-delay='604800' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -754,6 +754,7 @@ nsDS5BeginReplicaRefresh: start
               server_port: 1389,
               replica_port: 1636,
               replica_transport: 'SSL',
+              purge_delay: 9999,
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
@@ -798,7 +799,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for supplier supplier1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to supplier1 agreement'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' --repl-purge-delay='9999' 'specdirectory to supplier1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -826,7 +827,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for hub hub1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to hub1 agreement'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' --repl-purge-delay='9999' 'specdirectory to hub1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -854,7 +855,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt set --suffix='dc=test,dc=org' --frac-list='authorityRevocationList accountUnlockTime memberof' --repl-purge-delay='9999' 'specdirectory to consumer1 agreement'", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )

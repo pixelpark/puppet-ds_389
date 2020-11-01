@@ -152,7 +152,8 @@ define ds_389::replication (
   }
 
   if $excluded_attributes {
-    $attribute_list = join($excluded_attributes, ' ')
+    $_attribute_list = join($excluded_attributes, ' ')
+    $attribute_list = "--frac-list=\'${_attribute_list}\'"
   } else {
     $attribute_list = undef
   }
@@ -207,20 +208,17 @@ define ds_389::replication (
             ], ' ')
 
             # Command to update parameters of the replication agreement.
-            if ($attribute_list) {
-              $repl_update_command = join([
-                'dsconf',
-                "-D \'${root_dn}\'",
-                "-w \'${root_dn_pass}\'",
-                "${protocol}://${server_host}:${server_port}",
-                'repl-agmt set',
-                "--suffix=\'${suffix}\'",
-                "--frac-list=\'${attribute_list}\'",
-                "\'${name} to ${replica} agreement\'",
-              ], ' ')
-            } else {
-              $repl_update_command = 'true'
-            }
+            $repl_update_command = join([
+              'dsconf',
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              'repl-agmt set',
+              "--suffix=\'${suffix}\'",
+              $attribute_list,
+              "--repl-purge-delay=\'${purge_delay}\'",
+              "\'${name} to ${replica} agreement\'",
+            ], ' ')
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -333,20 +331,17 @@ define ds_389::replication (
             ], ' ')
 
             # Command to update parameters of the replication agreement.
-            if ($attribute_list) {
-              $repl_update_command = join([
-                'dsconf',
-                "-D \'${root_dn}\'",
-                "-w \'${root_dn_pass}\'",
-                "${protocol}://${server_host}:${server_port}",
-                'repl-agmt set',
-                "--suffix=\'${suffix}\'",
-                "--frac-list=\'${attribute_list}\'",
-                "\'${name} to ${replica} agreement\'",
-              ], ' ')
-            } else {
-              $repl_update_command = 'true'
-            }
+            $repl_update_command = join([
+              'dsconf',
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              'repl-agmt set',
+              "--suffix=\'${suffix}\'",
+              $attribute_list,
+              "--repl-purge-delay=\'${purge_delay}\'",
+              "\'${name} to ${replica} agreement\'",
+            ], ' ')
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -448,20 +443,17 @@ define ds_389::replication (
             ], ' ')
 
             # Command to update parameters of the replication agreement.
-            if ($attribute_list) {
-              $repl_update_command = join([
-                'dsconf',
-                "-D \'${root_dn}\'",
-                "-w \'${root_dn_pass}\'",
-                "${protocol}://${server_host}:${server_port}",
-                'repl-agmt set',
-                "--suffix=\'${suffix}\'",
-                "--frac-list=\'${attribute_list}\'",
-                "\'${name} to ${replica} agreement\'",
-              ], ' ')
-            } else {
-              $repl_update_command = 'true'
-            }
+            $repl_update_command = join([
+              'dsconf',
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              'repl-agmt set',
+              "--suffix=\'${suffix}\'",
+              $attribute_list,
+              "--repl-purge-delay=\'${purge_delay}\'",
+              "\'${name} to ${replica} agreement\'",
+            ], ' ')
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -564,20 +556,17 @@ define ds_389::replication (
             ], ' ')
 
             # Command to update parameters of the replication agreement.
-            if ($attribute_list) {
-              $repl_update_command = join([
-                'dsconf',
-                "-D \'${root_dn}\'",
-                "-w \'${root_dn_pass}\'",
-                "${protocol}://${server_host}:${server_port}",
-                'repl-agmt set',
-                "--suffix=\'${suffix}\'",
-                "--frac-list=\'${attribute_list}\'",
-                "\'${name} to ${replica} agreement\'",
-              ], ' ')
-            } else {
-              $repl_update_command = 'true'
-            }
+            $repl_update_command = join([
+              'dsconf',
+              "-D \'${root_dn}\'",
+              "-w \'${root_dn_pass}\'",
+              "${protocol}://${server_host}:${server_port}",
+              'repl-agmt set',
+              "--suffix=\'${suffix}\'",
+              $attribute_list,
+              "--repl-purge-delay=\'${purge_delay}\'",
+              "\'${name} to ${replica} agreement\'",
+            ], ' ')
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
