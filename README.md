@@ -104,7 +104,7 @@ ds_389::instance { 'example':
 
 ### Plugins
 
-If you need to enable or disable some if the 386 DS plugins, just pass a hash:
+If you need to enable or disable some of the 386 DS plugins, just pass a hash:
 
 ```puppet
 ds_389::instance { 'example':
