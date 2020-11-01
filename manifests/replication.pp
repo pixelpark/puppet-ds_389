@@ -182,6 +182,7 @@ define ds_389::replication (
     "-w \'${root_dn_pass}\'",
     "${protocol}://${server_host}:${server_port}",
     'repl-agmt create',
+    $attribute_list,
     "--suffix=\'${suffix}\'",
     "--host=\'%s\'",
     "--port=${replica_port}",
@@ -194,14 +195,14 @@ define ds_389::replication (
   ], ' ')
 
   # Command to update parameters of the replication agreement.
+  # TODO: Should be refactored to allow parameters to be changed.
   $_repl_update_command = join([
     'dsconf',
     "-D \'${root_dn}\'",
     "-w \'${root_dn_pass}\'",
     "${protocol}://${server_host}:${server_port}",
-    'repl-agmt set',
+    'replication set',
     "--suffix=\'${suffix}\'",
-    $attribute_list,
     "--repl-purge-delay=\'${purge_delay}\'",
     "\'${name} to %s agreement\'",
   ], ' ')
