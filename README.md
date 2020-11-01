@@ -341,7 +341,7 @@ This module requires 389-ds version 1.4 or later. If you rely on older versions 
 
 ### Migrating from spacepants module
 
-Version 2.x of this module contains migration tasks for users of [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389). They will ensure that the replication status of suppliers, hubs and consumers is preserved.
+Version 2.x of this module contains migration tasks for users of [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389). They will ensure that the SSL status as well as the replication status of suppliers, hubs and consumers is preserved. However, it is strongly recommended to setup a test environment or at least run Puppet Agent with `--noop` when migrating to this module.
 
 ## Development
 
