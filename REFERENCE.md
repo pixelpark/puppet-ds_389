@@ -19,6 +19,7 @@
 * [`ds_389::add`](#ds_389add): Adds an ldif file to a 389 ds instance.
 * [`ds_389::instance`](#ds_389instance): Manages a 389 ds instance.
 * [`ds_389::modify`](#ds_389modify): Adds an ldif modify file to a 389 ds instance.
+* [`ds_389::plugin`](#ds_389plugin): Manages a plugin for a 389 ds instance.
 * [`ds_389::replication`](#ds_389replication): Sets up replication for a 389 ds instance.
 * [`ds_389::schema`](#ds_389schema): Adds a schema extension ldif file to a 389 ds instance.
 * [`ds_389::service`](#ds_389service): Manages the service for a 389 ds instance.
@@ -104,6 +105,13 @@ Data type: `String`
 
 The service manager that should be used.
 
+##### `ssl_version_min_support`
+
+Data type: `Boolean`
+
+Obsolete parameter, only kept for compatibility with
+spacepants/puppet-ds_389. Will be removed in a later version.
+
 ##### `user`
 
 Data type: `String`
@@ -137,12 +145,6 @@ Data type: `String`
 ##### `ssl_dir`
 
 Data type: `Stdlib::Absolutepath`
-
-
-
-##### `ssl_version_min_support`
-
-Data type: `Boolean`
 
 
 
@@ -355,7 +357,15 @@ Default value: `0`
 
 Data type: `Optional[Hash]`
 
-A hash of ldif modify files. See modify.pp. Optional. Optional.
+A hash of ldif modify files. See modify.pp. Optional.
+
+Default value: ``undef``
+
+##### `plugins`
+
+Data type: `Optional[Hash]`
+
+A hash of plugins to enable or disable. See plugin.pp. Optional.
 
 Default value: ``undef``
 
@@ -585,6 +595,89 @@ Data type: `String`
 The owner of the created ldif file. Default: `$ds_389::user`
 
 Default value: `$ds_389::user`
+
+### `ds_389::plugin`
+
+Manages a plugin for a 389 ds instance.
+
+#### Examples
+
+##### Enable a plugin with required params.
+
+```puppet
+ds_389::plugin { 'memberof':
+  server_id    => 'foo',
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecure',
+}
+```
+
+##### Disable a plugin when using all params.
+
+```puppet
+ds_389::plugin { 'memberof':
+  ensure       => 'disabled',
+  server_id    => 'foo',
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecure',
+  server_host  => 'foo.example.com',
+  server_port  => 1389,
+}
+```
+
+#### Parameters
+
+The following parameters are available in the `ds_389::plugin` defined type.
+
+##### `ensure`
+
+Data type: `Enum['enabled','disabled']`
+
+The desired state of the plugin. Default: 'enabled'
+
+Default value: `'enabled'`
+
+##### `protocol`
+
+Data type: `Enum['ldap','ldaps']`
+
+The protocol to use when calling ldapadd. Default: 'ldap'
+
+Default value: `'ldap'`
+
+##### `root_dn_pass`
+
+Data type: `Variant[String,Sensitive[String]]`
+
+The password to use when calling ldapadd. Required.
+
+##### `root_dn`
+
+Data type: `String`
+
+The bind DN to use when calling ldapadd. Required.
+
+##### `server_host`
+
+Data type: `String`
+
+The host to use when calling ldapadd. Default: `$facts['networking']['fqdn']`
+
+Default value: `$facts['networking']['fqdn']`
+
+##### `server_id`
+
+Data type: `String`
+
+The 389 ds instance name. Required.
+
+##### `server_port`
+
+Data type: `Integer`
+
+The port to use when calling ldapadd. Default: 389
+
+Default value: `389`
 
 ### `ds_389::replication`
 

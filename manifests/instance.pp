@@ -28,7 +28,10 @@
 #   The minimum security strength for connections. Default: 0
 #
 # @param modify_ldifs
-#   A hash of ldif modify files. See modify.pp. Optional. Optional.
+#   A hash of ldif modify files. See modify.pp. Optional.
+#
+# @param plugins
+#   A hash of plugins to enable or disable. See plugin.pp. Optional.
 #
 # @param replication
 #   A replication config hash. See replication.pp. Optional.
@@ -85,6 +88,7 @@ define ds_389::instance (
   Optional[Hash] $add_ldifs = undef,
   Optional[Hash] $base_load_ldifs = undef,
   Optional[Hash] $modify_ldifs = undef,
+  Optional[Hash] $plugins = undef,
   Optional[Hash] $replication = undef,
   Optional[Hash] $schema_extensions = undef,
   Optional[Hash] $ssl = undef,
@@ -405,6 +409,20 @@ define ds_389::instance (
   }
   else {
     $_starttls = false
+  }
+
+  # Manage plugins.
+  if $plugins {
+    $plugins.each |$plugin_name, $plugin_state| {
+      ds_389::plugin { $plugin_name:
+        ensure       => $plugin_state,
+        server_id    => $server_id,
+        root_dn      => $root_dn,
+        root_dn_pass => $root_dn_pass,
+        server_host  => $server_host,
+        server_port  => $server_port,
+      }
+    }
   }
 
   # Setup replication.

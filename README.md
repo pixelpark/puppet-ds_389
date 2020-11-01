@@ -14,6 +14,7 @@
     - [Instances](#instances)
     - [Initialize suffix](#initialize-suffix)
     - [SSL](#ssl)
+    - [Plugins](#plugins)
     - [Replication overview](#replication-overview)
     - [Replication consumer](#replication-consumer)
     - [Replication hub](#replication-hub)
@@ -98,6 +99,34 @@ ds_389::instance { 'example':
     ],
     'cert_name'      => 'Certificate nickname goes here',
   },
+}
+```
+
+### Plugins
+
+If you need to enable or disable some if the 386 DS plugins, just pass a hash:
+
+```puppet
+ds_389::instance { 'example':
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecret',
+  suffix       => 'dc=example,dc=com',
+  cert_db_pass => 'secret',
+  server_id    => $facts['networking']['hostname'],
+  plugins      => {
+    'memberof'      => 'enabled',
+    'posix-winsync' => 'disabled',
+  },
+}
+```
+
+You can also declare those separately, by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password.
+
+```puppet
+ds_389::plugin { 'memberof':
+  server_id    => 'example',
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecret',
 }
 ```
 
