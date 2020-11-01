@@ -163,7 +163,7 @@ root_password = <%= $root_dn_pass %>
 # secure_port (int)
 # Description: Sets the TCP port the instance uses for TLS-secured LDAP connections (LDAPS).
 # Default value: 636 
-;secure_port = 636
+secure_port = <%= $server_ssl_port %>
 
 # self_sign_cert (bool)
 # Description: Sets whether the setup creates a self-signed certificate and enables TLS encryption during the installation. This is not suitable for production, but it enables administrators to use TLS right after the installation. You can replace the self-signed certificate with a certificate issued by a Certificate Authority.
