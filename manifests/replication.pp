@@ -158,6 +158,66 @@ define ds_389::replication (
     $attribute_list = undef
   }
 
+  # Command to enable replication for the specified suffix.
+  $_repl_enable_done = "/etc/dirsrv/slapd-${name}/%s_%s_enable.done"
+  $_repl_enable_command = join([
+    'dsconf',
+    "-D \'${root_dn}\'",
+    "-w \'${root_dn_pass}\'",
+    "${protocol}://${server_host}:${server_port}",
+    'replication enable',
+    "--suffix \'${suffix}\'",
+    '--role=%s',
+    '--replica-id=%s',
+    "--bind-dn=\'${_bind_dn}\'",
+    "--bind-passwd=\'${replication_pass}\'",
+    '&& touch %s',
+  ], ' ')
+
+  # Command to create a replication agreement between these hosts.
+  $_repl_agreement_done = "/etc/dirsrv/slapd-${name}/%s_%s_agreement.done"
+  $_repl_agreement_command = join([
+    'dsconf',
+    "-D \'${root_dn}\'",
+    "-w \'${root_dn_pass}\'",
+    "${protocol}://${server_host}:${server_port}",
+    'repl-agmt create',
+    "--suffix=\'${suffix}\'",
+    "--host=\'%s\'",
+    "--port=${replica_port}",
+    "--conn-protocol=${replica_transport}",
+    "--bind-dn=\'${_bind_dn}\'",
+    "--bind-passwd=\'${replication_pass}\'",
+    '--bind-method=SIMPLE',
+    "\'${name} to %s agreement\'",
+    '&& touch %s',
+  ], ' ')
+
+  # Command to update parameters of the replication agreement.
+  $_repl_update_command = join([
+    'dsconf',
+    "-D \'${root_dn}\'",
+    "-w \'${root_dn_pass}\'",
+    "${protocol}://${server_host}:${server_port}",
+    'repl-agmt set',
+    "--suffix=\'${suffix}\'",
+    $attribute_list,
+    "--repl-purge-delay=\'${purge_delay}\'",
+    "\'${name} to %s agreement\'",
+  ], ' ')
+
+  $_repl_init_done = "/etc/dirsrv/slapd-${name}/%s_%s_init.done"
+  $_repl_init_command = join([
+  'dsconf',
+  "-D \'${root_dn}\'",
+  "-w \'${root_dn_pass}\'",
+  "${protocol}://${server_host}:${server_port}",
+  'repl-agmt init',
+  "--suffix=\'${suffix}\'",
+  "\'${name} to %s agreement\'",
+  '&& touch %s',
+  ], ' ')
+
   case $role {
     'consumer': {
       $type = 2
@@ -173,52 +233,15 @@ define ds_389::replication (
         $consumers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
-            $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
-            $repl_enable_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'replication enable',
-              "--suffix \'${suffix}\'",
-              '--role=consumer',
-              "--replica-id=${_id}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              "&& touch ${repl_enable_done}",
-            ], ' ')
+            $repl_enable_done = sprintf($_repl_enable_done, 'consumer', $replica)
+            $repl_enable_command = sprintf($_repl_enable_command, 'consumer', $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
-            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
-            $repl_agreement_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt create',
-              "--suffix=\'${suffix}\'",
-              "--host=\'${replica}\'",
-              "--port=${replica_port}",
-              "--conn-protocol=${replica_transport}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              '--bind-method=SIMPLE',
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_agreement_done}",
-            ], ' ')
+            $repl_agreement_done = sprintf($_repl_agreement_done, 'consumer', $replica)
+            $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt set',
-              "--suffix=\'${suffix}\'",
-              $attribute_list,
-              "--repl-purge-delay=\'${purge_delay}\'",
-              "\'${name} to ${replica} agreement\'",
-            ], ' ')
+            $repl_update_command = sprintf($_repl_update_command, $replica)
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -257,17 +280,8 @@ define ds_389::replication (
             }
 
             if $init_consumers {
-              $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
-              $repl_init_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt init',
-              "--suffix=\'${suffix}\'",
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_init_done}",
-              ], ' ')
+              $repl_init_done = sprintf($_repl_init_done, 'consumer', $replica)
+              $repl_init_command = sprintf($_repl_init_command, $replica, $repl_init_done)
 
               exec { "Initialize consumer ${replica}: ${name}":
                 command => $repl_init_command,
@@ -296,52 +310,15 @@ define ds_389::replication (
         $suppliers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
-            $repl_enable_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_enable.done"
-            $repl_enable_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'replication enable',
-              "--suffix \'${suffix}\'",
-              '--role=master',
-              "--replica-id=${_id}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              "&& touch ${repl_enable_done}",
-            ], ' ')
+            $repl_enable_done = sprintf($_repl_enable_done, 'supplier', $replica)
+            $repl_enable_command = sprintf($_repl_enable_command, 'master', $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
-            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_agreement.done"
-            $repl_agreement_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt create',
-              "--suffix=\'${suffix}\'",
-              "--host=\'${replica}\'",
-              "--port=${replica_port}",
-              "--conn-protocol=${replica_transport}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              '--bind-method=SIMPLE',
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_agreement_done}",
-            ], ' ')
+            $repl_agreement_done = sprintf($_repl_agreement_done, 'supplier', $replica)
+            $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt set',
-              "--suffix=\'${suffix}\'",
-              $attribute_list,
-              "--repl-purge-delay=\'${purge_delay}\'",
-              "\'${name} to ${replica} agreement\'",
-            ], ' ')
+            $repl_update_command = sprintf($_repl_update_command, $replica)
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -380,17 +357,8 @@ define ds_389::replication (
             }
 
             if $init_suppliers {
-              $repl_init_done = "/etc/dirsrv/slapd-${name}/supplier_${replica}_init.done"
-              $repl_init_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt init',
-              "--suffix=\'${suffix}\'",
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_init_done}",
-              ], ' ')
+              $repl_init_done = sprintf($_repl_init_done, 'supplier', $replica)
+              $repl_init_command = sprintf($_repl_init_command, $replica, $repl_init_done)
 
               exec { "Initialize supplier ${replica}: ${name}":
                 command => $repl_init_command,
@@ -408,52 +376,15 @@ define ds_389::replication (
         $hubs.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
-            $repl_enable_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_enable.done"
-            $repl_enable_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'replication enable',
-              "--suffix \'${suffix}\'",
-              '--role=hub',
-              "--replica-id=${_id}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              "&& touch ${repl_enable_done}",
-            ], ' ')
+            $repl_enable_done = sprintf($_repl_enable_done, 'hub', $replica)
+            $repl_enable_command = sprintf($_repl_enable_command, 'hub', $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
-            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_agreement.done"
-            $repl_agreement_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt create',
-              "--suffix=\'${suffix}\'",
-              "--host=\'${replica}\'",
-              "--port=${replica_port}",
-              "--conn-protocol=${replica_transport}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              '--bind-method=SIMPLE',
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_agreement_done}",
-            ], ' ')
+            $repl_agreement_done = sprintf($_repl_agreement_done, 'hub', $replica)
+            $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt set',
-              "--suffix=\'${suffix}\'",
-              $attribute_list,
-              "--repl-purge-delay=\'${purge_delay}\'",
-              "\'${name} to ${replica} agreement\'",
-            ], ' ')
+            $repl_update_command = sprintf($_repl_update_command, $replica)
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -492,17 +423,8 @@ define ds_389::replication (
             }
 
             if $init_hubs {
-              $repl_init_done = "/etc/dirsrv/slapd-${name}/hub_${replica}_init.done"
-              $repl_init_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt init',
-              "--suffix=\'${suffix}\'",
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_init_done}",
-              ], ' ')
+              $repl_init_done = sprintf($_repl_init_done, 'hub', $replica)
+              $repl_init_command = sprintf($_repl_init_command, $replica, $repl_init_done)
 
               exec { "Initialize hub ${replica}: ${name}":
                 command => $repl_init_command,
@@ -521,52 +443,15 @@ define ds_389::replication (
         $consumers.each |$replica| {
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
-            $repl_enable_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_enable.done"
-            $repl_enable_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'replication enable',
-              "--suffix \'${suffix}\'",
-              '--role=consumer',
-              "--replica-id=${_id}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              "&& touch ${repl_enable_done}",
-            ], ' ')
+            $repl_enable_done = sprintf($_repl_enable_done, 'consumer', $replica)
+            $repl_enable_command = sprintf($_repl_enable_command, 'consumer', $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
-            $repl_agreement_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_agreement.done"
-            $repl_agreement_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt create',
-              "--suffix=\'${suffix}\'",
-              "--host=\'${replica}\'",
-              "--port=${replica_port}",
-              "--conn-protocol=${replica_transport}",
-              "--bind-dn=\'${_bind_dn}\'",
-              "--bind-passwd=\'${replication_pass}\'",
-              '--bind-method=SIMPLE',
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_agreement_done}",
-            ], ' ')
+            $repl_agreement_done = sprintf($_repl_agreement_done, 'consumer', $replica)
+            $repl_agreement_command = sprintf($_repl_agreement_command, $replica, $replica, $repl_agreement_done)
 
             # Command to update parameters of the replication agreement.
-            $repl_update_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt set',
-              "--suffix=\'${suffix}\'",
-              $attribute_list,
-              "--repl-purge-delay=\'${purge_delay}\'",
-              "\'${name} to ${replica} agreement\'",
-            ], ' ')
+            $repl_update_command = sprintf($_repl_update_command, $replica)
 
             # NOTE: This ensures that the status is not lost when migrating from
             # spacepants/puppet-ds_389 to this module. This migration path will
@@ -606,17 +491,8 @@ define ds_389::replication (
             }
 
             if $init_consumers {
-              $repl_init_done = "/etc/dirsrv/slapd-${name}/consumer_${replica}_init.done"
-              $repl_init_command = join([
-              'dsconf',
-              "-D \'${root_dn}\'",
-              "-w \'${root_dn_pass}\'",
-              "${protocol}://${server_host}:${server_port}",
-              'repl-agmt init',
-              "--suffix=\'${suffix}\'",
-              "\'${name} to ${replica} agreement\'",
-              "&& touch ${repl_init_done}",
-              ], ' ')
+              $repl_init_done = sprintf($_repl_init_done, 'consumer', $replica)
+              $repl_init_command = sprintf($_repl_init_command, $replica, $repl_init_done)
 
               exec { "Initialize consumer ${replica}: ${name}":
                 command => $repl_init_command,
