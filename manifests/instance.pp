@@ -423,6 +423,8 @@ define ds_389::instance (
         root_dn_pass => $root_dn_pass,
         server_host  => $server_host,
         server_port  => $server_port,
+        require      => Service["dirsrv@${server_id}"],
+        before       => Anchor["${name}_ldif_modify"],
       }
     }
   }
