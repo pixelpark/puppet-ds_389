@@ -415,9 +415,28 @@ define ds_389::instance (
 
   # Manage plugins.
   if $plugins {
-    $plugins.each |$plugin_name, $plugin_state| {
+    $plugins.each |$plugin_name, $plugin_config| {
+      # A hash may contain optional plugin configuration.
+      if ($plugin_config =~ Hash) {
+        if ('ensure' in $plugin_config) {
+          $_plugin_state = $plugin_config['ensure']
+        } else {
+          $_plugin_state = 'enabled'
+        }
+
+        if ('options' in $plugin_config) {
+          $_plugin_options = $plugin_config['options']
+        } else {
+          $_plugin_options = []
+        }
+      } else {
+        $_plugin_state = $plugin_config
+        $_plugin_options = []
+      }
+
       ds_389::plugin { $plugin_name:
-        ensure       => $plugin_state,
+        ensure       => $_plugin_state,
+        options      => $_plugin_options,
         server_id    => $server_id,
         root_dn      => $root_dn,
         root_dn_pass => $root_dn_pass,

@@ -24,11 +24,15 @@ describe 'ds_389::plugin' do
         it { is_expected.to compile }
 
         it {
-          is_expected.to contain_exec('Set plugin specplugin to enabled: specdirectory').with(
+          is_expected.to contain_exec('Set plugin specplugin state to enabled: specdirectory').with(
             command: "rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_disabled.done; dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://foo.example.com:389 plugin specplugin enable && touch /etc/dirsrv/slapd-specdirectory/plugin_specplugin_enabled.done", # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/plugin_specplugin_enabled.done',
           )
+        }
+
+        it {
+          is_expected.not_to contain_file('/etc/dirsrv/slapd-${name}/plugin_specplugin_options')
         }
       end
 
@@ -45,17 +49,27 @@ describe 'ds_389::plugin' do
         it { is_expected.to compile }
 
         it {
-          is_expected.to contain_exec('Set plugin specplugin to disabled: specdirectory').with(
+          is_expected.to contain_exec('Set plugin specplugin state to disabled: specdirectory').with(
             command: "rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_enabled.done; dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://foo.example.com:389 plugin specplugin disable && touch /etc/dirsrv/slapd-specdirectory/plugin_specplugin_disabled.done", # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/plugin_specplugin_disabled.done',
           )
+        }
+
+        it {
+          is_expected.not_to contain_file('/etc/dirsrv/slapd-${name}/plugin_specplugin_options')
         }
       end
 
       context 'with all params' do
         let(:params) do
           {
+            ensure: 'enabled',
+            options: [
+              'set --groupattr uniqueMember',
+              'set --allbackends on',
+              'set --skipnested off',
+            ],
             server_id: 'specdirectory',
             root_dn: 'cn=Directory Manager',
             root_dn_pass: 'supersecret',
@@ -67,11 +81,44 @@ describe 'ds_389::plugin' do
         it { is_expected.to compile }
 
         it {
-          is_expected.to contain_exec('Set plugin specplugin to enabled: specdirectory').with(
+          is_expected.to contain_exec('Set plugin specplugin state to enabled: specdirectory').with(
             command: "rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_disabled.done; dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://ldap.test.org:1389 plugin specplugin enable && touch /etc/dirsrv/slapd-specdirectory/plugin_specplugin_enabled.done", # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/plugin_specplugin_enabled.done',
           )
+        }
+
+        it {
+          is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/plugin_specplugin_options').with(
+            ensure: 'file',
+            mode: '0440',
+            owner: 'dirsrv',
+            group: 'dirsrv',
+            content: '[set --groupattr uniqueMember, set --allbackends on, set --skipnested off]',
+          )
+        }
+
+        it {
+          is_expected.to contain_exec('Set plugin specplugin options (set --groupattr uniqueMember): specdirectory').with(
+            command: "dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://ldap.test.org:1389 plugin specplugin set --groupattr uniqueMember || rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_options", # rubocop:disable LineLength
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+            refreshonly: true,
+          ).that_subscribes_to('File[/etc/dirsrv/slapd-specdirectory/plugin_specplugin_options]')
+          #).that_requires('Exec[Set plugin specplugin state to enabled: specdirectory]').that_subscribes_to('File[/etc/dirsrv/slapd-specdirectory/plugin_specplugin_options]')
+        }
+        it {
+          is_expected.to contain_exec('Set plugin specplugin options (set --allbackends on): specdirectory').with(
+            command: "dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://ldap.test.org:1389 plugin specplugin set --allbackends on || rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_options", # rubocop:disable LineLength
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+            refreshonly: true,
+          ).that_subscribes_to('File[/etc/dirsrv/slapd-specdirectory/plugin_specplugin_options]')
+        }
+        it {
+          is_expected.to contain_exec('Set plugin specplugin options (set --skipnested off): specdirectory').with(
+            command: "dsconf -D 'cn=Directory Manager' -w 'supersecret' ldap://ldap.test.org:1389 plugin specplugin set --skipnested off || rm -f /etc/dirsrv/slapd-specdirectory/plugin_specplugin_options", # rubocop:disable LineLength
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+            refreshonly: true,
+          ).that_subscribes_to('File[/etc/dirsrv/slapd-specdirectory/plugin_specplugin_options]')
         }
       end
     end

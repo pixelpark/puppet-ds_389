@@ -20,6 +20,10 @@
 # @param ensure
 #   The desired state of the plugin. Default: 'enabled'
 #
+# @param options
+#   An array containing additional plugin options. See `man 8 dsconf` for a
+#   complete list. Optional.
+#
 # @param protocol
 #   The protocol to use when calling ldapadd. Default: 'ldap'
 #
@@ -43,6 +47,7 @@ define ds_389::plugin (
   String $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
   Enum['enabled','disabled'] $ensure = 'enabled',
+  Array $options = [],
   String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Enum['ldap','ldaps'] $protocol = 'ldap',
@@ -75,9 +80,49 @@ define ds_389::plugin (
     "&& touch ${plugin_done}",
   ], ' ')
 
-  exec { "Set plugin ${name} to ${ensure}: ${server_id}":
+  exec { "Set plugin ${name} state to ${ensure}: ${server_id}":
     command => $plugin_command,
     path    => $ds_389::path,
     creates => $plugin_done,
+  }
+
+  if ($options and $ensure == 'enabled') {
+    # Store all options in a file. This way a change can be detected and
+    # updated options can be applied.
+    $plugin_options_file = "/etc/dirsrv/slapd-${server_id}/plugin_${name}_options"
+    file { $plugin_options_file:
+      ensure  => file,
+      owner   => $ds_389::user,
+      group   => $ds_389::group,
+      mode    => '0440',
+      content => inline_epp('<%= $options %>', {options => $options}),
+    }
+
+    # Enable every option individually. This way conflicts can be avoided
+    # and failures are easier to track down.
+    $options.each |$option| {
+      # Command to set the specified plugin option.
+      $plugin_option_command = join([
+        'dsconf',
+        "-D \'${root_dn}\'",
+        "-w \'${root_dn_pass}\'",
+        "${protocol}://${server_host}:${server_port}",
+        'plugin',
+        $name,
+        $option,
+        # Remove the options file in case of failure. This way a failed command
+        # is retried and if the error persists the user is encouraged to fix it.
+        "|| rm -f ${plugin_options_file}",
+      ], ' ')
+
+      exec { "Set plugin ${name} options (${option}): ${server_id}":
+        command     => $plugin_option_command,
+        path        => $ds_389::path,
+        refreshonly => true,
+        subscribe   => File[$plugin_options_file],
+        require     => Exec["Set plugin ${name} state to ${ensure}: ${server_id}"],
+      }
+
+    }
   }
 }

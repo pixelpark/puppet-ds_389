@@ -637,6 +637,15 @@ The desired state of the plugin. Default: 'enabled'
 
 Default value: `'enabled'`
 
+##### `options`
+
+Data type: `Array`
+
+An array containing additional plugin options. See `man 8 dsconf` for a
+complete list. Optional.
+
+Default value: `[]`
+
 ##### `protocol`
 
 Data type: `Enum['ldap','ldaps']`

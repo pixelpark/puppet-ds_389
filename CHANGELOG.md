@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+* Add new parameter `$options` to provide additional plugin configuration
+
 ### Fixed
 * Fix resource ordering: skip plugins on error
 
