@@ -22,7 +22,8 @@
 #
 # @param options
 #   An array containing additional plugin options. See `man 8 dsconf` for a
-#   complete list. Optional.
+#   complete list. Note that several options can only be applied once,
+#   further attempts will fail. Optional.
 #
 # @param protocol
 #   The protocol to use when calling ldapadd. Default: 'ldap'
@@ -103,6 +104,9 @@ define ds_389::plugin (
     $options.each |$option| {
       # Command to set the specified plugin option.
       $plugin_option_command = join([
+        # Rename the options file. This way a failed command is retried
+        # and if the error persists the user is encouraged to fix it.
+        "mv -f ${plugin_options_file} ${plugin_options_file}.error &&",
         'dsconf',
         "-D \'${root_dn}\'",
         "-w \'${root_dn_pass}\'",
@@ -110,9 +114,8 @@ define ds_389::plugin (
         'plugin',
         $name,
         $option,
-        # Remove the options file in case of failure. This way a failed command
-        # is retried and if the error persists the user is encouraged to fix it.
-        "|| rm -f ${plugin_options_file}",
+        # If the plugin command succeeds, move the options file back.
+        "&& mv -f ${plugin_options_file}.error ${plugin_options_file}",
       ], ' ')
 
       exec { "Set plugin ${name} options (${option}): ${server_id}":

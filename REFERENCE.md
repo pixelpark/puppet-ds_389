@@ -642,7 +642,8 @@ Default value: `'enabled'`
 Data type: `Array`
 
 An array containing additional plugin options. See `man 8 dsconf` for a
-complete list. Optional.
+complete list. Note that several options can only be applied once,
+further attempts will fail. Optional.
 
 Default value: `[]`
 
