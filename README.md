@@ -24,6 +24,7 @@
     - [Modifying existing LDIF data](#modifying-existing-ldif-data)
     - [Adding new LDIF data](#adding-new-ldif-data)
     - [Adding baseline LDIF data](#adding-baseline-ldif-data)
+    - [Recreate SSL certs](#recreate-ssl-certs)
 1. [Reference](#reference)
 1. [Limitations](#limitations)
     - [Supported versions](#supported-versions)
@@ -357,6 +358,48 @@ ds_389::instance { 'example':
 ```
 
 Note that while you can declare these via the `ds_389::add` define, puppet's resource load ordering may potentially result in it attempting to add the ldif before a configuration change that it requires.
+
+### Recreate SSL certs
+
+Currently some manual steps are required to regenerate the SSL certificates. A new Bolt task would be nice, PRs welcome. :)
+
+As always, create a backup before attempting this procedure.
+
+Run the following shell commands as root to remove the existing certificates:
+
+```shell
+export LDAP_INSTANCE="my-instance-name"
+
+test -d /etc/dirsrv/slapd-${LDAP_INSTANCE} || exit 1
+
+systemctl stop dirsrv@${LDAP_INSTANCE}
+
+dd if=/dev/random count=1024 | sha256sum | awk '{print $1}' > /tmp/noisefile-${LDAP_INSTANCE}
+cut -d: -f2 /etc/dirsrv/slapd-${LDAP_INSTANCE}/pin.txt > /tmp/passfile-${LDAP_INSTANCE}
+
+rm -f /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}CA.cnf \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}CA-Key.pem \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}CA.p12 \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}CA.pem \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}Cert-Key.pem \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/${LDAP_INSTANCE}Cert.pem \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/ssl_config.done \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/ssl.done \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/ssl_enable.done \
+  /etc/dirsrv/slapd-${LDAP_INSTANCE}/ssl.ldif
+
+certutil -D -n "${LDAP_INSTANCE}Cert" -d /etc/dirsrv/slapd-${LDAP_INSTANCE}
+certutil -D -n "${LDAP_INSTANCE}CA" -d /etc/dirsrv/slapd-${LDAP_INSTANCE}
+```
+
+Next edit `/etc/dirsrv/slapd-${LDAP_INSTANCE}/dse.ldif` and remove the following entries including their attributes:
+
+```
+  cn=AES,cn=encrypted attribute keys,cn=database_name,cn=ldbm database,cn=plugins,cn=config
+  cn=3DES,cn=encrypted attribute keys,cn=database_name,cn=ldbm database,cn=plugins,cn=config
+```
+
+Afterwards run Puppet to regenerate both the CA and the server certificates.
 
 ## Reference
 

@@ -5,8 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+This release fixes a major bug when using self-signed certificates. In previous
+releases the internal CA certificate was created without the required
+extensions. As a result, using LDAPS could lead to various SSL errors. Note
+that only *new* CA certificates will benefit from this bugfix. The README
+contains instructions to purge the existing SSL certificates.
+
+### Added
+* Add new dependency: camptocamp/openssl
+
+### Changed
+* Use camptocamp/openssl to generate CA certificates
 
 ### Fixed
+* Fix broken CA certificates by including the required CA extensions
 * Fix missing newline in cert bundle
 
 ## [2.1.0] - 2020-11-07

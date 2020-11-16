@@ -242,6 +242,14 @@ define ds_389::instance (
       $sans = undef
     }
 
+    # Certificate attributes and filenames.
+    $ca_key = "${instance_path}/${server_id}CA-Key.pem"
+    $ca_conf = "${instance_path}/${server_id}CA.cnf"
+    $ca_cert = "${instance_path}/${server_id}CA.pem"
+    $ca_p12 = "${instance_path}/${server_id}CA.p12"
+    $ca_nickname = "${server_id}CA"
+    $ssl_cert_name = "${server_id}Cert"
+
     # Create noise file.
     $temp_noise_file = "/tmp/noisefile-${server_id}"
     $temp_pass_file = "/tmp/passfile-${server_id}"
@@ -254,7 +262,7 @@ define ds_389::instance (
       notify      => Exec["Generate password file: ${server_id}"],
     }
 
-    # Create pwd file.
+    # Create password file.
     exec { "Generate password file: ${server_id}":
       command     => "echo ${root_dn_pass} > ${temp_pass_file}",
       path        => $ds_389::path,
@@ -262,28 +270,72 @@ define ds_389::instance (
       notify      => Exec["Create cert DB: ${server_id}"],
     }
 
-    # Create cert db.
-    exec { "Create cert DB: ${server_id}":
+    # Create nss db.
+    -> exec { "Create cert DB: ${server_id}":
       command     => "certutil -N -d ${instance_path} -f ${temp_pass_file}",
       path        => $ds_389::path,
       refreshonly => true,
-      notify      => Exec["Generate key pair: ${server_id}"],
+      notify      => Ssl_pkey["Generate CA private key: ${server_id}"],
     }
 
-    # Generate key pair.
-    exec { "Generate key pair: ${server_id}":
-      command     => "certutil -G -d ${instance_path} -g 4096 -z ${temp_noise_file} -f ${temp_pass_file}",
-      path        => $ds_389::path,
-      refreshonly => true,
-      notify      => Exec["Make ca cert and add to database: ${server_id}"],
+    # Generate the private key for the CA.
+    -> ssl_pkey { "Generate CA private key: ${server_id}":
+      ensure => 'present',
+      name   => $ca_key,
+      size   => 4096,
     }
 
-    # Make certs and add to database.
-    exec { "Make ca cert and add to database: ${server_id}":
+    # Fix permissions of CA private key.
+    -> file { "Fix permissions of CA private key: ${server_id}":
+      ensure  => 'present',
+      name    => $ca_key,
+      mode    => '0640',
+      owner   => $user,
+      group   => $group,
+    }
+
+    # Create the OpenSSL config template for the CA cert.
+    -> file { "Create CA config: ${server_id}":
+      ensure  => 'present',
+      name    => $ca_conf,
+      content => epp('ds_389/openssl_ca.cnf.epp',{
+        dc => $facts['networking']['fqdn'],
+        cn => $ca_nickname,
+      }),
+    }
+
+    # Create the CA certificate.
+    -> x509_cert { "Create CA cert: ${server_id}":
+      ensure      => 'present',
+      name        => $ca_cert,
+      template    => $ca_conf,
+      private_key => $ca_key,
+      days        => 3650,
+      req_ext     => false,
+    }
+
+    # Export CA cert to pkcs12, which is required for import into nss db.
+    # TODO: openssl::export::pkcs12 cannot be used, because it does not support
+    # a password file (yet).
+    -> exec { "Prepare CA cert for import (pkcs12): ${server_id}":
       cwd         => $instance_path,
-      command     => "certutil -S -n \"${server_id}CA\" -s \"cn=${server_id}CA,dc=${server_host}\" -x -t \"CT,,\" -v 120 -d ${instance_path} -k rsa -z ${temp_noise_file} -f ${temp_pass_file} ; sleep 2", # lint:ignore:140chars
+      command     => "openssl pkcs12 -export -in ${ca_cert} -inkey ${ca_key} -out ${ca_p12} -password file:${temp_pass_file}",
       path        => $ds_389::path,
       refreshonly => true,
+      subscribe   => [
+        X509_cert["Create CA cert: ${server_id}"],
+      ],
+    }
+
+    # Import CA cert+key into nss db.
+    -> exec { "Import CA cert: ${server_id}":
+      cwd         => $instance_path,
+      command     => "pk12util -i ${ca_p12} -d sql:${instance_path} -k ${temp_pass_file} -w ${temp_pass_file}",
+      path        => $ds_389::path,
+      refreshonly => true,
+      subscribe   => [
+        X509_cert["Create CA cert: ${server_id}"],
+      ],
       notify      => [
         Exec["Make server cert and add to database: ${server_id}"],
         Exec["Clean up temp files: ${server_id}"],
@@ -291,18 +343,48 @@ define ds_389::instance (
       ],
     }
 
-    exec { "Add trust for CA: ${server_id}":
-      command => "certutil -M -n \"${server_id}CA\" -t CT,, -d ${instance_path}",
-      path    => $ds_389::path,
-      unless  => "certutil -L -d ${instance_path} | grep \"${server_id}CA\" | grep \"CT\"",
-      notify  => Exec["Export CA cert: ${server_id}"],
+    # Change nickname to make it clear that this is the CA cert.
+    -> exec { "Fix name of imported CA: ${server_id}":
+      cwd         => $instance_path,
+      command     => "certutil --rename -n \"${ca_nickname} - ${facts['networking']['fqdn']}\" --new-n \"${ca_nickname}\" -d sql:${instance_path}", # lint:ignore:140chars
+      path        => $ds_389::path,
+      refreshonly => true,
+      subscribe   => [
+        X509_cert["Create CA cert: ${server_id}"],
+      ],
     }
 
-    # Make server cert and add to database.
-    $ssl_cert_name = "${server_id}Cert"
+    # Configure trust attributes.
+    -> exec { "Add trust for CA: ${server_id}":
+      command     => "certutil -M -n \"${ca_nickname}\" -t CT,C,C -d ${instance_path} -f ${temp_pass_file}",
+      path        => $ds_389::path,
+      unless     => "certutil -L -d ${instance_path} | grep \"${ca_nickname}\" | grep \"CTu,Cu,Cu\"",
+      subscribe   => [
+        X509_cert["Create CA cert: ${server_id}"],
+      ],
+      notify      => Exec["Export CA cert: ${server_id}"],
+    }
+
+    # Export ca cert.
+    -> exec { "Export CA cert: ${server_id}":
+      cwd     => $instance_path,
+      command => "certutil -d ${instance_path} -L -n \"${ca_nickname}\" -a > ${ca_cert}",
+      path    => $ds_389::path,
+      creates => $ca_cert,
+    }
+
+    # Copy ca cert to openldap.
+    -> file { "${ds_389::cacerts_path}/${server_id}CA.pem":
+      ensure  => file,
+      source  => $ca_cert,
+      require => Exec["Export CA cert: ${server_id}"],
+      notify  => Exec["Rehash cacertdir: ${server_id}"],
+    }
+
+    # Create server cert and add to database.
     exec { "Make server cert and add to database: ${server_id}":
       cwd         => $instance_path,
-      command     => "certutil -S -n \"${ssl_cert_name}\" -m 101 -s \"cn=${server_host}\" -c \"${server_id}CA\" -t \"u,u,u\" -v 120 -d ${instance_path} -k rsa -z ${temp_noise_file} -f ${temp_pass_file} ${sans} ; sleep 2", # lint:ignore:140chars
+      command     => "certutil -S -n \"${ssl_cert_name}\" -m 101 -s \"cn=${server_host}\" -c \"${ca_nickname}\" -t \"u,u,u\" -v 120 -d ${instance_path} -k rsa -z ${temp_noise_file} -f ${temp_pass_file} ${sans} && sleep 2", # lint:ignore:140chars
       path        => $ds_389::path,
       refreshonly => true,
       notify      => [
@@ -312,7 +394,8 @@ define ds_389::instance (
       ],
     }
 
-    exec { "Add trust for server cert: ${server_id}":
+    # Configure trust attributes.
+    -> exec { "Add trust for server cert: ${server_id}":
       command => "certutil -M -n \"${ssl_cert_name}\" -t u,u,u -d ${instance_path}",
       path    => $ds_389::path,
       unless  => "certutil -L -d ${instance_path} | grep \"${ssl_cert_name}\" | grep \"u,u,u\"",
@@ -320,30 +403,14 @@ define ds_389::instance (
     }
 
     # Set perms on database directory.
-    exec { "Set permissions on database directory: ${server_id}":
+    -> exec { "Set permissions on database directory: ${server_id}":
       command     => "chown ${user}:${group} ${instance_path}",
       path        => $ds_389::path,
       refreshonly => true,
     }
 
-    # Export ca cert.
-    exec { "Export CA cert: ${server_id}":
-      cwd     => $instance_path,
-      command => "certutil -d ${instance_path} -L -n \"${server_id}CA\" -a > ${server_id}CA.pem",
-      path    => $ds_389::path,
-      creates => "${instance_path}/${server_id}CA.pem",
-    }
-
-    # Copy ca cert to openldap.
-    file { "${ds_389::cacerts_path}/${server_id}CA.pem":
-      ensure  => file,
-      source  => "${instance_path}/${server_id}CA.pem",
-      require => Exec["Export CA cert: ${server_id}"],
-      notify  => Exec["Rehash cacertdir: ${server_id}"],
-    }
-
-    # Remove temp files (pwd and noise).
-    exec { "Clean up temp files: ${server_id}":
+    # Remove temp files (passwd and noise).
+    -> exec { "Clean up temp files: ${server_id}":
       command     => "rm -f ${temp_noise_file} ${temp_pass_file}",
       path        => $ds_389::path,
       refreshonly => true,

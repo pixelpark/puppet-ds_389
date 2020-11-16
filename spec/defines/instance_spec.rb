@@ -168,44 +168,34 @@ describe 'ds_389::instance' do
             command: 'certutil -N -d /etc/dirsrv/slapd-specdirectory -f /tmp/passfile-specdirectory',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
-          ).that_notifies('Exec[Generate key pair: specdirectory]')
+          ).that_notifies('Ssl_pkey[Generate CA private key: specdirectory]')
         }
 
         it {
-          is_expected.to contain_exec('Generate key pair: specdirectory').with(
-            command: 'certutil -G -d /etc/dirsrv/slapd-specdirectory -g 4096 -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory',
-            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            refreshonly: true,
-          ).that_notifies('Exec[Make ca cert and add to database: specdirectory]')
+          is_expected.to contain_ssl_pkey('Generate CA private key: specdirectory').with(
+            size: 4096,
+          )
         }
 
         it {
-          is_expected.to contain_exec('Make ca cert and add to database: specdirectory').with(
-            cwd: '/etc/dirsrv/slapd-specdirectory',
-            command: 'certutil -S -n "specdirectoryCA" -s "cn=specdirectoryCA,dc=foo.example.com" -x -t "CT,," -v 120 -d /etc/dirsrv/slapd-specdirectory -k rsa -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory ; sleep 2', # rubocop:disable LineLength
-            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            refreshonly: true,
-          ).that_notifies(
-            [
-              'Exec[Make server cert and add to database: specdirectory]',
-              'Exec[Clean up temp files: specdirectory]',
-              'Exec[Add trust for CA: specdirectory]',
-            ],
+          is_expected.to contain_x509_cert('Create CA cert: specdirectory').with(
+            days: 3650,
+            req_ext: false,
           )
         }
 
         it {
           is_expected.to contain_exec('Add trust for CA: specdirectory').with(
-            command: 'certutil -M -n "specdirectoryCA" -t CT,, -d /etc/dirsrv/slapd-specdirectory',
+            command: 'certutil -M -n "specdirectoryCA" -t CT,C,C -d /etc/dirsrv/slapd-specdirectory -f /tmp/passfile-specdirectory',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "specdirectoryCA" | grep "CT"',
+            unless: 'certutil -L -d /etc/dirsrv/slapd-specdirectory | grep "specdirectoryCA" | grep "CTu,Cu,Cu"',
           ).that_notifies('Exec[Export CA cert: specdirectory]')
         }
 
         it {
           is_expected.to contain_exec('Make server cert and add to database: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
-            command: 'certutil -S -n "specdirectoryCert" -m 101 -s "cn=foo.example.com" -c "specdirectoryCA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-specdirectory -k rsa -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory  ; sleep 2', # rubocop:disable LineLength
+            command: 'certutil -S -n "specdirectoryCert" -m 101 -s "cn=foo.example.com" -c "specdirectoryCA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-specdirectory -k rsa -z /tmp/noisefile-specdirectory -f /tmp/passfile-specdirectory  && sleep 2', # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
@@ -235,7 +225,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Export CA cert: specdirectory').with(
             cwd: '/etc/dirsrv/slapd-specdirectory',
-            command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "specdirectoryCA" -a > specdirectoryCA.pem',
+            command: 'certutil -d /etc/dirsrv/slapd-specdirectory -L -n "specdirectoryCA" -a > /etc/dirsrv/slapd-specdirectory/specdirectoryCA.pem',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-specdirectory/specdirectoryCA.pem',
           )
@@ -867,44 +857,34 @@ describe 'ds_389::instance' do
             command: 'certutil -N -d /etc/dirsrv/slapd-ldap01 -f /tmp/passfile-ldap01',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
-          ).that_notifies('Exec[Generate key pair: ldap01]')
+          ).that_notifies('Ssl_pkey[Generate CA private key: ldap01]')
         }
 
         it {
-          is_expected.to contain_exec('Generate key pair: ldap01').with(
-            command: 'certutil -G -d /etc/dirsrv/slapd-ldap01 -g 4096 -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01',
-            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            refreshonly: true,
-          ).that_notifies('Exec[Make ca cert and add to database: ldap01]')
+          is_expected.to contain_ssl_pkey('Generate CA private key: ldap01').with(
+            size: 4096,
+          )
         }
 
         it {
-          is_expected.to contain_exec('Make ca cert and add to database: ldap01').with(
-            cwd: '/etc/dirsrv/slapd-ldap01',
-            command: 'certutil -S -n "ldap01CA" -s "cn=ldap01CA,dc=ldap.test.org" -x -t "CT,," -v 120 -d /etc/dirsrv/slapd-ldap01 -k rsa -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01 ; sleep 2',
-            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            refreshonly: true,
-          ).that_notifies(
-            [
-              'Exec[Make server cert and add to database: ldap01]',
-              'Exec[Clean up temp files: ldap01]',
-              'Exec[Add trust for CA: ldap01]',
-            ],
+          is_expected.to contain_x509_cert('Create CA cert: ldap01').with(
+            days: 3650,
+            req_ext: false,
           )
         }
 
         it {
           is_expected.to contain_exec('Add trust for CA: ldap01').with(
-            command: 'certutil -M -n "ldap01CA" -t CT,, -d /etc/dirsrv/slapd-ldap01',
+            command: 'certutil -M -n "ldap01CA" -t CT,C,C -d /etc/dirsrv/slapd-ldap01 -f /tmp/passfile-ldap01',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-            unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "ldap01CA" | grep "CT"',
+            unless: 'certutil -L -d /etc/dirsrv/slapd-ldap01 | grep "ldap01CA" | grep "CTu,Cu,Cu"',
           ).that_notifies('Exec[Export CA cert: ldap01]')
         }
 
         it {
           is_expected.to contain_exec('Make server cert and add to database: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
-            command: 'certutil -S -n "ldap01Cert" -m 101 -s "cn=ldap.test.org" -c "ldap01CA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-ldap01 -k rsa -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01 -8 ldap01.test.org,ldap02.test.org ; sleep 2', # rubocop:disable LineLength
+            command: 'certutil -S -n "ldap01Cert" -m 101 -s "cn=ldap.test.org" -c "ldap01CA" -t "u,u,u" -v 120 -d /etc/dirsrv/slapd-ldap01 -k rsa -z /tmp/noisefile-ldap01 -f /tmp/passfile-ldap01 -8 ldap01.test.org,ldap02.test.org && sleep 2', # rubocop:disable LineLength
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             refreshonly: true,
           ).that_notifies(
@@ -934,7 +914,7 @@ describe 'ds_389::instance' do
         it {
           is_expected.to contain_exec('Export CA cert: ldap01').with(
             cwd: '/etc/dirsrv/slapd-ldap01',
-            command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "ldap01CA" -a > ldap01CA.pem',
+            command: 'certutil -d /etc/dirsrv/slapd-ldap01 -L -n "ldap01CA" -a > /etc/dirsrv/slapd-ldap01/ldap01CA.pem',
             path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
             creates: '/etc/dirsrv/slapd-ldap01/ldap01CA.pem',
           )

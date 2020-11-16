@@ -6,6 +6,7 @@ fixtures:
     "concat": "git://github.com/puppetlabs/puppetlabs-concat.git"
     "facts": "https://github.com/puppetlabs/puppetlabs-facts.git"
     "inifile": "git://github.com/puppetlabs/puppetlabs-inifile.git"
+    "openssl": "https://github.com/camptocamp/puppet-openssl.git"
     "provision": "https://github.com/puppetlabs/provision.git"
     "puppet_agent": "https://github.com/puppetlabs/puppetlabs-puppet_agent.git"
     "stdlib": "git://github.com/puppetlabs/puppetlabs-stdlib.git"

@@ -1,9 +1,33 @@
 require 'spec_helper'
 
 describe 'ds_389' do
+  # content blocks
+  let(:openssl_ca_cnf) do
+    '[ req ]
+default_bits = 4096
+default_md = sha256
+distinguished_name = req_distinguished_name
+prompt = no
+x509_extensions = v3_ca
+
+[ req_distinguished_name ]
+DC = foo.example.com
+CN = fooCA
+
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints = CA:true
+'
+  end
+
   on_supported_os(facterversion: '2.4').each do |os, os_facts|
     context "on #{os}" do
-      let(:facts) { os_facts }
+      let(:facts) do
+        os_facts.merge(
+          networking: { fqdn: 'foo.example.com' },
+        )
+      end
 
       context 'without any parameters' do
         it { is_expected.to compile }
@@ -210,18 +234,30 @@ describe 'ds_389' do
         it { is_expected.to contain_ds_389__instance('foo') }
         it { is_expected.to contain_ds_389__service('foo') }
         it { is_expected.to contain_ds_389__ssl('foo') }
-        it { is_expected.to contain_exec('Add trust for CA: foo') }
-        it { is_expected.to contain_exec('Add trust for server cert: foo') }
         it { is_expected.to contain_exec('Clean up temp files: foo') }
         it { is_expected.to contain_exec('Create cert DB: foo') }
         it { is_expected.to contain_exec('Export CA cert: foo') }
         it { is_expected.to contain_exec('Export server cert: foo') }
-        it { is_expected.to contain_exec('Generate key pair: foo') }
+        it { is_expected.to contain_ssl_pkey('Generate CA private key: foo') }
         it { is_expected.to contain_exec('Generate noise file: foo') }
         it { is_expected.to contain_exec('Generate password file: foo') }
         it { is_expected.to contain_exec('Import ssl ldif: foo') }
-        it { is_expected.to contain_exec('Make ca cert and add to database: foo') }
+
+        it {
+          is_expected.to contain_file('Create CA config: foo').with(
+            ensure: 'present',
+            content: openssl_ca_cnf,
+          )
+        }
+        it { is_expected.to contain_x509_cert('Create CA cert: foo') }
+        it { is_expected.to contain_exec('Prepare CA cert for import (pkcs12): foo') }
+        it { is_expected.to contain_exec('Import CA cert: foo') }
+        it { is_expected.to contain_exec('Fix name of imported CA: foo') }
+        it { is_expected.to contain_exec('Add trust for CA: foo') }
+
         it { is_expected.to contain_exec('Make server cert and add to database: foo') }
+        it { is_expected.to contain_exec('Add trust for server cert: foo') }
+
         it { is_expected.to contain_exec('Rehash cacertdir: foo') }
         it { is_expected.to contain_exec('Restart foo to enable SSL') }
         it { is_expected.to contain_exec('Set permissions on database directory: foo') }
