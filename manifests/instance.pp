@@ -291,11 +291,11 @@ define ds_389::instance (
 
     # Fix permissions of CA private key.
     -> file { "Fix permissions of CA private key: ${server_id}":
-      ensure  => 'present',
-      name    => $ca_key,
-      mode    => '0640',
-      owner   => $user,
-      group   => $group,
+      ensure => 'present',
+      name   => $ca_key,
+      mode   => '0640',
+      owner  => $user,
+      group  => $group,
     }
 
     # Create the OpenSSL config template for the CA cert.
@@ -360,13 +360,13 @@ define ds_389::instance (
 
     # Configure trust attributes.
     -> exec { "Add trust for CA: ${server_id}":
-      command     => "certutil -M -n \"${ca_nickname}\" -t CT,C,C -d ${instance_path} -f ${temp_pass_file}",
-      path        => $ds_389::path,
-      unless     => "certutil -L -d ${instance_path} | grep \"${ca_nickname}\" | grep \"CTu,Cu,Cu\"",
-      subscribe   => [
+      command   => "certutil -M -n \"${ca_nickname}\" -t CT,C,C -d ${instance_path} -f ${temp_pass_file}",
+      path      => $ds_389::path,
+      unless    => "certutil -L -d ${instance_path} | grep \"${ca_nickname}\" | grep \"CTu,Cu,Cu\"",
+      subscribe => [
         X509_cert["Create CA cert: ${server_id}"],
       ],
-      notify      => Exec["Export CA cert: ${server_id}"],
+      notify    => Exec["Export CA cert: ${server_id}"],
     }
 
     # Export ca cert.
