@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 * Add defined type to manage backup jobs: `ds_389::backup`
 
+### Fixed
+* Protect passwords by not displaying a diff when the password file changes
+
 ## [2.2.0] - 2020-11-16
 This release fixes a major bug when using self-signed certificates. In previous
 releases the internal CA certificate was created without the required

@@ -155,13 +155,14 @@ define ds_389::instance (
   }
 
   file { "${instance_path}/pin.txt":
-    ensure  => file,
-    mode    => '0440',
-    owner   => $user,
-    group   => $group,
-    content => "Internal (Software) Token:${root_dn_pass}\n",
-    require => Exec["setup ds: ${server_id}"],
-    notify  => Exec["restart ${server_id} to pick up new token"],
+    ensure    => file,
+    mode      => '0440',
+    owner     => $user,
+    group     => $group,
+    content   => "Internal (Software) Token:${root_dn_pass}\n",
+    show_diff => false,
+    require   => Exec["setup ds: ${server_id}"],
+    notify    => Exec["restart ${server_id} to pick up new token"],
   }
 
   # If we have existing certs, create cert db and import certs.
