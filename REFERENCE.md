@@ -17,6 +17,7 @@
 ### Defined types
 
 * [`ds_389::add`](#ds_389add): Adds an ldif file to a 389 ds instance.
+* [`ds_389::backup`](#ds_389backup): Setup backup jobs for a 389 ds instance.
 * [`ds_389::instance`](#ds_389instance): Manages a 389 ds instance.
 * [`ds_389::modify`](#ds_389modify): Adds an ldif modify file to a 389 ds instance.
 * [`ds_389::plugin`](#ds_389plugin): Manages a plugin for a 389 ds instance.
@@ -285,6 +286,110 @@ The owner of the created ldif file. Default: `$ds_389::user`
 
 Default value: `$ds_389::user`
 
+### `ds_389::backup`
+
+Setup backup jobs for a 389 ds instance.
+
+#### Examples
+
+##### 
+
+```puppet
+ds_389::backup { 'daily backup':
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecure',
+  server_id    => 'instancename',
+}
+```
+
+#### Parameters
+
+The following parameters are available in the `ds_389::backup` defined type.
+
+##### `backup_dir`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+The directory where the backup files will be stored. The directory must
+be read- and writable for the 389-ds user. Default: `/var/lib/dirsrv/slapd-instance/bak`
+
+Default value: ``undef``
+
+##### `ensure`
+
+Data type: `String`
+
+This parameter controls whether the backup job should be created (`present`)
+or removed (`absent`).
+
+Default value: `'present'`
+
+##### `root_dn_pass`
+
+Data type: `Variant[String,Sensitive[String]]`
+
+The password to use when performing the backup. Required.
+
+##### `root_dn`
+
+Data type: `String`
+
+The bind DN to use when performing the backup. Required.
+
+##### `rotate`
+
+Data type: `Integer`
+
+The maximum backup age in days. Older backups will be removed.
+
+Default value: `30`
+
+##### `time`
+
+Data type: `Array`
+
+An array containing the cron schedule in this order: minute, hour, weekday.
+
+Default value: `['15', '23', '*']`
+
+##### `server_host`
+
+Data type: `String`
+
+The host to use when performing the backup. Default: `$facts['networking']['fqdn']`
+
+Default value: `$facts['networking']['fqdn']`
+
+##### `server_id`
+
+Data type: `String`
+
+The 389 ds instance name. Required.
+
+##### `server_port`
+
+Data type: `Integer`
+
+The port to use when performing the backup. Default: 636
+
+Default value: `636`
+
+##### `success_file`
+
+Data type: `Stdlib::Absolutepath`
+
+Specify a path where upon successful backup a file should be created for checking purposes.
+
+Default value: `'/tmp/389ds_backup_success'`
+
+##### `protocol`
+
+Data type: `Enum['ldap','ldaps']`
+
+
+
+Default value: `'ldaps'`
+
 ### `ds_389::instance`
 
 Manages a 389 ds instance.
@@ -314,6 +419,14 @@ Data type: `Optional[Hash]`
 A hash of ldif add files. See add.pp. Optional.
 
 Default value: ``undef``
+
+##### `backup_enable`
+
+Data type: `Boolean`
+
+Whether to enable a periodic backup job for this instance.
+
+Default value: ``false``
 
 ##### `base_load_ldifs`
 

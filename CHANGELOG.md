@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+* Add defined type to manage backup jobs: `ds_389::backup`
+
 ## [2.2.0] - 2020-11-16
 This release fixes a major bug when using self-signed certificates. In previous
 releases the internal CA certificate was created without the required

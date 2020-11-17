@@ -15,6 +15,7 @@
     - [Initialize suffix](#initialize-suffix)
     - [SSL](#ssl)
     - [Plugins](#plugins)
+    - [Backups](#backups)
     - [Replication overview](#replication-overview)
     - [Replication consumer](#replication-consumer)
     - [Replication hub](#replication-hub)
@@ -157,6 +158,39 @@ ds_389::plugin { 'memberof':
   server_id    => 'example',
   root_dn      => 'cn=Directory Manager',
   root_dn_pass => 'supersecret',
+}
+```
+
+### Backups
+
+To perform online backups of your directory, use the `$backup_enable` parameter:
+
+```puppet
+ds_389::instance { 'example':
+  backup_enable => true,
+  root_dn       => 'cn=Directory Manager',
+  root_dn_pass  => 'supersecret',
+  suffix        => 'dc=example,dc=com',
+  cert_db_pass  => 'secret',
+  server_id     => $facts['networking']['hostname'],
+}
+```
+
+This will enable a backup job with default parameters that runs every night.
+If the backup was successful, then the empty file `/tmp/389ds_backup_success` is created, which makes it easy to monitor the status of the directory backup.
+
+You can also adjust backup tasks to match your needs by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password:
+
+```puppet
+ds_389::backup { 'Perform hourly backups of the directory':
+  ensure       => 'present',
+  server_id    => 'example',
+  root_dn      => 'cn=Directory Manager',
+  root_dn_pass => 'supersecret',
+  backup_dir   => '/path/to/ds-backups',
+  rotate       => 10,
+  time         => ['0', '*', '*'],
+  success_file => '/tmp/hourly_backup_success',
 }
 ```
 

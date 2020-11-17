@@ -12,6 +12,9 @@
 # @param add_ldifs
 #   A hash of ldif add files. See add.pp. Optional.
 #
+# @param backup_enable
+#   Whether to enable a periodic backup job for this instance.
+#
 # @param base_load_ldifs
 #   A hash of ldif add files to load after all other config files have been added. Optional.
 #
@@ -77,6 +80,7 @@ define ds_389::instance (
   String $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $suffix,
+  Boolean $backup_enable = false,
   Boolean $create_suffix = true,
   String $group = $ds_389::group,
   Integer $minssf = 0,
@@ -544,6 +548,18 @@ define ds_389::instance (
       group               => $group,
       require             => Service["dirsrv@${server_id}"],
       before              => Anchor["${name}_ldif_modify"],
+    }
+  }
+
+  # Configure backup.
+  if $backup_enable {
+    ds_389::backup { $server_id:
+      protocol     => 'ldaps',
+      root_dn      => $root_dn,
+      root_dn_pass => $root_dn_pass,
+      server_host  => $server_host,
+      server_id    => $server_id,
+      server_port  => $server_ssl_port,
     }
   }
 
