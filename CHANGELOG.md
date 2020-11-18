@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.0] - 2020-11-18
 
 ### Added
 * Add defined type to manage backup jobs: `ds_389::backup`
@@ -125,7 +125,8 @@ This release adds the ability to manage the content of both `ds_389::add` and `d
 ## 1.0.0 - 2017-10-27
 * Initial release.
 
-[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/markt-de/puppet-ds_389/compare/2.2.0...2.3.0
 [2.2.0]: https://github.com/markt-de/puppet-ds_389/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/markt-de/puppet-ds_389/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/markt-de/puppet-ds_389/compare/1.1.7...2.0.0
