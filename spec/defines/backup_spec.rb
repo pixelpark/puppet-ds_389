@@ -38,6 +38,7 @@ describe 'ds_389::backup' do
         it {
           is_expected.to contain_cron('Backup job for specdirectory: specbackup').with(
             command: "dsconf -D 'cn=Directory Manager' -y '/etc/dirsrv/slapd-specdirectory/backup_passwd.specbackup' ldaps://foo.example.com:636 backup create  && touch /tmp/389ds_backup_success && find '/var/lib/dirsrv/slapd-specdirectory/bak/' -mindepth 1 -maxdepth 1 -mtime +30 -print0 | xargs -0 -r rm -rf", # rubocop:disable LineLength
+            environment: ["PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"],
             user: 'dirsrv',
             minute: '15',
             hour: '23',
@@ -90,6 +91,7 @@ describe 'ds_389::backup' do
             root_dn: 'cn=Directory Manager',
             root_dn_pass: 'supersecret',
             backup_dir: '/path/to/ds-backups',
+            environment: ['MAILTO=admin@example.com'],
             protocol: 'ldap',
             rotate: 10,
             server_host: 'ldap.test.org',
@@ -116,6 +118,7 @@ describe 'ds_389::backup' do
         it {
           is_expected.to contain_cron('Backup job for specdirectory: specbackup').with(
             command: "dsconf -D 'cn=Directory Manager' -y '/etc/dirsrv/slapd-specdirectory/backup_passwd.specbackup' ldap://ldap.test.org:1389 backup create /path/to/ds-backups && touch /tmp/hourly_backup_success && find '/path/to/ds-backups/' -mindepth 1 -maxdepth 1 -mtime +10 -print0 | xargs -0 -r rm -rf", # rubocop:disable LineLength
+            environment: ["MAILTO=admin@example.com","PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"],
             user: 'dirsrv',
             minute: '0',
             hour: '*',

@@ -324,6 +324,15 @@ or removed (`absent`).
 
 Default value: `'present'`
 
+##### `environment`
+
+Data type: `Array`
+
+Any environment settings associated with the backup cron job. Note that the
+PATH variable is automatically added to the environment.
+
+Default value: `[]`
+
 ##### `root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`

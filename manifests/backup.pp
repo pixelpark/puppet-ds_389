@@ -15,6 +15,10 @@
 #   This parameter controls whether the backup job should be created (`present`)
 #   or removed (`absent`).
 #
+# @param environment
+#   Any environment settings associated with the backup cron job. Note that the
+#   PATH variable is automatically added to the environment.
+#
 # @param root_dn_pass
 #   The password to use when performing the backup. Required.
 #
@@ -44,6 +48,7 @@ define ds_389::backup (
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $server_id,
   String $ensure = 'present',
+  Array $environment = [],
   Enum['ldap','ldaps'] $protocol = 'ldaps',
   Integer $rotate = 30,
   Array $time = ['15', '23', '*'],
@@ -84,6 +89,13 @@ define ds_389::backup (
     show_diff => false,
   }
 
+  # Set environment variables for the cron job.
+  if ($environment) {
+    $_environment = $environment + ["PATH=${ds_389::path}"]
+  } else {
+    $_environment = ["PATH=${ds_389::path}"]
+  }
+
   # Command to perform all backup and cleanup tasks.
   $backup_command = join([
     # Create tasks to perform the backup.
@@ -101,11 +113,12 @@ define ds_389::backup (
   ], ' ')
 
   cron { "Backup job for ${server_id}: ${name}":
-    ensure  => $ensure,
-    command => $backup_command,
-    user    => $ds_389::user,
-    minute  => $time[0],
-    hour    => $time[1],
-    weekday => $time[2],
+    ensure      => $ensure,
+    command     => $backup_command,
+    user        => $ds_389::user,
+    environment => $_environment,
+    minute      => $time[0],
+    hour        => $time[1],
+    weekday     => $time[2],
   }
 }
