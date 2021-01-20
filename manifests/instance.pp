@@ -15,6 +15,9 @@
 # @param backup_enable
 #   Whether to enable a periodic backup job for this instance.
 #
+# @param backup_notls
+#   Whether to disable TLS connection for the backup job.
+#
 # @param base_load_ldifs
 #   A hash of ldif add files to load after all other config files have been added. Optional.
 #
@@ -81,6 +84,7 @@ define ds_389::instance (
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $suffix,
   Boolean $backup_enable = false,
+  Boolean $backup_notls = false,
   Boolean $create_suffix = true,
   String $group = $ds_389::group,
   Integer $minssf = 0,
@@ -554,13 +558,22 @@ define ds_389::instance (
 
   # Configure backup.
   if $backup_enable {
+    $_server_protocol = $backup_notls ? {
+      true    => 'ldap',
+      default => 'ldaps',
+    }
+    $_server_port = $backup_notls ? {
+      true    => $server_port,
+      default => $server_ssl_port,
+    }
+
     ds_389::backup { $server_id:
-      protocol     => 'ldaps',
+      protocol     => $_server_protocol,
       root_dn      => $root_dn,
       root_dn_pass => $root_dn_pass,
       server_host  => $server_host,
       server_id    => $server_id,
-      server_port  => $server_ssl_port,
+      server_port  => $_server_port,
     }
   }
 
