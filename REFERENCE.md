@@ -437,6 +437,14 @@ Whether to enable a periodic backup job for this instance.
 
 Default value: ``false``
 
+##### `backup_notls`
+
+Data type: `Boolean`
+
+Whether to disable TLS connection for the backup job.
+
+Default value: ``false``
+
 ##### `base_load_ldifs`
 
 Data type: `Optional[Hash]`
