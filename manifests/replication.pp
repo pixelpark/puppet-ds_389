@@ -311,7 +311,7 @@ define ds_389::replication (
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
             $repl_enable_done = sprintf($_repl_enable_done, 'supplier', $replica)
-            $repl_enable_command = sprintf($_repl_enable_command, 'master', $_id, $repl_enable_done)
+            $repl_enable_command = sprintf($_repl_enable_command, 'supplier', $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
             $repl_agreement_done = sprintf($_repl_agreement_done, 'supplier', $replica)
