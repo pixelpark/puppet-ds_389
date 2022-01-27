@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.5.0.1] - 2022-01-27
+
+### Changed
+* Updating dependencies and source information in metadata.json
+
+### Fixed
+* Fixing parameters of creating ssl objects
+* Fixing manifests/replication.pp because of wrong command parameter on
+  creating a replica as a supplier
+
 ## [2.5.0] - 2021-01-20
 
 ### Added
