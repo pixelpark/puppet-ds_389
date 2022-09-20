@@ -115,16 +115,16 @@ define ds_389::instance (
     owner   => $user,
     group   => $group,
     content => epp("${module_name}/instance.epp",{
-      create_suffix   => $create_suffix,
-      group           => $group,
-      root_dn         => $root_dn,
-      root_dn_pass    => $root_dn_pass,
-      server_host     => $server_host,
-      server_id       => $server_id,
-      server_port     => $server_port,
-      server_ssl_port => $server_ssl_port,
-      suffix          => $suffix,
-      user            => $user,
+        create_suffix   => $create_suffix,
+        group           => $group,
+        root_dn         => $root_dn,
+        root_dn_pass    => $root_dn_pass,
+        server_host     => $server_host,
+        server_id       => $server_id,
+        server_port     => $server_port,
+        server_ssl_port => $server_ssl_port,
+        suffix          => $suffix,
+        user            => $user,
     }),
   }
 
@@ -296,7 +296,7 @@ define ds_389::instance (
 
     # Fix permissions of CA private key.
     -> file { "Fix permissions of CA private key: ${server_id}":
-      ensure => 'present',
+      ensure => 'file',
       name   => $ca_key,
       mode   => '0640',
       owner  => $user,
@@ -305,11 +305,11 @@ define ds_389::instance (
 
     # Create the OpenSSL config template for the CA cert.
     -> file { "Create CA config: ${server_id}":
-      ensure  => 'present',
+      ensure  => 'file',
       name    => $ca_conf,
       content => epp('ds_389/openssl_ca.cnf.epp',{
-        dc => $facts['networking']['fqdn'],
-        cn => $ca_nickname,
+          dc => $facts['networking']['fqdn'],
+          cn => $ca_nickname,
       }),
     }
 
