@@ -85,7 +85,7 @@ define ds_389::backup (
     mode      => '0640',
     owner     => $ds_389::user,
     group     => $ds_389::group,
-    content   => inline_epp('<%= $pass %>',{pass => $root_dn_pass}),
+    content   => inline_epp('<%= $pass %>',{ pass => $root_dn_pass }),
     show_diff => false,
   }
 
@@ -98,18 +98,18 @@ define ds_389::backup (
 
   # Command to perform all backup and cleanup tasks.
   $backup_command = join([
-    # Create tasks to perform the backup.
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-y \'${passfile}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'backup create',
-    $backup_dir,
-    # Create success file upon successful backup.
-    "&& touch ${success_file}",
-    # Command to remove outdated backups. No cleanup is performed if the
-    # backup fails.
-    "&& find \'${real_backup_dir}/\' -mindepth 1 -maxdepth 1 -mtime +${rotate} -print0 | xargs -0 -r rm -rf",
+      # Create tasks to perform the backup.
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-y \'${passfile}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'backup create',
+      $backup_dir,
+      # Create success file upon successful backup.
+      "&& touch ${success_file}",
+      # Command to remove outdated backups. No cleanup is performed if the
+      # backup fails.
+      "&& find \'${real_backup_dir}/\' -mindepth 1 -maxdepth 1 -mtime +${rotate} -print0 | xargs -0 -r rm -rf",
   ], ' ')
 
   cron { "Backup job for ${server_id}: ${name}":

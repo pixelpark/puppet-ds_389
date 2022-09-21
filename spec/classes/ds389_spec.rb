@@ -44,7 +44,7 @@ basicConstraints = CA:true
 
         it {
           is_expected.to contain_package('389-ds-base').with(
-            ensure: 'present',
+            ensure: 'installed',
           ).that_requires(
             [
               'File[/etc/dirsrv]',
@@ -97,7 +97,7 @@ basicConstraints = CA:true
             }
           else
             it {
-              is_expected.to contain_file_line('dirsrv ulimit').with(
+              is_expected.to contain_File_line('dirsrv ulimit').with(
                 ensure: 'present',
                 path: '/etc/default/dirsrv',
                 line: 'ulimit -n 8192',
@@ -175,7 +175,7 @@ basicConstraints = CA:true
 
         it {
           is_expected.to contain_package('389-ds-custom').with(
-            ensure: 'present',
+            ensure: 'installed',
           ).that_requires(
             [
               'File[/etc/dirsrv]',
@@ -245,7 +245,7 @@ basicConstraints = CA:true
 
         it {
           is_expected.to contain_file('Create CA config: foo').with(
-            ensure: 'present',
+            ensure: 'file',
             content: openssl_ca_cnf,
           )
         }

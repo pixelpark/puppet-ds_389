@@ -161,61 +161,61 @@ define ds_389::replication (
   # Command to enable replication for the specified suffix.
   $_repl_enable_done = "/etc/dirsrv/slapd-${name}/%s_%s_enable.done"
   $_repl_enable_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'replication enable',
-    "--suffix \'${suffix}\'",
-    '--role=%s',
-    '--replica-id=%s',
-    "--bind-dn=\'${_bind_dn}\'",
-    "--bind-passwd=\'${replication_pass}\'",
-    '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'replication enable',
+      "--suffix \'${suffix}\'",
+      '--role=%s',
+      '--replica-id=%s',
+      "--bind-dn=\'${_bind_dn}\'",
+      "--bind-passwd=\'${replication_pass}\'",
+      '&& touch %s',
   ], ' ')
 
   # Command to create a replication agreement between these hosts.
   $_repl_agreement_done = "/etc/dirsrv/slapd-${name}/%s_%s_agreement.done"
   $_repl_agreement_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'repl-agmt create',
-    $attribute_list,
-    "--suffix=\'${suffix}\'",
-    "--host=\'%s\'",
-    "--port=${replica_port}",
-    "--conn-protocol=${replica_transport}",
-    "--bind-dn=\'${_bind_dn}\'",
-    "--bind-passwd=\'${replication_pass}\'",
-    '--bind-method=SIMPLE',
-    "\'${name} to %s agreement\'",
-    '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'repl-agmt create',
+      $attribute_list,
+      "--suffix=\'${suffix}\'",
+      "--host=\'%s\'",
+      "--port=${replica_port}",
+      "--conn-protocol=${replica_transport}",
+      "--bind-dn=\'${_bind_dn}\'",
+      "--bind-passwd=\'${replication_pass}\'",
+      '--bind-method=SIMPLE',
+      "\'${name} to %s agreement\'",
+      '&& touch %s',
   ], ' ')
 
   # Command to update parameters of the replication agreement.
   # TODO: Should be refactored to allow parameters to be changed.
   $_repl_update_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'replication set',
-    "--suffix=\'${suffix}\'",
-    "--repl-purge-delay=\'${purge_delay}\'",
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'replication set',
+      "--suffix=\'${suffix}\'",
+      "--repl-purge-delay=\'${purge_delay}\'",
   ], ' ')
 
   $_repl_init_done = "/etc/dirsrv/slapd-${name}/%s_%s_init.done"
   $_repl_init_command = join([
-  'dsconf',
-  "-D \'${root_dn}\'",
-  "-w \'${root_dn_pass}\'",
-  "${protocol}://${server_host}:${server_port}",
-  'repl-agmt init',
-  "--suffix=\'${suffix}\'",
-  "\'${name} to %s agreement\'",
-  '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'repl-agmt init',
+      "--suffix=\'${suffix}\'",
+      "\'${name} to %s agreement\'",
+      '&& touch %s',
   ], ' ')
 
   case $role {
@@ -517,9 +517,9 @@ define ds_389::replication (
     owner   => $user,
     group   => $group,
     content => epp('ds_389/replication-user.epp',{
-      bind_dn          => $_bind_dn,
-      replication_pass => $replication_pass,
-      replication_user => $replication_user,
+        bind_dn          => $_bind_dn,
+        replication_pass => $replication_pass,
+        replication_user => $replication_user,
     }),
   }
   -> exec { "Add replication user: ${name}":

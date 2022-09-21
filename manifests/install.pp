@@ -23,12 +23,12 @@ class ds_389::install {
   # Support multiple package names by converting everything to an Array.
   $_packages = Array($ds_389::package_name, true)
   ensure_packages($_packages,
-  {
-    ensure  => $ds_389::package_ensure,
-    require => [
-      File['/etc/dirsrv'],
-      Exec['Create ldap cacerts directory'],
-    ],
+    {
+      ensure  => $ds_389::package_ensure,
+      require => [
+        File['/etc/dirsrv'],
+        Exec['Create ldap cacerts directory'],
+      ],
   })
 
   package { $ds_389::nsstools_package_name:

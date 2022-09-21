@@ -68,17 +68,17 @@ define ds_389::plugin (
 
   $plugin_done = "/etc/dirsrv/slapd-${server_id}/plugin_${name}_${ensure}.done"
   $plugin_command = join([
-    # When changing plugin state, ensure that the flag for the opposite state
-    # is cleared. Otherwise it would not be possible to change the state again.
-    "rm -f ${plugin_clear_state};",
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'plugin',
-    $name,
-    $plugin_action,
-    "&& touch ${plugin_done}",
+      # When changing plugin state, ensure that the flag for the opposite state
+      # is cleared. Otherwise it would not be possible to change the state again.
+      "rm -f ${plugin_clear_state};",
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'plugin',
+      $name,
+      $plugin_action,
+      "&& touch ${plugin_done}",
   ], ' ')
 
   exec { "Set plugin ${name} state to ${ensure}: ${server_id}":
@@ -96,7 +96,7 @@ define ds_389::plugin (
       owner   => $ds_389::user,
       group   => $ds_389::group,
       mode    => '0440',
-      content => inline_epp('<%= $options %>', {options => $options}),
+      content => inline_epp('<%= $options %>', { options => $options }),
     }
 
     # Enable every option individually. This way conflicts can be avoided
@@ -104,18 +104,18 @@ define ds_389::plugin (
     $options.each |$option| {
       # Command to set the specified plugin option.
       $plugin_option_command = join([
-        # Rename the options file. This way a failed command is retried
-        # and if the error persists the user is encouraged to fix it.
-        "mv -f ${plugin_options_file} ${plugin_options_file}.error &&",
-        'dsconf',
-        "-D \'${root_dn}\'",
-        "-w \'${root_dn_pass}\'",
-        "${protocol}://${server_host}:${server_port}",
-        'plugin',
-        $name,
-        $option,
-        # If the plugin command succeeds, move the options file back.
-        "&& mv -f ${plugin_options_file}.error ${plugin_options_file}",
+          # Rename the options file. This way a failed command is retried
+          # and if the error persists the user is encouraged to fix it.
+          "mv -f ${plugin_options_file} ${plugin_options_file}.error &&",
+          'dsconf',
+          "-D \'${root_dn}\'",
+          "-w \'${root_dn_pass}\'",
+          "${protocol}://${server_host}:${server_port}",
+          'plugin',
+          $name,
+          $option,
+          # If the plugin command succeeds, move the options file back.
+          "&& mv -f ${plugin_options_file}.error ${plugin_options_file}",
       ], ' ')
 
       exec { "Set plugin ${name} options (${option}): ${server_id}":
@@ -125,7 +125,6 @@ define ds_389::plugin (
         subscribe   => File[$plugin_options_file],
         require     => Exec["Set plugin ${name} state to ${ensure}: ${server_id}"],
       }
-
     }
   }
 }

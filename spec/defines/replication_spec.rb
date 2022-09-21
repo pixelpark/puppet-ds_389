@@ -379,7 +379,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -478,7 +478,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 replication set --suffix='dc=test,dc=org' --repl-purge-delay='604800'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 replication set --suffix='dc=test,dc=org' --repl-purge-delay='604800'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
@@ -623,7 +623,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Update replication config for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication set --suffix='dc=example,dc=com' --repl-purge-delay='604800'",
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
