@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 * Add documentation for all parameters
 
+### Changed
+* Replace dependency camptocamp/openssl with puppet/openssl
+* Migrate tests to GitHub Actions
+
 ### Fixed
 * Fix unit tests
 

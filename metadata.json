@@ -17,8 +17,8 @@
       "version_requirement": ">=5.0.0 <6.0.0"
     },
     {
-      "name": "camptocamp-openssl",
-      "version_requirement": ">=1.14.0 <3.0.0"
+      "name": "puppet-openssl",
+      "version_requirement": ">=2.0.0 <3.0.0"
     },
     {
       "name": "puppetlabs-stdlib",
