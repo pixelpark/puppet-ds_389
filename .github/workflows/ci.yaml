@@ -59,7 +59,7 @@ jobs:
           ruby-version: "2.7"
           bundler-cache: true
 
-      - name: Run Litmus: main tests
+      - name: Run Litmus / main tests
         env:
           RUN_TEST: 'main'
           VENDOR_TYPE: ${{ matrix.vendor_type }}
@@ -70,11 +70,11 @@ jobs:
           bundle exec rake litmus:install_module
           bundle exec rake litmus:acceptance:parallel
 
-      - name: Cleanup: main tests
+      - name: Cleanup / main tests
         run: |
           bundle exec rake 'litmus:tear_down'
 
-      - name: Run Litmus: replication tests
+      - name: Run Litmus / replication tests
         env:
           RUN_TEST: 'replication'
           VENDOR_TYPE: ${{ matrix.vendor_type }}
@@ -85,6 +85,6 @@ jobs:
           bundle exec rake litmus:install_module
           bundle exec rake litmus:acceptance:parallel
 
-      - name: Cleanup: replication tests
+      - name: Cleanup / replication tests
         run: |
           bundle exec rake 'litmus:tear_down'
