@@ -48,6 +48,12 @@ include ds_389
 
 The following parameters are available in the `ds_389` class.
 
+##### `cacert_rehash`
+
+Data type: `String`
+
+The command that is used to rehash CA certificates.
+
 ##### `cacerts_path`
 
 Data type: `Stdlib::Absolutepath`
@@ -88,6 +94,18 @@ Data type: `Hash`
 
 A hash of ds_389::instance resources. Optional.
 
+##### `limits_config_dir`
+
+Data type: `Stdlib::Absolutepath`
+
+Target directory for resource limit configuration.
+
+##### `nsstools_package_name`
+
+Data type: `String`
+
+Name of the NSS tools package.
+
 ##### `package_ensure`
 
 Data type: `String`
@@ -100,11 +118,24 @@ Data type: `Variant[String,Array]`
 
 Name of the 389 ds package to install. Default: '389-ds-base'
 
+##### `path`
+
+Data type: `String`
+
+Specifies the content of the PATH environment variable when running commands.
+Should usually NOT be altered.
+
 ##### `service_type`
 
 Data type: `String`
 
 The service manager that should be used.
+
+##### `ssl_dir`
+
+Data type: `Stdlib::Absolutepath`
+
+Target directory for generated SSL certificates.
 
 ##### `ssl_version_min_support`
 
@@ -119,41 +150,11 @@ Data type: `String`
 
 User account 389 ds should run as. Default: 'dirsrv'
 
-##### `cacert_rehash`
-
-Data type: `String`
-
-
-
-##### `limits_config_dir`
-
-Data type: `Stdlib::Absolutepath`
-
-
-
-##### `nsstools_package_name`
-
-Data type: `String`
-
-
-
-##### `path`
-
-Data type: `String`
-
-
-
-##### `ssl_dir`
-
-Data type: `Stdlib::Absolutepath`
-
-
-
 ##### `user_shell`
 
 Data type: `String`
 
-
+Shell for the user account. Usually a pseudo-shell to prevent console access.
 
 ## Defined types
 
@@ -333,6 +334,14 @@ PATH variable is automatically added to the environment.
 
 Default value: `[]`
 
+##### `protocol`
+
+Data type: `Enum['ldap','ldaps']`
+
+The protocol to use when performing the backup.
+
+Default value: `'ldaps'`
+
 ##### `root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
@@ -390,14 +399,6 @@ Data type: `Stdlib::Absolutepath`
 Specify a path where upon successful backup a file should be created for checking purposes.
 
 Default value: `'/tmp/389ds_backup_success'`
-
-##### `protocol`
-
-Data type: `Enum['ldap','ldaps']`
-
-
-
-Default value: `'ldaps'`
 
 ### `ds_389::instance`
 
@@ -987,6 +988,14 @@ Data type: `Variant[String,Sensitive[String]]`
 
 The password of the replication user. Required.
 
+##### `replication_user`
+
+Data type: `String`
+
+The user account to use for replication.
+
+Default value: `'Replication Manager'`
+
 ##### `role`
 
 Data type: `Enum['supplier','hub','consumer']`
@@ -1050,14 +1059,6 @@ Data type: `String`
 The owner of the created ldif file. Default: $ds_389::user
 
 Default value: `$ds_389::user`
-
-##### `replication_user`
-
-Data type: `String`
-
-
-
-Default value: `'Replication Manager'`
 
 ### `ds_389::schema`
 
