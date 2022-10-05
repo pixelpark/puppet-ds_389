@@ -39,9 +39,16 @@ describe 'ds_389::instance' do
           )
         }
 
-        # rubocop:disable RepeatedExample
-        case os_facts[:osfamily]
-        when 'Debian'
+        it {
+          is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
+            command: 'openssl rehash /etc/openldap/cacerts',
+            path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+            refreshonly: true,
+          )
+        }
+
+        case os_facts[:kernel]
+        when 'Linux'
           it {
             is_expected.to contain_exec('setup ds: specdirectory').with(
               command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
@@ -51,99 +58,37 @@ describe 'ds_389::instance' do
           }
 
           it {
-            is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-              command: 'openssl rehash /etc/openldap/cacerts',
+            is_expected.to contain_exec('stop specdirectory to create new token').with(
+              command: 'systemctl stop dirsrv@specdirectory ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
+          }
+
+          it {
+            is_expected.to contain_exec('restart specdirectory to pick up new token').with(
+              command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
-
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: 'systemctl stop dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
-            }
-
-            it {
-              is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: 'service dirsrv stop specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
-            }
-
-            it {
-              is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
-        when 'RedHat'
+        else
           it {
-            is_expected.to contain_exec('setup ds: specdirectory').with(
-              command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+            is_expected.to contain_exec('stop specdirectory to create new token').with(
+              command: 'service dirsrv stop specdirectory ; sleep 2',
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-              creates: '/etc/dirsrv/slapd-specdirectory',
-            )
+              refreshonly: true,
+            ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
           }
+
           it {
-            is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-              command: 'openssl rehash /etc/openldap/cacerts',
+            is_expected.to contain_exec('restart specdirectory to pick up new token').with(
+              command: 'service dirsrv restart specdirectory ; sleep 2',
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
-
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: 'systemctl stop dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
-            }
-
-            it {
-              is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_exec('stop specdirectory to create new token').with(
-                command: 'service dirsrv stop specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              ).that_comes_before('File[/etc/dirsrv/slapd-specdirectory/pin.txt]')
-            }
-
-            it {
-              is_expected.to contain_exec('restart specdirectory to pick up new token').with(
-                command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
         end
-        # rubocop:enable RepeatedExample
 
         it {
           is_expected.to contain_exec('Generate noise file: specdirectory').with(
@@ -644,41 +589,21 @@ describe 'ds_389::instance' do
             )
           }
 
-          case os_facts[:osfamily]
-          when 'Debian'
-            # rubocop:disable RepeatedExample
-            it {
-              is_expected.to contain_exec('setup ds: specdirectory').with(
-                command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                creates: '/etc/dirsrv/slapd-specdirectory',
-              )
-            }
+          it {
+            is_expected.to contain_exec('setup ds: specdirectory').with(
+              command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              creates: '/etc/dirsrv/slapd-specdirectory',
+            )
+          }
 
-            it {
-              is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-                command: 'openssl rehash /custom/cacerts/path',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          when 'RedHat'
-            it {
-              is_expected.to contain_exec('setup ds: specdirectory').with(
-                command: 'dscreate from-file /etc/dirsrv/template-specdirectory.inf',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                creates: '/etc/dirsrv/slapd-specdirectory',
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
-                command: 'openssl rehash /custom/cacerts/path',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
+          it {
+            is_expected.to contain_exec('Rehash cacertdir: specdirectory').with(
+              command: 'openssl rehash /custom/cacerts/path',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
 
           it {
             is_expected.to contain_ds_389__ssl('specdirectory').with(
@@ -728,8 +653,8 @@ describe 'ds_389::instance' do
           )
         }
 
-        case os_facts[:osfamily]
-        when 'Debian'
+        case os_facts[:kernel]
+        when 'Linux'
           it {
             is_expected.to contain_exec('setup ds: ldap01').with(
               command: 'dscreate from-file /etc/dirsrv/template-ldap01.inf',
@@ -746,93 +671,38 @@ describe 'ds_389::instance' do
             )
           }
 
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: 'systemctl stop dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: 'service dirsrv stop ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
-        when 'RedHat'
           it {
-            is_expected.to contain_exec('setup ds: ldap01').with(
-              command: 'dscreate from-file /etc/dirsrv/template-ldap01.inf',
-              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-              creates: '/etc/dirsrv/slapd-ldap01',
-            )
-          }
-
-          it {
-            is_expected.to contain_exec('Rehash cacertdir: ldap01').with(
-              command: 'openssl rehash /etc/openldap/cacerts',
+            is_expected.to contain_exec('stop ldap01 to create new token').with(
+              command: 'systemctl stop dirsrv@ldap01 ; sleep 2',
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               refreshonly: true,
             )
           }
 
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: 'systemctl stop dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
+          it {
+            is_expected.to contain_exec('restart ldap01 to pick up new token').with(
+              command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+        else
+          it {
+            is_expected.to contain_exec('stop ldap01 to create new token').with(
+              command: 'service dirsrv stop ldap01 ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
 
-            it {
-              is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_exec('stop ldap01 to create new token').with(
-                command: 'service dirsrv stop ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('restart ldap01 to pick up new token').with(
-                command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
+          it {
+            is_expected.to contain_exec('restart ldap01 to pick up new token').with(
+              command: 'service dirsrv restart ldap01 ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
         end
-        # rubocop:enable RepeatedExample
 
         it {
           is_expected.to contain_exec('Generate noise file: ldap01').with(

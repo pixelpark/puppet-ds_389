@@ -82,68 +82,17 @@ exit 0
       context 'without any params' do
         it { is_expected.to compile }
 
-        # rubocop:disable RepeatedExample
-        case os_facts[:osfamily]
-        when 'Debian'
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_service('dirsrv@specdirectory').with(
-                ensure: 'running',
-                enable: true,
-                hasrestart: true,
-                hasstatus: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/init.d/dirsrv@specdirectory').with(
-                ensure: 'file',
-                mode: '0755',
-                content: service_default,
-              )
-            }
-
-            it {
-              is_expected.to contain_service('dirsrv@specdirectory').with(
-                ensure: 'running',
-                enable: true,
-                hasrestart: true,
-                hasstatus: true,
-              ).that_requires('File[/etc/init.d/dirsrv@specdirectory]')
-            }
-          end
-        when 'RedHat'
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_service('dirsrv@specdirectory').with(
-                ensure: 'running',
-                enable: true,
-                hasrestart: true,
-                hasstatus: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/init.d/dirsrv@specdirectory').with(
-                ensure: 'file',
-                mode: '0755',
-                content: service_default,
-              )
-            }
-
-            it {
-              is_expected.to contain_service('dirsrv@specdirectory').with(
-                ensure: 'running',
-                enable: true,
-                hasrestart: true,
-                hasstatus: true,
-              ).that_requires('File[/etc/init.d/dirsrv@specdirectory]')
-            }
-          end
+        case os_facts[:kernel]
+        when 'Linux'
+          it {
+            is_expected.to contain_service('dirsrv@specdirectory').with(
+              ensure: 'running',
+              enable: true,
+              hasrestart: true,
+              hasstatus: true,
+            )
+          }
         end
-        # rubocop:enable RepeatedExample
       end
 
       context 'with all params' do
@@ -157,68 +106,17 @@ exit 0
 
         it { is_expected.to compile }
 
-        # rubocop:disable RepeatedExample
-        case os_facts[:osfamily]
-        when 'Debian'
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_service('dirsrv@ldap01').with(
-                ensure: 'stopped',
-                enable: false,
-                hasrestart: true,
-                hasstatus: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/init.d/dirsrv@ldap01').with(
-                ensure: 'file',
-                mode: '0755',
-                content: service_custom,
-              )
-            }
-
-            it {
-              is_expected.to contain_service('dirsrv@ldap01').with(
-                ensure: 'stopped',
-                enable: false,
-                hasrestart: true,
-                hasstatus: true,
-              ).that_requires('File[/etc/init.d/dirsrv@ldap01]')
-            }
-          end
-        when 'RedHat'
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_service('dirsrv@ldap01').with(
-                ensure: 'stopped',
-                enable: false,
-                hasrestart: true,
-                hasstatus: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/init.d/dirsrv@ldap01').with(
-                ensure: 'file',
-                mode: '0755',
-                content: service_custom,
-              )
-            }
-
-            it {
-              is_expected.to contain_service('dirsrv@ldap01').with(
-                ensure: 'stopped',
-                enable: false,
-                hasrestart: true,
-                hasstatus: true,
-              ).that_requires('File[/etc/init.d/dirsrv@ldap01]')
-            }
-          end
+        case os_facts[:kernel]
+        when 'Linux'
+          it {
+            is_expected.to contain_service('dirsrv@ldap01').with(
+              ensure: 'stopped',
+              enable: false,
+              hasrestart: true,
+              hasstatus: true,
+            )
+          }
         end
-        # rubocop:enable RepeatedExample
       end
     end
   end

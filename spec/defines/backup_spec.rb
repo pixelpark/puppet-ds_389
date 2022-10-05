@@ -4,7 +4,7 @@ describe 'ds_389::backup' do
   let(:pre_condition) { 'class {"ds_389": }' }
   let(:title) { 'specbackup' }
 
-  on_supported_os(facterversion: '2.4').each do |os, os_facts|
+  on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
@@ -118,7 +118,7 @@ describe 'ds_389::backup' do
         it {
           is_expected.to contain_cron('Backup job for specdirectory: specbackup').with(
             command: "dsconf -D 'cn=Directory Manager' -y '/etc/dirsrv/slapd-specdirectory/backup_passwd.specbackup' ldap://ldap.test.org:1389 backup create /path/to/ds-backups && touch /tmp/hourly_backup_success && find '/path/to/ds-backups/' -mindepth 1 -maxdepth 1 -mtime +10 -print0 | xargs -0 -r rm -rf", # rubocop:disable LineLength
-            environment: ['MAILTO=admin@example.com", "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'],
+            environment: ['MAILTO=admin@example.com', 'PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'],
             user: 'dirsrv',
             minute: '0',
             hour: '*',

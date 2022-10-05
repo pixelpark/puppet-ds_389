@@ -21,7 +21,7 @@ basicConstraints = CA:true
 '
   end
 
-  on_supported_os(facterversion: '2.4').each do |os, os_facts|
+  on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) do
         os_facts.merge(
@@ -84,26 +84,15 @@ basicConstraints = CA:true
             )
           }
 
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_ini_setting('dirsrv ulimit').with(
-                ensure: 'present',
-                path: '/etc/default/dirsrv.systemd',
-                section: 'Service',
-                setting: 'LimitNOFILE',
-                value: '8192',
-              ).that_requires('Package[389-ds-base]')
-            }
-          else
-            it {
-              is_expected.to contain_File_line('dirsrv ulimit').with(
-                ensure: 'present',
-                path: '/etc/default/dirsrv',
-                line: 'ulimit -n 8192',
-              ).that_requires('Package[389-ds-base]')
-            }
-          end
+          it {
+            is_expected.to contain_ini_setting('dirsrv ulimit').with(
+              ensure: 'present',
+              path: '/etc/default/dirsrv.systemd',
+              section: 'Service',
+              setting: 'LimitNOFILE',
+              value: '8192',
+            ).that_requires('Package[389-ds-base]')
+          }
 
         when 'RedHat'
           it {
@@ -131,24 +120,17 @@ basicConstraints = CA:true
                 provider: 'dnfmodule',
               )
             }
-            it {
-              is_expected.to contain_ini_setting('dirsrv ulimit').with(
-                ensure: 'present',
-                path: '/etc/sysconfig/dirsrv.systemd',
-                section: 'Service',
-                setting: 'LimitNOFILE',
-                value: '8192',
-              ).that_requires('Package[389-ds-base]')
-            }
-          else
-            it {
-              is_expected.to contain_file_line('dirsrv ulimit').with(
-                ensure: 'present',
-                path: '/etc/sysconfig/dirsrv',
-                line: 'ulimit -n 8192',
-              ).that_requires('Package[389-ds-base]')
-            }
           end
+
+          it {
+            is_expected.to contain_ini_setting('dirsrv ulimit').with(
+              ensure: 'present',
+              path: '/etc/sysconfig/dirsrv.systemd',
+              section: 'Service',
+              setting: 'LimitNOFILE',
+              value: '8192',
+            ).that_requires('Package[389-ds-base]')
+          }
         end
       end
 

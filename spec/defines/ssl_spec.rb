@@ -94,88 +94,34 @@ nsSSL2: off
             'Exec[Restart specdirectory to enable SSL]',
           )
         }
-        # rubocop:disable RepeatedExample
-        case os_facts[:osfamily]
-        when 'Debian'
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: ssl_default,
-              )
-            }
+        case os_facts[:kernel]
+        when 'Linux'
+          it {
+            is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
+              ensure: 'file',
+              mode: '0440',
+              owner: 'dirsrv',
+              group: 'dirsrv',
+              content: ssl_default,
+            )
+          }
 
-            it {
-              is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
-                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: ssl_no_version_min,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
-                command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
-        when 'RedHat'
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: ssl_default,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
-                command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-specdirectory/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'dirsrv',
-                group: 'dirsrv',
-                content: ssl_no_version_min,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
-                command: 'service dirsrv restart specdirectory ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
+          it {
+            is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
+              command: 'systemctl restart dirsrv@specdirectory ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+        else
+          it {
+            is_expected.to contain_exec('Restart specdirectory to enable SSL').with(
+              command: 'service dirsrv restart specdirectory ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
         end
-        # rubocop:enable RepeatedExample
       end
 
       context 'with all params' do
@@ -206,88 +152,35 @@ nsSSL2: off
             'Exec[Restart ldap01 to enable SSL]',
           )
         }
-        # rubocop:disable RepeatedExample
-        case os_facts[:osfamily]
-        when 'Debian'
-          case os_facts[:operatingsystemmajrelease]
-          when '10', '20.04'
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'custom_user',
-                group: 'custom_group',
-                content: ssl_custom,
-              )
-            }
 
-            it {
-              is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
-                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'custom_user',
-                group: 'custom_group',
-                content: ssl_custom_no_version_min,
-              )
-            }
+        it {
+          is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
+            ensure: 'file',
+            mode: '0440',
+            owner: 'custom_user',
+            group: 'custom_group',
+            content: ssl_custom,
+          )
+        }
 
-            it {
-              is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
-                command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
-        when 'RedHat'
-          case os_facts[:operatingsystemmajrelease]
-          when '8'
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'custom_user',
-                group: 'custom_group',
-                content: ssl_custom,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
-                command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          else
-            it {
-              is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/ssl.ldif').with(
-                ensure: 'file',
-                mode: '0440',
-                owner: 'custom_user',
-                group: 'custom_group',
-                content: ssl_custom_no_version_min,
-              )
-            }
-
-            it {
-              is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
-                command: 'service dirsrv restart ldap01 ; sleep 2',
-                path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
-                refreshonly: true,
-              )
-            }
-          end
+        case os_facts[:kernel]
+        when 'Linux'
+          it {
+            is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
+              command: 'systemctl restart dirsrv@ldap01 ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
+        else
+          it {
+            is_expected.to contain_exec('Restart ldap01 to enable SSL').with(
+              command: 'service dirsrv restart ldap01 ; sleep 2',
+              path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
+              refreshonly: true,
+            )
+          }
         end
-        # rubocop:enable RepeatedExample
       end
     end
   end
