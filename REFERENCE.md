@@ -144,6 +144,13 @@ Data type: `Boolean`
 Obsolete parameter, only kept for compatibility with
 spacepants/puppet-ds_389. Will be removed in a later version.
 
+##### `supplier_role_name`
+
+Data type: `String`
+
+In 389-ds the name of the supplier replication role was renamed from
+'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
+
 ##### `user`
 
 Data type: `String`
@@ -1043,6 +1050,15 @@ Default value: ``false``
 Data type: `String`
 
 The LDAP suffix to use. Required.
+
+##### `supplier_role_name`
+
+Data type: `String`
+
+In 389-ds the name of the supplier replication role was renamed from
+'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
+
+Default value: `$ds_389::supplier_role_name`
 
 ##### `suppliers`
 
