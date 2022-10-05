@@ -105,6 +105,10 @@
 # @param suffix
 #   The LDAP suffix to use. Required.
 #
+# @param supplier_role_name
+#   In 389-ds the name of the supplier replication role was renamed from
+#   'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
+#
 # @param suppliers
 #   An array of supplier names to ensure. Optional.
 #
@@ -130,6 +134,7 @@ define ds_389::replication (
   String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Boolean $starttls = false,
+  String $supplier_role_name = $ds_389::supplier_role_name,
   String $user = $ds_389::user,
   Optional[Array] $consumers = undef,
   Optional[Array] $excluded_attributes = undef,
@@ -314,7 +319,7 @@ define ds_389::replication (
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
             $repl_enable_done = sprintf($_repl_enable_done, 'supplier', $replica)
-            $repl_enable_command = sprintf($_repl_enable_command, 'master', $_id, $repl_enable_done)
+            $repl_enable_command = sprintf($_repl_enable_command, $supplier_role_name, $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
             $repl_agreement_done = sprintf($_repl_agreement_done, 'supplier', $replica)

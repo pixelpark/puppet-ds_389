@@ -8,4 +8,5 @@ ds_389::package_name: '389-ds-base'
 ds_389::path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin'
 ds_389::service_type: 'systemd'
 ds_389::ssl_version_min_support: true
+ds_389::supplier_role_name: 'master'
 ds_389::user: 'dirsrv'

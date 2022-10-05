@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+* Add new parameter `$supplier_role_name` (set to either 'master' or 'supplier')
+
 ### Fixed
+* Fix compatibility with recent versions of 389-ds (through `$supplier_role_name`)
 * Revive acceptance tests
 
 ## [2.7.0] - 2022-10-05

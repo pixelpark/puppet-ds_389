@@ -50,6 +50,10 @@
 #   Obsolete parameter, only kept for compatibility with
 #   spacepants/puppet-ds_389. Will be removed in a later version.
 #
+# @param supplier_role_name
+#   In 389-ds the name of the supplier replication role was renamed from
+#   'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
+#
 # @param user
 #   User account 389 ds should run as. Default: 'dirsrv'
 #
@@ -70,6 +74,7 @@ class ds_389 (
   String $service_type,
   Stdlib::Absolutepath $ssl_dir,
   Boolean $ssl_version_min_support,
+  String $supplier_role_name,
   String $user,
   String $user_shell,
   Optional[String] $dnf_module_name = undef,
