@@ -81,6 +81,9 @@
 # @param replication_pass
 #   The password of the replication user. Required.
 #
+# @param replication_user
+#   The user account to use for replication.
+#
 # @param role
 #   Replication role. Either 'supplier', 'hub', or 'consumer'. Required.
 #

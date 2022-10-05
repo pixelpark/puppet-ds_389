@@ -3,6 +3,9 @@
 # @example
 #   include ds_389
 #
+# @param cacert_rehash
+#   The command that is used to rehash CA certificates.
+#
 # @param cacerts_path
 #   Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
 #
@@ -21,14 +24,27 @@
 # @param instances
 #   A hash of ds_389::instance resources. Optional.
 #
+# @param limits_config_dir
+#   Target directory for resource limit configuration.
+#
+# @param nsstools_package_name
+#   Name of the NSS tools package.
+#
 # @param package_ensure
 #   389 ds package state. Default 'installed'
 #
 # @param package_name
 #   Name of the 389 ds package to install. Default: '389-ds-base'
 #
+# @param path
+#   Specifies the content of the PATH environment variable when running commands.
+#   Should usually NOT be altered.
+#
 # @param service_type
 #   The service manager that should be used.
+#
+# @param ssl_dir
+#   Target directory for generated SSL certificates.
 #
 # @param ssl_version_min_support
 #   Obsolete parameter, only kept for compatibility with
@@ -36,6 +52,9 @@
 #
 # @param user
 #   User account 389 ds should run as. Default: 'dirsrv'
+#
+# @param user_shell
+#   Shell for the user account. Usually a pseudo-shell to prevent console access.
 #
 class ds_389 (
   Stdlib::Absolutepath $cacerts_path,

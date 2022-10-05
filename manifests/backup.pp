@@ -19,6 +19,9 @@
 #   Any environment settings associated with the backup cron job. Note that the
 #   PATH variable is automatically added to the environment.
 #
+# @param protocol
+#   The protocol to use when performing the backup.
+#
 # @param root_dn_pass
 #   The password to use when performing the backup. Required.
 #
