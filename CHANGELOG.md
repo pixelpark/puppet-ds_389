@@ -188,7 +188,8 @@ This release adds the ability to manage the content of both `ds_389::add` and `d
 ## 1.0.0 - 2017-10-27
 * Initial release.
 
-[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/2.7.0...HEAD
+[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/markt-de/puppet-ds_389/compare/2.7.0...3.0.0
 [2.7.0]: https://github.com/markt-de/puppet-ds_389/compare/2.6.0...2.7.0
 [2.6.0]: https://github.com/markt-de/puppet-ds_389/compare/2.5.0...2.6.0
 [2.5.0]: https://github.com/markt-de/puppet-ds_389/compare/2.4.0...2.5.0
