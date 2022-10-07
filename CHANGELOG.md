@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+This new major release breaks compatibility with spacepants/ds_389. Users
+should first migrate to version 2.x of this module when coming from
+spacepants/ds_389.
 
 ### Added
 * Add new parameter `$supplier_role_name` (set to either 'master' or 'supplier')
@@ -12,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 * Fix compatibility with recent versions of 389-ds (through `$supplier_role_name`)
 * Revive acceptance tests
+
+### Removed
+* Remove migration path for spacepants/ds_389
 
 ## [2.7.0] - 2022-10-05
 

@@ -86,20 +86,6 @@ define ds_389::ssl (
       "&& touch ${security_config_done}",
   ], ' ')
 
-  # NOTE: This ensures that the status is not lost when migrating from
-  # spacepants/puppet-ds_389 to this module. This migration path will
-  # be removed in a later version.
-  exec { "Migrate SSL status: ${name}":
-    command => "touch ${security_enable_done} && touch ${security_config_done}",
-    path    => $ds_389::path,
-    creates => $security_enable_done,
-    onlyif  => "test -f /etc/dirsrv/slapd-${name}/ssl.done",
-    before  => [
-      Exec["Enable security: ${name}"],
-      Exec["Configure security parameters: ${name}"],
-    ],
-  }
-
   # XXX: Neither sslVersionMin nor --tls-protocol-min work with dsconf, so
   # we still have to use ldif to configure some parameters.
   file { "/etc/dirsrv/slapd-${name}/ssl.ldif":
