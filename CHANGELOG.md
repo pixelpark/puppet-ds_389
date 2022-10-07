@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2022-10-08
 This new major release breaks compatibility with spacepants/ds_389. Users
 should first migrate to version 2.x of this module when coming from
 spacepants/ds_389.
@@ -12,8 +12,12 @@ spacepants/ds_389.
 ### Added
 * Add new parameter `$supplier_role_name` (set to either 'master' or 'supplier')
 
+### Changed
+* Use the 'path' parameter for 'ssl_pkey' and 'x509_cert' resources ([#2])
+
 ### Fixed
 * Fix compatibility with recent versions of 389-ds (through `$supplier_role_name`)
+* Do not ignore failures when running ldapadd ([#4])
 * Revive acceptance tests
 
 ### Removed
@@ -201,3 +205,5 @@ This release adds the ability to manage the content of both `ds_389::add` and `d
 [1.1.2]: https://github.com/markt-de/puppet-ds_389/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/markt-de/puppet-ds_389/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/markt-de/puppet-ds_389/compare/1.0.0...1.1.0
+[#4]: https://github.com/markt-de/puppet-ds_389/pull/4
+[#2]: https://github.com/markt-de/puppet-ds_389/pull/2
