@@ -37,9 +37,11 @@
 
 ## Overview
 
-This module allows you to install and manage [389 Directory Server](https://www.port389.org/), create and bootstrap 389 DS instances, configure SSL, replication, schema extensions and even load LDIF data.
+This module installs and manages the [389 Directory Server](https://www.port389.org/). It will create and bootstrap 389 DS instances, configure SSL, replication, schema extensions and even load LDIF data.
 
-SSL is enabled by default. If you already have an SSL cert you can provide the cert, key, and CA bundle, and they will be imported into your instance. Otherwise, it will generate self-signed certificates. Replication is supported for consumers, hubs, and suppliers (both master and multi-master), and there is a Puppet task to reinitialize replication.
+SSL is enabled by default using self-signed certificates, but existing SSL certificates may also be used and will automatically be imported into the 389 DS instance.
+
+Replication is supported for consumers, hubs, and suppliers (both master and multi-master), and there is a Puppet task to reinitialize replication.
 
 ## Requirements
 
@@ -53,9 +55,11 @@ This module requires 389-ds version 1.4 or later. Older versions are incompatibl
 include ds_389
 ```
 
-At a bare minimum, the module ensures that the 389 DS base package and NSS tools are installed, and increases the file descriptors for 389 DS.
+At a bare minimum, the module ensures that the 389 DS base package and NSS tools are installed and sets appropiate resource limits.
 
-You will probably also want to create a 389 DS instance, though, which you can do by declaring a `ds_389::instance` resource:
+### Instances
+
+The primary resource for configuring a 389 DS service is the `ds_389::instance` define:
 
 ```puppet
 ds_389::instance { 'example':
@@ -67,11 +71,7 @@ ds_389::instance { 'example':
 }
 ```
 
-### Instances
-
-The primary resource for configuring 389 DS is the `ds_389::instance` define.
-
-In our previous example, we created an instance with the server ID set to the hostname of the node. For a node with a hostname of `foo`, this would create an instance at `/etc/dirsrv/slapd-foo` that listens on the default ports of 389 and 636 (for SSL).
+In this example an instance is created with the server ID set to the hostname of the node. For a node with a hostname of `foo`, this would create an instance at `/etc/dirsrv/slapd-foo` that listens on the default ports of 389 and 636 (for SSL).
 
 ### Initialize suffix
 
@@ -79,9 +79,9 @@ When creating new instances, it is possible to initialize the specified suffix b
 
 ### SSL
 
-If you have existing SSL certificates you would like to use, you could pass them in to the instance with the `ssl` parameter. It expects a hash with paths (either local file paths on the node or a puppet:/// path) for the PEM files for your certificate, key, and CA bundle. It also requires the certificate nickname for the cert and every CA in the bundle. (`pk12util` sets the nickname for the certificate to the friendly name of the cert in the pkcs12 bundle, and the nickname for each ca cert to "${the common name(cn) of the ca cert subject} - ${the organization(o) of the cert issuer}".)
+When existing SSL certificates should be used, they could be passed to the instance with the `$ssl` parameter. This parameter expects a hash with paths (either local file paths on the node or a puppet:/// path) for the PEM files for the certificate, key, and CA bundle. It also requires the certificate nickname for the cert and every CA in the bundle. (`pk12util` sets the nickname for the certificate to the friendly name of the cert in the pkcs12 bundle, and the nickname for each ca cert to `"${the common name(cn) of the ca cert subject} - ${the organization(o) of the cert issuer}"`.)
 
-To require StartTLS for non-SSL connections, you can pass in the `minssf` param to specify the minimum required encryption.
+To require StartTLS for non-SSL connections, the `$minssf` parameter should be used to specify the minimum required encryption.
 
 ```puppet
 ds_389::instance { 'example':
@@ -106,7 +106,7 @@ ds_389::instance { 'example':
 
 ### Plugins
 
-If you need to enable or disable some of the 386 DS plugins, just pass a hash:
+In order to enable or disable some of the 386 DS plugins, the plugin name and a simple string should be added to the `$plugins` parameter:
 
 ```puppet
 ds_389::instance { 'example':
@@ -122,7 +122,7 @@ ds_389::instance { 'example':
 }
 ```
 
-If you need to configure plugin options, you could provide a hash instead:
+When additional plugin options need to be configured, a hash should be used instead:
 
 ```puppet
 ds_389::instance { 'example':
@@ -145,7 +145,7 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also declare those separately, by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password.
+To use the defined type directly, the server id of the instance as well as the root dn and password must be provided:
 
 ```puppet
 ds_389::plugin { 'memberof':
@@ -163,7 +163,7 @@ ds_389::plugin { 'memberof':
 
 ### Backups
 
-To perform online backups of your directory, use the `$backup_enable` parameter:
+To perform online backups of a directory, the `$backup_enable` parameter should be used:
 
 ```puppet
 ds_389::instance { 'example':
@@ -176,10 +176,10 @@ ds_389::instance { 'example':
 }
 ```
 
-This will enable a backup job with default parameters that runs every night.
-If the backup was successful, then the empty file `/tmp/389ds_backup_success` is created, which makes it easy to monitor the status of the directory backup.
+This will enable a backup job with default parameters that is scheduled to run every night.
+If the backup was successful, an empty file `/tmp/389ds_backup_success` is created and the modification time is updated. This will make it easy to monitor the status of the directory backup (by checking for the existence of the file and it's modification time).
 
-You can also adjust backup tasks to match your needs by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password:
+To use the defined type directly, the server id of the instance as well as the root dn and password must be provided:
 
 ```puppet
 ds_389::backup { 'Perform hourly backups of the directory':
@@ -196,11 +196,11 @@ ds_389::backup { 'Perform hourly backups of the directory':
 
 ### Replication overview
 
-If you need to set up replication, you could pass in the replication config via the `replication` parameter. At a minimum, it expects a hash with the replication bind dn, replication bind dn password, and replication role (either 'consumer', 'hub', or 'supplier').
+To set up replication, the `$replication` parameter should be used to add the replication config. At a minimum, it expects a hash with the replication bind dn, replication bind dn password, and replication role (either 'consumer', 'hub', or 'supplier').
 
 ### Replication consumer
 
-For a consumer, with our previous example:
+Example config for a consumer role:
 
 ```puppet
 ds_389::instance { 'example':
@@ -220,7 +220,7 @@ This would ensure that the replica bind dn and credentials are present in the in
 
 ### Replication hub
 
-For a hub, you can also pass in any consumers for the hub as an array of server IDs, and the replication agreement will be created and added to the instance.
+For a hub, any consumers for the hub should be passed as an array of server IDs:
 
 ```puppet
 ds_389::instance { 'example':
@@ -240,9 +240,11 @@ ds_389::instance { 'example':
 }
 ```
 
+The replication agreement will then be created and added to the instance.
+
 ### Replication supplier
 
-For a supplier, you can pass in consumers, and also any hubs or other suppliers (if running in multi-master) that should be present in the instance. You will also need to provide the replica ID for the supplier.
+For a supplier, consumers need to be passed as an array, and also any hubs or other suppliers (if running in multi-master) that should be present in the instance. The replica ID for the supplier must also be provided.
 
 ```puppet
 ds_389::instance { 'example':
@@ -272,7 +274,7 @@ ds_389::instance { 'example':
 
 ### Initializing replication
 
-Once replication has been configured on all of the desired nodes, you can initialize replication for consumers, hubs, and/or other suppliers by passing the appropriate parameters.
+Once replication has been configured on all of the desired nodes, replication can be initialized for consumers, hubs, and/or other suppliers by passing the appropriate "init_" parameters:
 
 ```puppet
 ds_389::instance { 'example':
@@ -303,11 +305,11 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also initialize (or reinitialize) replication with the [Puppet task](#reference).
+Replication can also be initialize (or reinitialize) with the [Puppet task](#reference).
 
 ### Schema extensions
 
-If you need to add any schema extensions, you can can pass those in with the `schema_extensions` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). Note that schema filenames are typically prefixed with a number that indicates the desired schema load order.
+If a schema extension needs to be added, the `$schema_extensions` parameter should be used. This parameter expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node):
 
 ```puppet
 ds_389::instance { 'example':
@@ -321,9 +323,11 @@ ds_389::instance { 'example':
 }
 ```
 
+Note that schema filenames are typically prefixed with a number that indicates the desired schema load order.
+
 ### Modifying existing LDIF data
 
-If you need to modify any of the default ldif data (typically configs), you can do so via the `modify_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). The ldif file is created and passed to ldapmodify to load it into the instance.
+If the default ldif data (typically configs) needs to be modified, the `$modify_ldifs` parameter should be used. This parameter expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node):
 
 ```puppet
 ds_389::instance { 'example':
@@ -337,7 +341,9 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also declare those separately, by calling their define directly, but you'll need to provide the server id of the instance as well as the root dn and password.
+The ldif file is then created and passed to ldapmodify to load it into the instance.
+
+To use the defined type directly, by calling their define directly, but the server id of the instance as well as the root dn and password must be provided:
 
 ```puppet
 ds_389::modify { 'example_ldif_modify':
@@ -350,7 +356,7 @@ ds_389::modify { 'example_ldif_modify':
 
 ### Adding new LDIF data
 
-If you need to add any new ldif data (typically configs), you can do so via the `add_ldifs` parameter. It expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node). These function similarly to the modify_ldifs param, but are passed to ldapadd instead of ldapmodify.
+If new ldif data (typically configs) needs to be added, the `$add_ldifs` parameter should be used. This parameter expects a hash with the desired ldif filename as the key, and a source reference (either via puppet:/// or an absolute path on the node):
 
 ```puppet
 ds_389::instance { 'example':
@@ -364,7 +370,9 @@ ds_389::instance { 'example':
 }
 ```
 
-You can also declare those separately, by calling their define directly, but you will need to provide the server id of the instance as well as the root dn and password.
+This works similar to the modify_ldifs parameter, but it utilizes `ldapadd` instead of `ldapmodify`.
+
+To use the defined type directly, the server id of the instance as well as the root dn and password must be provided:
 
 ```puppet
 ds_389::add { 'example_ldif_add':
@@ -377,7 +385,7 @@ ds_389::add { 'example_ldif_add':
 
 ### Adding baseline LDIF data
 
-If you need to load baseline ldif data that runs after any other ldif configuration changes, you can pass those in via the `base_load_ldifs` parameter.
+To load baseline ldif data that runs after any other ldif configuration changes, the `$base_load_ldifs` parameter should be used:
 
 ```puppet
 ds_389::instance { 'example':
@@ -391,15 +399,15 @@ ds_389::instance { 'example':
 }
 ```
 
-Note that while you can declare these via the `ds_389::add` define, puppet's resource load ordering may potentially result in it attempting to add the ldif before a configuration change that it requires.
+Note that while it's possible declare these via the `ds_389::add` defined type, Puppet's resource load ordering may potentially result in it attempting to add the ldif before a configuration change that it requires.
 
 ### Recreate SSL certs
 
-Currently some manual steps are required to regenerate the SSL certificates. A new Bolt task would be nice, PRs welcome. :)
+Currently some manual steps are required to regenerate the SSL certificates. A new Bolt task would be nice, PRs are welcome. :)
 
-As always, create a backup before attempting this procedure.
+A backup should be created before attempting this procedure.
 
-Run the following shell commands as root to remove the existing certificates:
+The following shell commands need to be run as root to remove the existing certificates:
 
 ```shell
 export LDAP_INSTANCE="my-instance-name"
@@ -426,14 +434,14 @@ certutil -D -n "${LDAP_INSTANCE}Cert" -d /etc/dirsrv/slapd-${LDAP_INSTANCE}
 certutil -D -n "${LDAP_INSTANCE}CA" -d /etc/dirsrv/slapd-${LDAP_INSTANCE}
 ```
 
-Next edit `/etc/dirsrv/slapd-${LDAP_INSTANCE}/dse.ldif` and remove the following entries including their attributes:
+Next the file `/etc/dirsrv/slapd-${LDAP_INSTANCE}/dse.ldif` needs to be modified and the following entries including their attributes must be removed:
 
 ```
   cn=AES,cn=encrypted attribute keys,cn=database_name,cn=ldbm database,cn=plugins,cn=config
   cn=3DES,cn=encrypted attribute keys,cn=database_name,cn=ldbm database,cn=plugins,cn=config
 ```
 
-Afterwards run Puppet to regenerate both the CA and the server certificates.
+Afterwards Puppet should be used to regenerate both the CA and the server certificates.
 
 ## Reference
 
@@ -443,7 +451,9 @@ Classes and parameters are documented in [REFERENCE.md](REFERENCE.md).
 
 ### Supported versions
 
-This module requires 389-ds version 1.4 or later. If you rely on older versions of 389-ds, you may consider using [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389) (which is no longer under active development) until you are ready to migrate to an up-to-date version.
+This module requires 389-ds version 1.4 or later. When using an older version of 389-ds, consider using [spacepants/puppet-ds_389](https://github.com/spacepants/puppet-ds_389) instead. It is no longer under active development, but it may still be useful to migrate to an up-to-date version of 389-ds.
+
+In newer versions of 389-ds the "master" role was renamed to "supplier" in an [backwards-incompatible way](https://github.com/389ds/389-ds-base/issues/4656). The `$supplier_role_name` parameter can be used to change the role name accordingly.
 
 ### Migrating from spacepants module
 
@@ -459,6 +469,6 @@ Contributions must pass all existing tests, new features should provide addition
 
 ## License
 
-Copyright 2020 Frank Wall
+Copyright 2020-2022 Frank Wall
 
 Copyright 2019 Paul Bailey
