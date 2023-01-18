@@ -456,7 +456,7 @@ define ds_389::replication (
     mode    => '0440',
     owner   => $user,
     group   => $group,
-    content => epp('ds_389/replication-user.epp',{
+    content => epp('ds_389/replication-user.epp', {
         bind_dn          => $_bind_dn,
         replication_pass => $replication_pass,
         replication_user => $replication_user,
