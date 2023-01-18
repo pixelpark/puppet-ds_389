@@ -88,7 +88,7 @@ define ds_389::backup (
     mode      => '0640',
     owner     => $ds_389::user,
     group     => $ds_389::group,
-    content   => inline_epp('<%= $pass %>',{ pass => $root_dn_pass }),
+    content   => inline_epp('<%= $pass %>', { pass => $root_dn_pass }),
     show_diff => false,
   }
 

@@ -93,7 +93,7 @@ define ds_389::ssl (
     owner   => $user,
     group   => $group,
     mode    => '0440',
-    content => epp('ds_389/ssl.epp',{
+    content => epp('ds_389/ssl.epp', {
         ssl_version_min => $ssl_version_min,
     }),
   }

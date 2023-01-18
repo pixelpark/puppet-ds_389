@@ -114,7 +114,7 @@ define ds_389::instance (
     mode    => '0400',
     owner   => $user,
     group   => $group,
-    content => epp("${module_name}/instance.epp",{
+    content => epp("${module_name}/instance.epp", {
         create_suffix   => $create_suffix,
         group           => $group,
         root_dn         => $root_dn,
@@ -307,7 +307,7 @@ define ds_389::instance (
     -> file { "Create CA config: ${server_id}":
       ensure  => 'file',
       name    => $ca_conf,
-      content => epp('ds_389/openssl_ca.cnf.epp',{
+      content => epp('ds_389/openssl_ca.cnf.epp', {
           dc => $facts['networking']['fqdn'],
           cn => $ca_nickname,
       }),
