@@ -1,3 +1,7 @@
+> **Warning**
+> This Fork will no longer maintained since the [upstream](https://github.com/markt-de/puppet-ds_389) has been updated and the changes from here are not needed anymore.
+> Please migrate back to use [markt-de/puppet-ds_389](https://github.com/markt-de/puppet-ds_389) instead.
+
 # puppet-ds_389
 
 [![Build Status](https://travis-ci.org/markt-de/puppet-ds_389.png?branch=master)](https://travis-ci.org/markt-de/puppet-ds_389)
