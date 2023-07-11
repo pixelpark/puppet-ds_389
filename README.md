@@ -1,8 +1,8 @@
 # puppet-ds_389
 
 [![Build Status](https://github.com/markt-de/puppet-ds_389/actions/workflows/ci.yaml/badge.svg)](https://github.com/markt-de/puppet-ds_389/actions/workflows/ci.yaml)
-[![Puppet Forge](https://img.shields.io/puppetforge/v/fraenki/ds_389.svg)](https://forge.puppetlabs.com/fraenki/ds_389)
-[![Puppet Forge](https://img.shields.io/puppetforge/f/fraenki/ds_389.svg)](https://forge.puppetlabs.com/fraenki/ds_389)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/markt/ds_389.svg)](https://forge.puppetlabs.com/markt/ds_389)
+[![Puppet Forge](https://img.shields.io/puppetforge/f/markt/ds_389.svg)](https://forge.puppetlabs.com/markt/ds_389)
 
 
 #### Table of Contents

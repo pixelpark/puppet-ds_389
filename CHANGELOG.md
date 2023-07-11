@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2023-07-11
+
+### Changed
+* Fix puppet-lint offenses & use modern fact in acceptance test ([#6])
+
 ## [3.0.0] - 2022-10-08
 This new major release breaks compatibility with spacepants/ds_389. Users
 should first migrate to version 2.x of this module when coming from
@@ -188,7 +193,8 @@ This release adds the ability to manage the content of both `ds_389::add` and `d
 ## 1.0.0 - 2017-10-27
 * Initial release.
 
-[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/markt-de/puppet-ds_389/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/markt-de/puppet-ds_389/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/markt-de/puppet-ds_389/compare/2.7.0...3.0.0
 [2.7.0]: https://github.com/markt-de/puppet-ds_389/compare/2.6.0...2.7.0
 [2.6.0]: https://github.com/markt-de/puppet-ds_389/compare/2.5.0...2.6.0
@@ -206,5 +212,6 @@ This release adds the ability to manage the content of both `ds_389::add` and `d
 [1.1.2]: https://github.com/markt-de/puppet-ds_389/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/markt-de/puppet-ds_389/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/markt-de/puppet-ds_389/compare/1.0.0...1.1.0
+[#6]: https://github.com/markt-de/puppet-ds_389/pull/6
 [#4]: https://github.com/markt-de/puppet-ds_389/pull/4
 [#2]: https://github.com/markt-de/puppet-ds_389/pull/2
