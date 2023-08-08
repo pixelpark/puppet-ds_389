@@ -240,10 +240,10 @@ nsDS5BeginReplicaRefresh: start
 '
   end
 
-  on_supported_os(facterversion: '2.4').each do |os, os_facts|
+  on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
-        os_facts.merge(
+        facts.merge(
           networking: { fqdn: 'foo.example.com' },
         )
       end
@@ -523,6 +523,13 @@ nsDS5BeginReplicaRefresh: start
       end
 
       context 'when setting up a supplier' do
+        # Handle incompatible change in new version of ds_389.
+        if facts[:os]['name'] == 'Ubuntu' && facts[:os]['release']['major'].to_i >= 22
+          let(:supplier_role_name) { 'supplier' }
+        else
+          let(:supplier_role_name) { 'master' }
+        end
+
         context 'with required parameters' do
           let(:params) do
             {
@@ -563,7 +570,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Enable replication for supplier supplier1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=master --replica-id=1 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://foo.example.com:389 replication enable --suffix 'dc=example,dc=com' --role=#{supplier_role_name} --replica-id=1 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done',
             ).that_requires(
@@ -779,7 +786,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Enable replication for supplier supplier1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=master --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 replication enable --suffix 'dc=test,dc=org' --role=#{supplier_role_name} --replica-id=100 --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_enable.done',
             ).that_requires(
