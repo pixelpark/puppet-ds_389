@@ -32,7 +32,7 @@
 
 ## Classes
 
-### `ds_389`
+### <a name="ds_389"></a>`ds_389`
 
 Manages and configures the 389 Directory Server
 
@@ -46,21 +46,40 @@ include ds_389
 
 #### Parameters
 
-The following parameters are available in the `ds_389` class.
+The following parameters are available in the `ds_389` class:
 
-##### `cacert_rehash`
+* [`cacert_rehash`](#cacert_rehash)
+* [`cacerts_path`](#cacerts_path)
+* [`dnf_module_name`](#dnf_module_name)
+* [`dnf_module_version`](#dnf_module_version)
+* [`group`](#group)
+* [`home_dir`](#home_dir)
+* [`instances`](#instances)
+* [`limits_config_dir`](#limits_config_dir)
+* [`nsstools_package_name`](#nsstools_package_name)
+* [`package_ensure`](#package_ensure)
+* [`package_name`](#package_name)
+* [`path`](#path)
+* [`service_type`](#service_type)
+* [`ssl_dir`](#ssl_dir)
+* [`ssl_version_min_support`](#ssl_version_min_support)
+* [`supplier_role_name`](#supplier_role_name)
+* [`user`](#user)
+* [`user_shell`](#user_shell)
+
+##### <a name="cacert_rehash"></a>`cacert_rehash`
 
 Data type: `String`
 
 The command that is used to rehash CA certificates.
 
-##### `cacerts_path`
+##### <a name="cacerts_path"></a>`cacerts_path`
 
 Data type: `Stdlib::Absolutepath`
 
 Target directory the 389 ds certs should be exported to. Default: '/etc/openldap/cacerts'
 
-##### `dnf_module_name`
+##### <a name="dnf_module_name"></a>`dnf_module_name`
 
 Data type: `Optional[String]`
 
@@ -68,7 +87,7 @@ The name of the DNF module that should be enabled on RHEL. Optional.
 
 Default value: ``undef``
 
-##### `dnf_module_version`
+##### <a name="dnf_module_version"></a>`dnf_module_version`
 
 Data type: `Optional[String]`
 
@@ -76,88 +95,88 @@ The version of the DNF module that should be enabled on RHEL. Optional.
 
 Default value: ``undef``
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
 Group account 389 ds user should belong to. Default: 'dirsrv'
 
-##### `home_dir`
+##### <a name="home_dir"></a>`home_dir`
 
 Data type: `Stdlib::Absolutepath`
 
 Home directory for the 389 ds user account. Default: '/usr/share/dirsrv'
 
-##### `instances`
+##### <a name="instances"></a>`instances`
 
 Data type: `Hash`
 
 A hash of ds_389::instance resources. Optional.
 
-##### `limits_config_dir`
+##### <a name="limits_config_dir"></a>`limits_config_dir`
 
 Data type: `Stdlib::Absolutepath`
 
 Target directory for resource limit configuration.
 
-##### `nsstools_package_name`
+##### <a name="nsstools_package_name"></a>`nsstools_package_name`
 
 Data type: `String`
 
 Name of the NSS tools package.
 
-##### `package_ensure`
+##### <a name="package_ensure"></a>`package_ensure`
 
 Data type: `String`
 
 389 ds package state. Default 'installed'
 
-##### `package_name`
+##### <a name="package_name"></a>`package_name`
 
 Data type: `Variant[String,Array]`
 
 Name of the 389 ds package to install. Default: '389-ds-base'
 
-##### `path`
+##### <a name="path"></a>`path`
 
 Data type: `String`
 
 Specifies the content of the PATH environment variable when running commands.
 Should usually NOT be altered.
 
-##### `service_type`
+##### <a name="service_type"></a>`service_type`
 
 Data type: `String`
 
 The service manager that should be used.
 
-##### `ssl_dir`
+##### <a name="ssl_dir"></a>`ssl_dir`
 
 Data type: `Stdlib::Absolutepath`
 
 Target directory for generated SSL certificates.
 
-##### `ssl_version_min_support`
+##### <a name="ssl_version_min_support"></a>`ssl_version_min_support`
 
 Data type: `Boolean`
 
 Obsolete parameter, only kept for compatibility with
 spacepants/puppet-ds_389. Will be removed in a later version.
 
-##### `supplier_role_name`
+##### <a name="supplier_role_name"></a>`supplier_role_name`
 
 Data type: `String`
 
 In 389-ds the name of the supplier replication role was renamed from
 'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
 User account 389 ds should run as. Default: 'dirsrv'
 
-##### `user_shell`
+##### <a name="user_shell"></a>`user_shell`
 
 Data type: `String`
 
@@ -165,7 +184,7 @@ Shell for the user account. Usually a pseudo-shell to prevent console access.
 
 ## Defined types
 
-### `ds_389::add`
+### <a name="ds_389add"></a>`ds_389::add`
 
 Adds an ldif file to a 389 ds instance.
 
@@ -210,9 +229,21 @@ ds_389::add { 'add_example_3':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::add` defined type.
+The following parameters are available in the `ds_389::add` defined type:
 
-##### `content`
+* [`content`](#content)
+* [`group`](#group)
+* [`protocol`](#protocol)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`server_host`](#server_host)
+* [`server_id`](#server_id)
+* [`server_port`](#server_port)
+* [`source`](#source)
+* [`starttls`](#starttls)
+* [`user`](#user)
+
+##### <a name="content"></a>`content`
 
 Data type: `Optional[String]`
 
@@ -220,7 +251,7 @@ The content value to use for the ldif file. Required, unless providing the sourc
 
 Default value: ``undef``
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -228,7 +259,7 @@ The group of the created ldif file. Default: `$ds_389::group`
 
 Default value: `$ds_389::group`
 
-##### `protocol`
+##### <a name="protocol"></a>`protocol`
 
 Data type: `Enum['ldap','ldaps']`
 
@@ -236,19 +267,19 @@ The protocol to use when calling ldapadd. Default: 'ldap'
 
 Default value: `'ldap'`
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password to use when calling ldapadd. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The bind DN to use when calling ldapadd. Required.
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -256,13 +287,13 @@ The host to use when calling ldapadd. Default: `$facts['networking']['fqdn']`
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
 The 389 ds instance name. Required.
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -270,7 +301,7 @@ The port to use when calling ldapadd. Default: 389
 
 Default value: `389`
 
-##### `source`
+##### <a name="source"></a>`source`
 
 Data type: `Optional[String]`
 
@@ -278,7 +309,7 @@ The source path to use for the ldif file. Required, unless providing the content
 
 Default value: ``undef``
 
-##### `starttls`
+##### <a name="starttls"></a>`starttls`
 
 Data type: `Boolean`
 
@@ -286,7 +317,7 @@ Whether to use StartTLS when calling ldapadd. Default: false
 
 Default value: ``false``
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -294,7 +325,7 @@ The owner of the created ldif file. Default: `$ds_389::user`
 
 Default value: `$ds_389::user`
 
-### `ds_389::backup`
+### <a name="ds_389backup"></a>`ds_389::backup`
 
 Setup backup jobs for a 389 ds instance.
 
@@ -312,9 +343,22 @@ ds_389::backup { 'daily backup':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::backup` defined type.
+The following parameters are available in the `ds_389::backup` defined type:
 
-##### `backup_dir`
+* [`backup_dir`](#backup_dir)
+* [`ensure`](#ensure)
+* [`environment`](#environment)
+* [`protocol`](#protocol)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`rotate`](#rotate)
+* [`time`](#time)
+* [`server_host`](#server_host)
+* [`server_id`](#server_id)
+* [`server_port`](#server_port)
+* [`success_file`](#success_file)
+
+##### <a name="backup_dir"></a>`backup_dir`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
@@ -323,7 +367,7 @@ be read- and writable for the 389-ds user. Default: `/var/lib/dirsrv/slapd-insta
 
 Default value: ``undef``
 
-##### `ensure`
+##### <a name="ensure"></a>`ensure`
 
 Data type: `String`
 
@@ -332,7 +376,7 @@ or removed (`absent`).
 
 Default value: `'present'`
 
-##### `environment`
+##### <a name="environment"></a>`environment`
 
 Data type: `Array`
 
@@ -341,7 +385,7 @@ PATH variable is automatically added to the environment.
 
 Default value: `[]`
 
-##### `protocol`
+##### <a name="protocol"></a>`protocol`
 
 Data type: `Enum['ldap','ldaps']`
 
@@ -349,19 +393,19 @@ The protocol to use when performing the backup.
 
 Default value: `'ldaps'`
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password to use when performing the backup. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The bind DN to use when performing the backup. Required.
 
-##### `rotate`
+##### <a name="rotate"></a>`rotate`
 
 Data type: `Integer`
 
@@ -369,7 +413,7 @@ The maximum backup age in days. Older backups will be removed.
 
 Default value: `30`
 
-##### `time`
+##### <a name="time"></a>`time`
 
 Data type: `Array`
 
@@ -377,7 +421,7 @@ An array containing the cron schedule in this order: minute, hour, weekday.
 
 Default value: `['15', '23', '*']`
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -385,13 +429,13 @@ The host to use when performing the backup. Default: `$facts['networking']['fqdn
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
 The 389 ds instance name. Required.
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -399,7 +443,7 @@ The port to use when performing the backup. Default: 636
 
 Default value: `636`
 
-##### `success_file`
+##### <a name="success_file"></a>`success_file`
 
 Data type: `Stdlib::Absolutepath`
 
@@ -407,7 +451,7 @@ Specify a path where upon successful backup a file should be created for checkin
 
 Default value: `'/tmp/389ds_backup_success'`
 
-### `ds_389::instance`
+### <a name="ds_389instance"></a>`ds_389::instance`
 
 Manages a 389 ds instance.
 
@@ -427,9 +471,33 @@ ds_389::instance { 'foo':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::instance` defined type.
+The following parameters are available in the `ds_389::instance` defined type:
 
-##### `add_ldifs`
+* [`add_ldifs`](#add_ldifs)
+* [`backup_enable`](#backup_enable)
+* [`backup_notls`](#backup_notls)
+* [`base_load_ldifs`](#base_load_ldifs)
+* [`cert_db_pass`](#cert_db_pass)
+* [`create_suffix`](#create_suffix)
+* [`group`](#group)
+* [`minssf`](#minssf)
+* [`modify_ldifs`](#modify_ldifs)
+* [`plugins`](#plugins)
+* [`replication`](#replication)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`schema_extensions`](#schema_extensions)
+* [`server_host`](#server_host)
+* [`server_id`](#server_id)
+* [`server_port`](#server_port)
+* [`server_ssl_port`](#server_ssl_port)
+* [`ssl`](#ssl)
+* [`ssl_version_min`](#ssl_version_min)
+* [`subject_alt_names`](#subject_alt_names)
+* [`suffix`](#suffix)
+* [`user`](#user)
+
+##### <a name="add_ldifs"></a>`add_ldifs`
 
 Data type: `Optional[Hash]`
 
@@ -437,7 +505,7 @@ A hash of ldif add files. See add.pp. Optional.
 
 Default value: ``undef``
 
-##### `backup_enable`
+##### <a name="backup_enable"></a>`backup_enable`
 
 Data type: `Boolean`
 
@@ -445,7 +513,7 @@ Whether to enable a periodic backup job for this instance.
 
 Default value: ``false``
 
-##### `backup_notls`
+##### <a name="backup_notls"></a>`backup_notls`
 
 Data type: `Boolean`
 
@@ -453,7 +521,7 @@ Whether to disable TLS connection for the backup job.
 
 Default value: ``false``
 
-##### `base_load_ldifs`
+##### <a name="base_load_ldifs"></a>`base_load_ldifs`
 
 Data type: `Optional[Hash]`
 
@@ -461,13 +529,13 @@ A hash of ldif add files to load after all other config files have been added. O
 
 Default value: ``undef``
 
-##### `cert_db_pass`
+##### <a name="cert_db_pass"></a>`cert_db_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The certificate db password to ensure. Required.
 
-##### `create_suffix`
+##### <a name="create_suffix"></a>`create_suffix`
 
 Data type: `Boolean`
 
@@ -475,7 +543,7 @@ Set this parameter to `True` to create a generic root node entry for the suffix 
 
 Default value: ``true``
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -483,7 +551,7 @@ The group for the instance. Default: `$ds_389::group`
 
 Default value: `$ds_389::group`
 
-##### `minssf`
+##### <a name="minssf"></a>`minssf`
 
 Data type: `Integer`
 
@@ -491,7 +559,7 @@ The minimum security strength for connections. Default: 0
 
 Default value: `0`
 
-##### `modify_ldifs`
+##### <a name="modify_ldifs"></a>`modify_ldifs`
 
 Data type: `Optional[Hash]`
 
@@ -499,7 +567,7 @@ A hash of ldif modify files. See modify.pp. Optional.
 
 Default value: ``undef``
 
-##### `plugins`
+##### <a name="plugins"></a>`plugins`
 
 Data type: `Optional[Hash]`
 
@@ -507,7 +575,7 @@ A hash of plugins to enable or disable. See plugin.pp. Optional.
 
 Default value: ``undef``
 
-##### `replication`
+##### <a name="replication"></a>`replication`
 
 Data type: `Optional[Hash]`
 
@@ -515,19 +583,19 @@ A replication config hash. See replication.pp. Optional.
 
 Default value: ``undef``
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The root dn password to ensure. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The root dn to ensure. Required.
 
-##### `schema_extensions`
+##### <a name="schema_extensions"></a>`schema_extensions`
 
 Data type: `Optional[Hash]`
 
@@ -535,7 +603,7 @@ A hash of schemas to ensure. See schema.pp. Optional.
 
 Default value: ``undef``
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -543,7 +611,7 @@ The fqdn for the instance. Default: `$facts['networking']['fqdn']`
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
@@ -551,7 +619,7 @@ The server identifier for the instance. Default: `$facts['networking']['hostname
 
 Default value: `$facts['networking']['hostname']`
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -559,7 +627,7 @@ The port to use for non-SSL traffic. Default: 389
 
 Default value: `389`
 
-##### `server_ssl_port`
+##### <a name="server_ssl_port"></a>`server_ssl_port`
 
 Data type: `Integer`
 
@@ -567,7 +635,7 @@ The port to use for SSL traffic. Default: 636
 
 Default value: `636`
 
-##### `ssl`
+##### <a name="ssl"></a>`ssl`
 
 Data type: `Optional[Hash]`
 
@@ -575,7 +643,7 @@ An ssl config hash. See ssl.pp. Optional.
 
 Default value: ``undef``
 
-##### `ssl_version_min`
+##### <a name="ssl_version_min"></a>`ssl_version_min`
 
 Data type: `Optional[String]`
 
@@ -583,7 +651,7 @@ The minimum TLS version the instance should support. Optional.
 
 Default value: ``undef``
 
-##### `subject_alt_names`
+##### <a name="subject_alt_names"></a>`subject_alt_names`
 
 Data type: `Optional[Array]`
 
@@ -591,13 +659,13 @@ An array of subject alt names, if using self-signed certificates. Optional.
 
 Default value: ``undef``
 
-##### `suffix`
+##### <a name="suffix"></a>`suffix`
 
 Data type: `String`
 
 The LDAP suffix to use. Required.
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -605,7 +673,7 @@ The user for the instance. Default: $ds_389::user
 
 Default value: `$ds_389::user`
 
-### `ds_389::modify`
+### <a name="ds_389modify"></a>`ds_389::modify`
 
 Adds an ldif modify file to a 389 ds instance.
 
@@ -650,9 +718,21 @@ ds_389::modify { 'modify_example_3':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::modify` defined type.
+The following parameters are available in the `ds_389::modify` defined type:
 
-##### `content`
+* [`content`](#content)
+* [`group`](#group)
+* [`protocol`](#protocol)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`server_host`](#server_host)
+* [`server_id`](#server_id)
+* [`server_port`](#server_port)
+* [`source`](#source)
+* [`starttls`](#starttls)
+* [`user`](#user)
+
+##### <a name="content"></a>`content`
 
 Data type: `Optional[String]`
 
@@ -660,7 +740,7 @@ The content value to use for the ldif file. Required, unless providing the sourc
 
 Default value: ``undef``
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -668,7 +748,7 @@ The group of the created ldif file. Default: `$ds_389::group`
 
 Default value: `$ds_389::group`
 
-##### `protocol`
+##### <a name="protocol"></a>`protocol`
 
 Data type: `Enum['ldap','ldaps']`
 
@@ -676,19 +756,19 @@ The protocol to use when calling ldapmodify. Default: 'ldap'
 
 Default value: `'ldap'`
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password to use when calling ldapmodify. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The bind DN to use when calling ldapmodify. Required.
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -696,13 +776,13 @@ The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
 The 389 ds instance name. Required.
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -710,7 +790,7 @@ The port to use when calling ldapmodify. Default: 389
 
 Default value: `389`
 
-##### `source`
+##### <a name="source"></a>`source`
 
 Data type: `Optional[String]`
 
@@ -718,7 +798,7 @@ The source path to use for the ldif file. Required, unless providing the content
 
 Default value: ``undef``
 
-##### `starttls`
+##### <a name="starttls"></a>`starttls`
 
 Data type: `Boolean`
 
@@ -726,7 +806,7 @@ Whether to use StartTLS when calling ldapmodify. Default: false
 
 Default value: ``false``
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -734,7 +814,7 @@ The owner of the created ldif file. Default: `$ds_389::user`
 
 Default value: `$ds_389::user`
 
-### `ds_389::plugin`
+### <a name="ds_389plugin"></a>`ds_389::plugin`
 
 Manages a plugin for a 389 ds instance.
 
@@ -765,9 +845,18 @@ ds_389::plugin { 'memberof':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::plugin` defined type.
+The following parameters are available in the `ds_389::plugin` defined type:
 
-##### `ensure`
+* [`ensure`](#ensure)
+* [`options`](#options)
+* [`protocol`](#protocol)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`server_host`](#server_host)
+* [`server_id`](#server_id)
+* [`server_port`](#server_port)
+
+##### <a name="ensure"></a>`ensure`
 
 Data type: `Enum['enabled','disabled']`
 
@@ -775,7 +864,7 @@ The desired state of the plugin. Default: 'enabled'
 
 Default value: `'enabled'`
 
-##### `options`
+##### <a name="options"></a>`options`
 
 Data type: `Array`
 
@@ -785,7 +874,7 @@ further attempts will fail. Optional.
 
 Default value: `[]`
 
-##### `protocol`
+##### <a name="protocol"></a>`protocol`
 
 Data type: `Enum['ldap','ldaps']`
 
@@ -793,19 +882,19 @@ The protocol to use when calling ldapadd. Default: 'ldap'
 
 Default value: `'ldap'`
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password to use when calling ldapadd. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The bind DN to use when calling ldapadd. Required.
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -813,13 +902,13 @@ The host to use when calling ldapadd. Default: `$facts['networking']['fqdn']`
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
 The 389 ds instance name. Required.
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -827,7 +916,7 @@ The port to use when calling ldapadd. Default: 389
 
 Default value: `389`
 
-### `ds_389::replication`
+### <a name="ds_389replication"></a>`ds_389::replication`
 
 Sets up replication for a 389 ds instance.
 
@@ -883,9 +972,35 @@ ds_389::replication { 'supplier1':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::replication` defined type.
+The following parameters are available in the `ds_389::replication` defined type:
 
-##### `bind_dn`
+* [`bind_dn`](#bind_dn)
+* [`consumers`](#consumers)
+* [`excluded_attributes`](#excluded_attributes)
+* [`group`](#group)
+* [`hubs`](#hubs)
+* [`id`](#id)
+* [`init_consumers`](#init_consumers)
+* [`init_hubs`](#init_hubs)
+* [`init_suppliers`](#init_suppliers)
+* [`protocol`](#protocol)
+* [`purge_delay`](#purge_delay)
+* [`replica_port`](#replica_port)
+* [`replica_transport`](#replica_transport)
+* [`replication_pass`](#replication_pass)
+* [`replication_user`](#replication_user)
+* [`role`](#role)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`server_host`](#server_host)
+* [`server_port`](#server_port)
+* [`starttls`](#starttls)
+* [`suffix`](#suffix)
+* [`supplier_role_name`](#supplier_role_name)
+* [`suppliers`](#suppliers)
+* [`user`](#user)
+
+##### <a name="bind_dn"></a>`bind_dn`
 
 Data type: `Optional[String]`
 
@@ -893,7 +1008,7 @@ The bind dn of the replication user. Required.
 
 Default value: ``undef``
 
-##### `consumers`
+##### <a name="consumers"></a>`consumers`
 
 Data type: `Optional[Array]`
 
@@ -901,7 +1016,7 @@ An array of consumer names to ensure. Optional.
 
 Default value: ``undef``
 
-##### `excluded_attributes`
+##### <a name="excluded_attributes"></a>`excluded_attributes`
 
 Data type: `Optional[Array]`
 
@@ -909,7 +1024,7 @@ An array of attributes to exclude from replication. Optional.
 
 Default value: ``undef``
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -917,7 +1032,7 @@ The group of the created ldif file. Default: $ds_389::group
 
 Default value: `$ds_389::group`
 
-##### `hubs`
+##### <a name="hubs"></a>`hubs`
 
 Data type: `Optional[Array]`
 
@@ -925,7 +1040,7 @@ An array of hub names to ensure. Optional.
 
 Default value: ``undef``
 
-##### `id`
+##### <a name="id"></a>`id`
 
 Data type: `Optional[Integer]`
 
@@ -933,7 +1048,7 @@ The replica id. Optional unless declaring a supplier.
 
 Default value: ``undef``
 
-##### `init_consumers`
+##### <a name="init_consumers"></a>`init_consumers`
 
 Data type: `Boolean`
 
@@ -941,7 +1056,7 @@ Whether to initialize replication for consumers. Default: false
 
 Default value: ``false``
 
-##### `init_hubs`
+##### <a name="init_hubs"></a>`init_hubs`
 
 Data type: `Boolean`
 
@@ -949,7 +1064,7 @@ Whether to initialize replication for hubs. Default: false
 
 Default value: ``false``
 
-##### `init_suppliers`
+##### <a name="init_suppliers"></a>`init_suppliers`
 
 Data type: `Boolean`
 
@@ -957,7 +1072,7 @@ Whether to initialize replication for suppliers. Default: false
 
 Default value: ``false``
 
-##### `protocol`
+##### <a name="protocol"></a>`protocol`
 
 Data type: `Enum['ldap','ldaps']`
 
@@ -965,7 +1080,7 @@ The protocol to use when calling ldapmodify. Default: 'ldap'
 
 Default value: `'ldap'`
 
-##### `purge_delay`
+##### <a name="purge_delay"></a>`purge_delay`
 
 Data type: `Integer`
 
@@ -973,7 +1088,7 @@ Time in seconds state information stored in replica entries is retained. Default
 
 Default value: `604800`
 
-##### `replica_port`
+##### <a name="replica_port"></a>`replica_port`
 
 Data type: `Integer`
 
@@ -981,21 +1096,21 @@ The port to use for replication. Default: 389
 
 Default value: `389`
 
-##### `replica_transport`
+##### <a name="replica_transport"></a>`replica_transport`
 
-Data type: `Enum['LDAP','SSL','TLS']`
+Data type: `Enum['LDAP','SSL','TLS','LDAPS','StartTLS']`
 
 The transport type to use for replication. Default: 'LDAP'
 
 Default value: `'LDAP'`
 
-##### `replication_pass`
+##### <a name="replication_pass"></a>`replication_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password of the replication user. Required.
 
-##### `replication_user`
+##### <a name="replication_user"></a>`replication_user`
 
 Data type: `String`
 
@@ -1003,25 +1118,25 @@ The user account to use for replication.
 
 Default value: `'Replication Manager'`
 
-##### `role`
+##### <a name="role"></a>`role`
 
 Data type: `Enum['supplier','hub','consumer']`
 
 Replication role. Either 'supplier', 'hub', or 'consumer'. Required.
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The root dn password for configuring replication. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The root dn for configuring replication. Required.
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -1029,7 +1144,7 @@ The host to use when calling ldapmodify. Default: $fqdn
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -1037,7 +1152,7 @@ The port to use when calling ldapmodify. Default: 389
 
 Default value: `389`
 
-##### `starttls`
+##### <a name="starttls"></a>`starttls`
 
 Data type: `Boolean`
 
@@ -1045,13 +1160,13 @@ Whether to use StartTLS when calling ldapmodify. Default: false
 
 Default value: ``false``
 
-##### `suffix`
+##### <a name="suffix"></a>`suffix`
 
 Data type: `String`
 
 The LDAP suffix to use. Required.
 
-##### `supplier_role_name`
+##### <a name="supplier_role_name"></a>`supplier_role_name`
 
 Data type: `String`
 
@@ -1060,7 +1175,7 @@ In 389-ds the name of the supplier replication role was renamed from
 
 Default value: `$ds_389::supplier_role_name`
 
-##### `suppliers`
+##### <a name="suppliers"></a>`suppliers`
 
 Data type: `Optional[Array]`
 
@@ -1068,7 +1183,7 @@ An array of supplier names to ensure. Optional.
 
 Default value: ``undef``
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -1076,7 +1191,7 @@ The owner of the created ldif file. Default: $ds_389::user
 
 Default value: `$ds_389::user`
 
-### `ds_389::schema`
+### <a name="ds_389schema"></a>`ds_389::schema`
 
 Adds a schema extension ldif file to a 389 ds instance.
 
@@ -1093,9 +1208,14 @@ ds_389::schema { '50example':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::schema` defined type.
+The following parameters are available in the `ds_389::schema` defined type:
 
-##### `group`
+* [`group`](#group)
+* [`server_id`](#server_id)
+* [`source`](#source)
+* [`user`](#user)
+
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -1103,19 +1223,19 @@ The group of the created ldif file. Default: $ds_389::group
 
 Default value: `$ds_389::group`
 
-##### `server_id`
+##### <a name="server_id"></a>`server_id`
 
 Data type: `String`
 
 The 389 ds instance name. Required.
 
-##### `source`
+##### <a name="source"></a>`source`
 
 Data type: `String`
 
 The source path to use for the ldif file. Required.
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -1123,15 +1243,18 @@ The owner of the created ldif file. Default: $ds_389::user
 
 Default value: `$ds_389::user`
 
-### `ds_389::service`
+### <a name="ds_389service"></a>`ds_389::service`
 
 Manages the service for a 389 ds instance.
 
 #### Parameters
 
-The following parameters are available in the `ds_389::service` defined type.
+The following parameters are available in the `ds_389::service` defined type:
 
-##### `service_enable`
+* [`service_enable`](#service_enable)
+* [`service_ensure`](#service_ensure)
+
+##### <a name="service_enable"></a>`service_enable`
 
 Data type: `Boolean`
 
@@ -1139,7 +1262,7 @@ Whether the service should be enabled. Default: true
 
 Default value: ``true``
 
-##### `service_ensure`
+##### <a name="service_ensure"></a>`service_ensure`
 
 Data type: `String`
 
@@ -1147,7 +1270,7 @@ The state the service should be in. Default: 'running'
 
 Default value: `'running'`
 
-### `ds_389::ssl`
+### <a name="ds_389ssl"></a>`ds_389::ssl`
 
 Manages SSL for a 389 ds instance.
 
@@ -1165,15 +1288,26 @@ ds_389::ssl { 'foo':
 
 #### Parameters
 
-The following parameters are available in the `ds_389::ssl` defined type.
+The following parameters are available in the `ds_389::ssl` defined type:
 
-##### `cert_name`
+* [`cert_name`](#cert_name)
+* [`group`](#group)
+* [`minssf`](#minssf)
+* [`root_dn_pass`](#root_dn_pass)
+* [`root_dn`](#root_dn)
+* [`server_host`](#server_host)
+* [`server_port`](#server_port)
+* [`server_ssl_port`](#server_ssl_port)
+* [`ssl_version_min`](#ssl_version_min)
+* [`user`](#user)
+
+##### <a name="cert_name"></a>`cert_name`
 
 Data type: `String`
 
 The nickname of the SSL cert to use. Required.
 
-##### `group`
+##### <a name="group"></a>`group`
 
 Data type: `String`
 
@@ -1181,7 +1315,7 @@ The group of the created ldif file. Default: $ds_389::group
 
 Default value: `$ds_389::group`
 
-##### `minssf`
+##### <a name="minssf"></a>`minssf`
 
 Data type: `Integer`
 
@@ -1189,19 +1323,19 @@ The minimum security strength for connections. Default: 0
 
 Default value: `0`
 
-##### `root_dn_pass`
+##### <a name="root_dn_pass"></a>`root_dn_pass`
 
 Data type: `Variant[String,Sensitive[String]]`
 
 The password to use when calling ldapmodify. Required.
 
-##### `root_dn`
+##### <a name="root_dn"></a>`root_dn`
 
 Data type: `String`
 
 The bind DN to use when calling ldapmodify. Required.
 
-##### `server_host`
+##### <a name="server_host"></a>`server_host`
 
 Data type: `String`
 
@@ -1209,7 +1343,7 @@ The host to use when calling ldapmodify. Default: `$facts['networking']['fqdn']`
 
 Default value: `$facts['networking']['fqdn']`
 
-##### `server_port`
+##### <a name="server_port"></a>`server_port`
 
 Data type: `Integer`
 
@@ -1217,7 +1351,7 @@ The port to use when calling ldapmodify. Default: 389
 
 Default value: `389`
 
-##### `server_ssl_port`
+##### <a name="server_ssl_port"></a>`server_ssl_port`
 
 Data type: `Integer`
 
@@ -1225,7 +1359,7 @@ The port to use for SSL traffic. Default: 636
 
 Default value: `636`
 
-##### `ssl_version_min`
+##### <a name="ssl_version_min"></a>`ssl_version_min`
 
 Data type: `String`
 
@@ -1233,7 +1367,7 @@ The minimum TLS version to allow. Default: 'TLS1.1'
 
 Default value: `'TLS1.1'`
 
-##### `user`
+##### <a name="user"></a>`user`
 
 Data type: `String`
 
@@ -1243,7 +1377,7 @@ Default value: `$ds_389::user`
 
 ## Tasks
 
-### `reinit_consumer`
+### <a name="reinit_consumer"></a>`reinit_consumer`
 
 Allows you to reinitialize replication for a consumer
 

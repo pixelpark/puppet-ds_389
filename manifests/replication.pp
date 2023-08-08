@@ -129,7 +129,7 @@ define ds_389::replication (
   Enum['ldap','ldaps'] $protocol = 'ldap',
   Integer $purge_delay = 604800,
   Integer $replica_port = 389,
-  Enum['LDAP','SSL','TLS'] $replica_transport = 'LDAP',
+  Enum['LDAP','SSL','TLS','LDAPS','StartTLS'] $replica_transport = 'LDAP',
   String $replication_user = 'Replication Manager',
   String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,

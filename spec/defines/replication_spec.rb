@@ -119,7 +119,7 @@ objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to consumer1 agreement
 nsDS5ReplicaHost: consumer1
 nsDS5ReplicaPort: 1636
-nsDS5ReplicaTransportInfo: SSL
+nsDS5ReplicaTransportInfo: LDAPS
 nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
 nsDS5ReplicaBindMethod: SIMPLE
 nsDS5ReplicaCredentials: supersecret
@@ -151,7 +151,7 @@ objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to hub1 agreement
 nsDS5ReplicaHost: hub1
 nsDS5ReplicaPort: 1636
-nsDS5ReplicaTransportInfo: SSL
+nsDS5ReplicaTransportInfo: LDAPS
 nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
 nsDS5ReplicaBindMethod: SIMPLE
 nsDS5ReplicaCredentials: supersecret
@@ -183,7 +183,7 @@ objectClass: nsDS5ReplicationAgreement
 cn: specdirectory to supplier1 agreement
 nsDS5ReplicaHost: supplier1
 nsDS5ReplicaPort: 1636
-nsDS5ReplicaTransportInfo: SSL
+nsDS5ReplicaTransportInfo: LDAPS
 nsDS5ReplicaBindDN: cn=Replication Manager,cn=config
 nsDS5ReplicaBindMethod: SIMPLE
 nsDS5ReplicaCredentials: supersecret
@@ -296,7 +296,7 @@ nsDS5BeginReplicaRefresh: start
               server_port: 1389,
               starttls: true,
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               user: 'custom_user',
               group: 'custom_group',
             }
@@ -428,7 +428,7 @@ nsDS5BeginReplicaRefresh: start
               server_port: 1636,
               protocol: 'ldaps',
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               user: 'custom_user',
               group: 'custom_group',
               consumers: ['consumer1', 'specdirectory'],
@@ -470,7 +470,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 repl-agmt create  --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldaps://ldap.test.org:1636 repl-agmt create  --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=LDAPS --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
             )
@@ -497,7 +497,7 @@ nsDS5BeginReplicaRefresh: start
                 server_host: 'ldap.test.org',
                 server_port: 1389,
                 replica_port: 1636,
-                replica_transport: 'SSL',
+                replica_transport: 'LDAPS',
                 user: 'custom_user',
                 group: 'custom_group',
                 consumers: ['consumer1'],
@@ -760,7 +760,7 @@ nsDS5BeginReplicaRefresh: start
               server_host: 'ldap.test.org',
               server_port: 1389,
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               purge_delay: 9999,
               user: 'custom_user',
               group: 'custom_group',
@@ -798,7 +798,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Create replication agreement for supplier supplier1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='supplier1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='supplier1' --port=1636 --conn-protocol=LDAPS --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to supplier1 agreement' && touch /etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/supplier_supplier1_agreement.done',
             )
@@ -826,7 +826,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Create replication agreement for hub hub1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='hub1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='hub1' --port=1636 --conn-protocol=LDAPS --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to hub1 agreement' && touch /etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_agreement.done',
             )
@@ -854,7 +854,7 @@ nsDS5BeginReplicaRefresh: start
 
           it {
             is_expected.to contain_exec('Create replication agreement for consumer consumer1: specdirectory').with(
-              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=SSL --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
+              command: "dsconf -D 'cn=Directory Manager' -w 'supersecure' ldap://ldap.test.org:1389 repl-agmt create --frac-list='authorityRevocationList accountUnlockTime memberof' --suffix='dc=test,dc=org' --host='consumer1' --port=1636 --conn-protocol=LDAPS --bind-dn='cn=Replication Manager,cn=config' --bind-passwd='supersecret' --bind-method=SIMPLE 'specdirectory to consumer1 agreement' && touch /etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done", # rubocop:disable LineLength
               path: '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin',
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_agreement.done',
             )
@@ -884,7 +884,7 @@ nsDS5BeginReplicaRefresh: start
               server_host: 'ldap.test.org',
               server_port: 1389,
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
@@ -926,7 +926,7 @@ nsDS5BeginReplicaRefresh: start
               server_host: 'ldap.test.org',
               server_port: 1389,
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
@@ -968,7 +968,7 @@ nsDS5BeginReplicaRefresh: start
               server_host: 'ldap.test.org',
               server_port: 1389,
               replica_port: 1636,
-              replica_transport: 'SSL',
+              replica_transport: 'LDAPS',
               user: 'custom_user',
               group: 'custom_group',
               id: 100,
