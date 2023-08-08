@@ -1,6 +1,6 @@
 {
   "name": "markt-ds_389",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "author": "markt.de",
   "summary": "Module for installing and managing 389 Directory Server",
   "license": "Apache-2.0",
