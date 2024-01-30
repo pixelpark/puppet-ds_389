@@ -520,7 +520,6 @@ define ds_389::instance (
         server_host  => $server_host,
         server_port  => $server_port,
         require      => Service["dirsrv@${server_id}"],
-        before       => Anchor["${name}_ldif_modify"],
       }
     }
   }
@@ -552,7 +551,6 @@ define ds_389::instance (
       user                => $user,
       group               => $group,
       require             => Service["dirsrv@${server_id}"],
-      before              => Anchor["${name}_ldif_modify"],
     }
   }
 
@@ -577,10 +575,6 @@ define ds_389::instance (
     }
   }
 
-  anchor { "${name}_ldif_modify":
-    require => Service["dirsrv@${server_id}"],
-  }
-
   # ldif modify
   if $modify_ldifs {
     $modify_ldifs.each |$filename, $source| {
@@ -595,13 +589,10 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_modify",
-        require      => Anchor["${name}_ldif_modify"],
-        before       => Anchor["${name}_ldif_add"],
+        require      => Service["dirsrv@${server_id}"],
       }
     }
   }
-
-  anchor { "${name}_ldif_add": }
 
   # ldif add
   if $add_ldifs {
@@ -617,13 +608,9 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_add",
-        require      => Anchor["${name}_ldif_add"],
-        before       => Anchor["${name}_ldif_base_load"],
       }
     }
   }
-
-  anchor { "${name}_ldif_base_load": }
 
   # ldif base_load
   if $base_load_ldifs {
@@ -639,7 +626,6 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_base_load",
-        require      => Anchor["${name}_ldif_base_load"],
       }
     }
   }

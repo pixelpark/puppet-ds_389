@@ -255,9 +255,6 @@ basicConstraints = CA:true
           it { is_expected.to contain_file('/etc/init.d/dirsrv@foo') }
         end
         it { is_expected.to contain_service('dirsrv@foo') }
-        it { is_expected.to contain_anchor('foo_ldif_modify').that_requires('Service[dirsrv@foo]') }
-        it { is_expected.to contain_anchor('foo_ldif_add') }
-        it { is_expected.to contain_anchor('foo_ldif_base_load') }
       end
     end
   end

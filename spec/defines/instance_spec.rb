@@ -1046,9 +1046,6 @@ describe 'ds_389::instance' do
 
           it { is_expected.to contain_exec('Add replication user: ldap01') }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/replication-user.ldif') }
-          it { is_expected.to contain_anchor('ldap01_replication_suppliers').that_requires('Exec[Add replication user: ldap01]') }
-          it { is_expected.to contain_anchor('ldap01_replication_hubs').that_requires('Anchor[ldap01_replication_suppliers]') }
-          it { is_expected.to contain_anchor('ldap01_replication_consumers').that_requires('Anchor[ldap01_replication_hubs]') }
         end
 
         context 'when loading additional ldifs' do
@@ -1083,10 +1080,6 @@ describe 'ds_389::instance' do
 
           it { is_expected.to compile }
 
-          it { is_expected.to contain_anchor('specdirectory_ldif_modify').that_requires('Service[dirsrv@ldap01]') }
-          it { is_expected.to contain_anchor('specdirectory_ldif_add') }
-          it { is_expected.to contain_anchor('specdirectory_ldif_base_load') }
-
           it {
             is_expected.to contain_ds_389__modify('specmodify1').with(
               server_id: 'ldap01',
@@ -1098,7 +1091,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specmodify1.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_modify]').that_comes_before('Anchor[specdirectory_ldif_add]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specmodify1.ldif') }
           it { is_expected.to contain_exec('Modify ldif specmodify1: ldap01') }
@@ -1113,7 +1106,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specmodify2.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_modify]').that_comes_before('Anchor[specdirectory_ldif_add]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specmodify2.ldif') }
           it { is_expected.to contain_exec('Modify ldif specmodify2: ldap01') }
@@ -1129,7 +1122,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specadd1.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_add]').that_comes_before('Anchor[specdirectory_ldif_base_load]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specadd1.ldif') }
           it { is_expected.to contain_exec('Add ldif specadd1: ldap01') }
@@ -1144,7 +1137,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specadd2.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_add]').that_comes_before('Anchor[specdirectory_ldif_base_load]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specadd2.ldif') }
           it { is_expected.to contain_exec('Add ldif specadd2: ldap01') }
@@ -1160,7 +1153,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specbaseload1.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_base_load]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specbaseload1.ldif') }
           it { is_expected.to contain_exec('Add ldif specbaseload1: ldap01') }
@@ -1175,7 +1168,7 @@ describe 'ds_389::instance' do
               source: 'puppet:///specfiles/specbaseload2.ldif',
               user: 'custom_user',
               group: 'custom_group',
-            ).that_requires('Anchor[specdirectory_ldif_base_load]')
+            )
           }
           it { is_expected.to contain_file('/etc/dirsrv/slapd-ldap01/specbaseload2.ldif') }
           it { is_expected.to contain_exec('Add ldif specbaseload2: ldap01') }

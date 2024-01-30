@@ -278,10 +278,6 @@ nsDS5BeginReplicaRefresh: start
               creates: '/etc/dirsrv/slapd-specdirectory/replication-user.done',
             ).that_requires('File[/etc/dirsrv/slapd-specdirectory/replication-user.ldif]')
           }
-
-          it { is_expected.to contain_anchor('specdirectory_replication_suppliers').that_requires('Exec[Add replication user: specdirectory]') }
-          it { is_expected.to contain_anchor('specdirectory_replication_hubs').that_requires('Anchor[specdirectory_replication_suppliers]') }
-          it { is_expected.to contain_anchor('specdirectory_replication_consumers').that_requires('Anchor[specdirectory_replication_hubs]') }
         end
 
         context 'with parameter overrides' do
@@ -706,6 +702,7 @@ nsDS5BeginReplicaRefresh: start
                 creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_init.done',
               ).that_requires(
                 [
+                  'Exec[Add replication user: specdirectory]',
                   'Exec[Create replication agreement for hub hub1: specdirectory]',
                 ],
               )
@@ -742,6 +739,7 @@ nsDS5BeginReplicaRefresh: start
                 creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
               ).that_requires(
                 [
+                  'Exec[Add replication user: specdirectory]',
                   'Exec[Create replication agreement for consumer consumer1: specdirectory]',
                 ],
               )
@@ -951,6 +949,7 @@ nsDS5BeginReplicaRefresh: start
               creates: '/etc/dirsrv/slapd-specdirectory/hub_hub1_init.done',
             ).that_requires(
               [
+                'Exec[Add replication user: specdirectory]',
                 'Exec[Create replication agreement for hub hub1: specdirectory]',
               ],
             )
@@ -993,6 +992,7 @@ nsDS5BeginReplicaRefresh: start
               creates: '/etc/dirsrv/slapd-specdirectory/consumer_consumer1_init.done',
             ).that_requires(
               [
+                'Exec[Add replication user: specdirectory]',
                 'Exec[Create replication agreement for consumer consumer1: specdirectory]',
               ],
             )

@@ -388,7 +388,7 @@ define ds_389::replication (
                 path    => $ds_389::path,
                 creates => $repl_init_done,
                 require => [
-                  Anchor["${name}_replication_suppliers"],
+                  Exec["Add replication user: ${name}"],
                   Exec["Create replication agreement for hub ${replica}: ${name}"],
                 ],
               }
@@ -415,7 +415,6 @@ define ds_389::replication (
               path    => $ds_389::path,
               creates => $repl_enable_done,
               require => [
-                Anchor["${name}_replication_hubs"],
                 Exec["Add replication user: ${name}"],
               ],
             }
@@ -439,7 +438,7 @@ define ds_389::replication (
                 path    => $ds_389::path,
                 creates => $repl_init_done,
                 require => [
-                  Anchor["${name}_replication_consumers"],
+                  Exec["Add replication user: ${name}"],
                   Exec["Create replication agreement for consumer ${replica}: ${name}"],
                 ],
               }
@@ -469,15 +468,5 @@ define ds_389::replication (
     require => [
       Ds_389::Ssl[$name],
     ],
-  }
-
-  anchor { "${name}_replication_suppliers":
-    require => Exec["Add replication user: ${name}"],
-  }
-  anchor { "${name}_replication_hubs":
-    require => Anchor["${name}_replication_suppliers"],
-  }
-  anchor { "${name}_replication_consumers":
-    require => Anchor["${name}_replication_hubs"],
   }
 }
