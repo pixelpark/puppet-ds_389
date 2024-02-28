@@ -9,20 +9,20 @@
   "issues_url": "https://github.com/markt-de/puppet-ds_389/issues",
   "dependencies": [
     {
-      "name": "puppetlabs-concat",
-      "version_requirement": ">=7.0.0 <10.0.0"
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 9.0.0 < 10.0.0"
     },
     {
-      "name": "puppetlabs-inifile",
-      "version_requirement": ">=5.0.0 <7.0.0"
+      "name": "puppetlabs/concat",
+      "version_requirement": ">= 9.0.0 < 10.0.0"
     },
     {
-      "name": "puppet-openssl",
-      "version_requirement": ">=2.0.0 <3.0.0"
+      "name": "puppet/openssl",
+      "version_requirement": ">= 3.0.0 < 4.0.0"
     },
     {
-      "name": "puppetlabs-stdlib",
-      "version_requirement": ">=7.0.0 <10.0.0"
+      "name": "puppetlabs/inifile",
+      "version_requirement": ">= 6.1.0 < 7.0.0"
     }
   ],
   "operatingsystem_support": [
