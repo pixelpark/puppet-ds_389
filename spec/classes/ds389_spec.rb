@@ -18,6 +18,8 @@ CN = fooCA
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer:always
 basicConstraints = CA:true
+
+[ v3_req ]
 '
   end
 

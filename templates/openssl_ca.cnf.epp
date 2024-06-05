@@ -13,3 +13,5 @@ CN = <%= $cn %>
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer:always
 basicConstraints = CA:true
+
+[ v3_req ]
