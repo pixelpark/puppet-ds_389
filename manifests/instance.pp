@@ -171,7 +171,7 @@ define ds_389::instance (
     require   => [
       File[$instance_template],
       File[$db_dir],
-    ]
+    ],
     notify    => Exec["stop ${server_id} to create new token"],
   }
   ~> exec { "remove default cert DB: ${server_id}":
