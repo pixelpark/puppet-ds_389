@@ -119,6 +119,23 @@ define ds_389::instance (
     }
   }
 
+  $var_dir = "/var/lib/dirsrv/slapd-${server_id}"
+  $db_dir = "${var_dir}/db"
+
+  file { $var_dir:
+    ensure  => directory,
+    owner   => $user,
+    group   => $group,
+    mode    => '0770',
+    require => File['/var/lib/dirsrv'],
+  }
+  -> file { $db_dir:
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => '0700',
+  }
+
   # Create instance template.
   file { $instance_template:
     ensure  => file,
@@ -151,7 +168,10 @@ define ds_389::instance (
     path      => $ds_389::path,
     creates   => $instance_path,
     logoutput => $logoutput,
-    require   => File[$instance_template],
+    require   => [
+      File[$instance_template],
+      File[$db_dir],
+    ]
     notify    => Exec["stop ${server_id} to create new token"],
   }
   ~> exec { "remove default cert DB: ${server_id}":

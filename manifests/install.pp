@@ -4,6 +4,9 @@ class ds_389::install {
   file { '/etc/dirsrv':
     ensure => directory,
   }
+  file { '/var/lib/dirsrv':
+    ensure => directory,
+  }
 
   exec { 'Create ldap cacerts directory':
     command => "mkdir -p ${ds_389::cacerts_path}",
