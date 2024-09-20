@@ -81,6 +81,9 @@
 # @param replication_pass
 #   The password of the replication user. Required.
 #
+# @param replication_user
+#   The user account to use for replication.
+#
 # @param role
 #   Replication role. Either 'supplier', 'hub', or 'consumer'. Required.
 #
@@ -102,6 +105,10 @@
 # @param suffix
 #   The LDAP suffix to use. Required.
 #
+# @param supplier_role_name
+#   In 389-ds the name of the supplier replication role was renamed from
+#   'master' to 'supplier' in a backwards-incompatible fashion (issue #4656).
+#
 # @param suppliers
 #   An array of supplier names to ensure. Optional.
 #
@@ -122,11 +129,12 @@ define ds_389::replication (
   Enum['ldap','ldaps'] $protocol = 'ldap',
   Integer $purge_delay = 604800,
   Integer $replica_port = 389,
-  Enum['LDAP','SSL','TLS'] $replica_transport = 'LDAP',
+  Enum['LDAP','SSL','TLS','LDAPS','StartTLS'] $replica_transport = 'LDAP',
   String $replication_user = 'Replication Manager',
   String $server_host = $facts['networking']['fqdn'],
   Integer $server_port = 389,
   Boolean $starttls = false,
+  String $supplier_role_name = $ds_389::supplier_role_name,
   String $user = $ds_389::user,
   Optional[Array] $consumers = undef,
   Optional[Array] $excluded_attributes = undef,
@@ -161,61 +169,61 @@ define ds_389::replication (
   # Command to enable replication for the specified suffix.
   $_repl_enable_done = "/etc/dirsrv/slapd-${name}/%s_%s_enable.done"
   $_repl_enable_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'replication enable',
-    "--suffix \'${suffix}\'",
-    '--role=%s',
-    '--replica-id=%s',
-    "--bind-dn=\'${_bind_dn}\'",
-    "--bind-passwd=\'${replication_pass}\'",
-    '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'replication enable',
+      "--suffix \'${suffix}\'",
+      '--role=%s',
+      '--replica-id=%s',
+      "--bind-dn=\'${_bind_dn}\'",
+      "--bind-passwd=\'${replication_pass}\'",
+      '&& touch %s',
   ], ' ')
 
   # Command to create a replication agreement between these hosts.
   $_repl_agreement_done = "/etc/dirsrv/slapd-${name}/%s_%s_agreement.done"
   $_repl_agreement_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'repl-agmt create',
-    $attribute_list,
-    "--suffix=\'${suffix}\'",
-    "--host=\'%s\'",
-    "--port=${replica_port}",
-    "--conn-protocol=${replica_transport}",
-    "--bind-dn=\'${_bind_dn}\'",
-    "--bind-passwd=\'${replication_pass}\'",
-    '--bind-method=SIMPLE',
-    "\'${name} to %s agreement\'",
-    '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'repl-agmt create',
+      $attribute_list,
+      "--suffix=\'${suffix}\'",
+      "--host=\'%s\'",
+      "--port=${replica_port}",
+      "--conn-protocol=${replica_transport}",
+      "--bind-dn=\'${_bind_dn}\'",
+      "--bind-passwd=\'${replication_pass}\'",
+      '--bind-method=SIMPLE',
+      "\'${name} to %s agreement\'",
+      '&& touch %s',
   ], ' ')
 
   # Command to update parameters of the replication agreement.
   # TODO: Should be refactored to allow parameters to be changed.
   $_repl_update_command = join([
-    'dsconf',
-    "-D \'${root_dn}\'",
-    "-w \'${root_dn_pass}\'",
-    "${protocol}://${server_host}:${server_port}",
-    'replication set',
-    "--suffix=\'${suffix}\'",
-    "--repl-purge-delay=\'${purge_delay}\'",
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'replication set',
+      "--suffix=\'${suffix}\'",
+      "--repl-purge-delay=\'${purge_delay}\'",
   ], ' ')
 
   $_repl_init_done = "/etc/dirsrv/slapd-${name}/%s_%s_init.done"
   $_repl_init_command = join([
-  'dsconf',
-  "-D \'${root_dn}\'",
-  "-w \'${root_dn_pass}\'",
-  "${protocol}://${server_host}:${server_port}",
-  'repl-agmt init',
-  "--suffix=\'${suffix}\'",
-  "\'${name} to %s agreement\'",
-  '&& touch %s',
+      'dsconf',
+      "-D \'${root_dn}\'",
+      "-w \'${root_dn_pass}\'",
+      "${protocol}://${server_host}:${server_port}",
+      'repl-agmt init',
+      "--suffix=\'${suffix}\'",
+      "\'${name} to %s agreement\'",
+      '&& touch %s',
   ], ' ')
 
   case $role {
@@ -242,23 +250,6 @@ define ds_389::replication (
 
             # Command to update parameters of the replication agreement.
             $repl_update_command = $_repl_update_command
-
-            # NOTE: This ensures that the status is not lost when migrating from
-            # spacepants/puppet-ds_389 to this module. This migration path will
-            # be removed in a later version.
-            exec { "Migrate replication status for consumer ${replica}: ${name}":
-              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
-              path    => $ds_389::path,
-              creates => $repl_enable_done,
-              onlyif  => "test -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done",
-              require => [
-                Exec["Add replication user: ${name}"],
-              ],
-              before  => [
-                Exec["Enable replication for consumer ${replica}: ${name}"],
-                Exec["Create replication agreement for consumer ${replica}: ${name}"],
-              ],
-            }
 
             exec { "Enable replication for consumer ${replica}: ${name}":
               command => $repl_enable_command,
@@ -311,7 +302,7 @@ define ds_389::replication (
           if ($replica != $name) and ($replica != $facts['networking']['fqdn']) {
             # Command to enable replication for the specified suffix.
             $repl_enable_done = sprintf($_repl_enable_done, 'supplier', $replica)
-            $repl_enable_command = sprintf($_repl_enable_command, 'supplier', $_id, $repl_enable_done)
+            $repl_enable_command = sprintf($_repl_enable_command, $supplier_role_name, $_id, $repl_enable_done)
 
             # Command to create a replication agreement between these hosts.
             $repl_agreement_done = sprintf($_repl_agreement_done, 'supplier', $replica)
@@ -319,23 +310,6 @@ define ds_389::replication (
 
             # Command to update parameters of the replication agreement.
             $repl_update_command = $_repl_update_command
-
-            # NOTE: This ensures that the status is not lost when migrating from
-            # spacepants/puppet-ds_389 to this module. This migration path will
-            # be removed in a later version.
-            exec { "Migrate replication status for supplier ${replica}: ${name}":
-              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/supplier_${replica}.done", # lint:ignore:140chars
-              path    => $ds_389::path,
-              creates => $repl_enable_done,
-              onlyif  => "test -f /etc/dirsrv/slapd-${name}/supplier_${replica}.done",
-              require => [
-                Exec["Add replication user: ${name}"],
-              ],
-              before  => [
-                Exec["Enable replication for supplier ${replica}: ${name}"],
-                Exec["Create replication agreement for supplier ${replica}: ${name}"],
-              ],
-            }
 
             exec { "Enable replication for supplier ${replica}: ${name}":
               command => $repl_enable_command,
@@ -386,23 +360,6 @@ define ds_389::replication (
             # Command to update parameters of the replication agreement.
             $repl_update_command = $_repl_update_command
 
-            # NOTE: This ensures that the status is not lost when migrating from
-            # spacepants/puppet-ds_389 to this module. This migration path will
-            # be removed in a later version.
-            exec { "Migrate replication status for hub ${replica}: ${name}":
-              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/hub_${replica}.done",
-              path    => $ds_389::path,
-              creates => $repl_enable_done,
-              onlyif  => "test -f /etc/dirsrv/slapd-${name}/hub_${replica}.done",
-              require => [
-                Exec["Add replication user: ${name}"],
-              ],
-              before  => [
-                Exec["Enable replication for hub ${replica}: ${name}"],
-                Exec["Create replication agreement for hub ${replica}: ${name}"],
-              ],
-            }
-
             exec { "Enable replication for hub ${replica}: ${name}":
               command => $repl_enable_command,
               path    => $ds_389::path,
@@ -431,7 +388,7 @@ define ds_389::replication (
                 path    => $ds_389::path,
                 creates => $repl_init_done,
                 require => [
-                  Anchor["${name}_replication_suppliers"],
+                  Exec["Add replication user: ${name}"],
                   Exec["Create replication agreement for hub ${replica}: ${name}"],
                 ],
               }
@@ -453,29 +410,11 @@ define ds_389::replication (
             # Command to update parameters of the replication agreement.
             $repl_update_command = $_repl_update_command
 
-            # NOTE: This ensures that the status is not lost when migrating from
-            # spacepants/puppet-ds_389 to this module. This migration path will
-            # be removed in a later version.
-            exec { "Migrate replication status for consumer ${replica}: ${name}":
-              command => "touch ${repl_enable_done} && touch ${repl_agreement_done} && rm -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done", # lint:ignore:140chars
-              path    => $ds_389::path,
-              creates => $repl_enable_done,
-              onlyif  => "test -f /etc/dirsrv/slapd-${name}/consumer_${replica}.done",
-              require => [
-                Exec["Add replication user: ${name}"],
-              ],
-              before  => [
-                Exec["Enable replication for consumer ${replica}: ${name}"],
-                Exec["Create replication agreement for consumer ${replica}: ${name}"],
-              ],
-            }
-
             exec { "Enable replication for consumer ${replica}: ${name}":
               command => $repl_enable_command,
               path    => $ds_389::path,
               creates => $repl_enable_done,
               require => [
-                Anchor["${name}_replication_hubs"],
                 Exec["Add replication user: ${name}"],
               ],
             }
@@ -499,7 +438,7 @@ define ds_389::replication (
                 path    => $ds_389::path,
                 creates => $repl_init_done,
                 require => [
-                  Anchor["${name}_replication_consumers"],
+                  Exec["Add replication user: ${name}"],
                   Exec["Create replication agreement for consumer ${replica}: ${name}"],
                 ],
               }
@@ -516,10 +455,10 @@ define ds_389::replication (
     mode    => '0440',
     owner   => $user,
     group   => $group,
-    content => epp('ds_389/replication-user.epp',{
-      bind_dn          => $_bind_dn,
-      replication_pass => $replication_pass,
-      replication_user => $replication_user,
+    content => epp('ds_389/replication-user.epp', {
+        bind_dn          => $_bind_dn,
+        replication_pass => $replication_pass,
+        replication_user => $replication_user,
     }),
   }
   -> exec { "Add replication user: ${name}":
@@ -529,15 +468,5 @@ define ds_389::replication (
     require => [
       Ds_389::Ssl[$name],
     ],
-  }
-
-  anchor { "${name}_replication_suppliers":
-    require => Exec["Add replication user: ${name}"],
-  }
-  anchor { "${name}_replication_hubs":
-    require => Anchor["${name}_replication_suppliers"],
-  }
-  anchor { "${name}_replication_consumers":
-    require => Anchor["${name}_replication_hubs"],
   }
 }

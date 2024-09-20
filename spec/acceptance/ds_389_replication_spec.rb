@@ -92,5 +92,4 @@ if ENV['RUN_TEST'] == 'replication'
       end
     end
   end
-
 end

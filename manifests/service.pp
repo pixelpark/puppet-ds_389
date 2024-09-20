@@ -25,8 +25,8 @@ define ds_389::service (
     file { "/etc/init.d/dirsrv@${name}":
       ensure  => file,
       mode    => '0755',
-      content => epp('ds_389/service-init.epp',{
-        name => $name,
+      content => epp('ds_389/service-init.epp', {
+          name => $name,
       }),
     }
     service { "dirsrv@${name}":

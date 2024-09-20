@@ -81,7 +81,7 @@ if ENV['RUN_TEST'] == 'main'
                     'USERTrust RSA Certification Authority - AddTrust AB',
                     'AddTrust External CA Root - AddTrust AB',
                   ],
-                  'cert_name'      => $::fqdn,
+                  'cert_name'      => $facts['networking']['fqdn'],
                 },
               },
             },
@@ -108,5 +108,4 @@ if ENV['RUN_TEST'] == 'main'
       end
     end
   end
-
 end

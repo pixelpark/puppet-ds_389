@@ -114,17 +114,17 @@ define ds_389::instance (
     mode    => '0400',
     owner   => $user,
     group   => $group,
-    content => epp("${module_name}/instance.epp",{
-      create_suffix   => $create_suffix,
-      group           => $group,
-      root_dn         => $root_dn,
-      root_dn_pass    => $root_dn_pass,
-      server_host     => $server_host,
-      server_id       => $server_id,
-      server_port     => $server_port,
-      server_ssl_port => $server_ssl_port,
-      suffix          => $suffix,
-      user            => $user,
+    content => epp("${module_name}/instance.epp", {
+        create_suffix   => $create_suffix,
+        group           => $group,
+        root_dn         => $root_dn,
+        root_dn_pass    => $root_dn_pass,
+        server_host     => $server_host,
+        server_id       => $server_id,
+        server_port     => $server_port,
+        server_ssl_port => $server_ssl_port,
+        suffix          => $suffix,
+        user            => $user,
     }),
   }
 
@@ -296,7 +296,7 @@ define ds_389::instance (
 
     # Fix permissions of CA private key.
     -> file { "Fix permissions of CA private key: ${server_id}":
-      ensure => 'present',
+      ensure => 'file',
       name   => $ca_key,
       mode   => '0640',
       owner  => $user,
@@ -305,11 +305,11 @@ define ds_389::instance (
 
     # Create the OpenSSL config template for the CA cert.
     -> file { "Create CA config: ${server_id}":
-      ensure  => 'present',
+      ensure  => 'file',
       name    => $ca_conf,
-      content => epp('ds_389/openssl_ca.cnf.epp',{
-        dc => $facts['networking']['fqdn'],
-        cn => $ca_nickname,
+      content => epp('ds_389/openssl_ca.cnf.epp', {
+          dc => $facts['networking']['fqdn'],
+          cn => $ca_nickname,
       }),
     }
 
@@ -520,7 +520,6 @@ define ds_389::instance (
         server_host  => $server_host,
         server_port  => $server_port,
         require      => Service["dirsrv@${server_id}"],
-        before       => Anchor["${name}_ldif_modify"],
       }
     }
   }
@@ -552,7 +551,6 @@ define ds_389::instance (
       user                => $user,
       group               => $group,
       require             => Service["dirsrv@${server_id}"],
-      before              => Anchor["${name}_ldif_modify"],
     }
   }
 
@@ -577,10 +575,6 @@ define ds_389::instance (
     }
   }
 
-  anchor { "${name}_ldif_modify":
-    require => Service["dirsrv@${server_id}"],
-  }
-
   # ldif modify
   if $modify_ldifs {
     $modify_ldifs.each |$filename, $source| {
@@ -595,13 +589,10 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_modify",
-        require      => Anchor["${name}_ldif_modify"],
-        before       => Anchor["${name}_ldif_add"],
+        require      => Service["dirsrv@${server_id}"],
       }
     }
   }
-
-  anchor { "${name}_ldif_add": }
 
   # ldif add
   if $add_ldifs {
@@ -617,13 +608,9 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_add",
-        require      => Anchor["${name}_ldif_add"],
-        before       => Anchor["${name}_ldif_base_load"],
       }
     }
   }
-
-  anchor { "${name}_ldif_base_load": }
 
   # ldif base_load
   if $base_load_ldifs {
@@ -639,7 +626,6 @@ define ds_389::instance (
         user         => $user,
         group        => $group,
         tag          => "${server_id}_base_load",
-        require      => Anchor["${name}_ldif_base_load"],
       }
     }
   }
