@@ -111,6 +111,14 @@ define ds_389::instance (
   $instance_path = "/etc/dirsrv/slapd-${server_id}"
   $instance_template = "/etc/dirsrv/template-${server_id}.inf"
 
+  if $debug_output {
+    echo { 'Managing 389ds instance':
+      message => $server_id,
+      loglevel => 'info',
+      withpath => false,
+    }
+  }
+
   # Create instance template.
   file { $instance_template:
     ensure  => file,
@@ -142,7 +150,7 @@ define ds_389::instance (
     command   => $_cmd,
     path      => $ds_389::path,
     creates   => $instance_path,
-    logoutput => true,
+    logoutput => $logoutput,
     require   => File[$instance_template],
     notify    => Exec["stop ${server_id} to create new token"],
   }
