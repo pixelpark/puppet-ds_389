@@ -103,6 +103,12 @@ class ds_389 (
         modify_ldifs      => $params['modify_ldifs'],
         add_ldifs         => $params['add_ldifs'],
         base_load_ldifs   => $params['base_load_ldifs'],
+        backup_enable     => $params['backup_enable'],
+        backup_notls      => $params['backup_notls'],
+        create_suffix     => $params['create_suffix'],
+        minssf            => $params['minssf'],
+        plugins           => $params['plugins'],
+        debug_output      => $params['debug_output'],
         require           => Class['ds_389::install'],
       }
     }
