@@ -108,7 +108,6 @@ class ds_389 (
         create_suffix     => $params['create_suffix'],
         minssf            => $params['minssf'],
         plugins           => $params['plugins'],
-        debug_output      => $params['debug_output'],
         require           => Class['ds_389::install'],
       }
     }
