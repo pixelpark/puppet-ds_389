@@ -78,6 +78,8 @@
 # @param user
 #   The user for the instance. Default: $ds_389::user
 #
+# @param debug_output
+#
 define ds_389::instance (
   Variant[String,Sensitive[String]] $cert_db_pass,
   String $root_dn,
@@ -86,6 +88,7 @@ define ds_389::instance (
   Boolean $backup_enable = false,
   Boolean $backup_notls = false,
   Boolean $create_suffix = true,
+  Boolean $debug_output = false,
   String $group = $ds_389::group,
   Integer $minssf = 0,
   String $server_host = $facts['networking']['fqdn'],
@@ -129,12 +132,19 @@ define ds_389::instance (
   }
 
   # Create a new instance from template file.
+  $_cmd = $debug_output ? {
+    true    => "dscreate -v from-file ${instance_template}",
+    default => "dscreate from-file ${instance_template}",
+  }
+  $logoutput = $debug_output ? { true => true, default => 'on_failure' }
+
   exec { "setup ds: ${server_id}":
-    command => "dscreate from-file ${instance_template}",
-    path    => $ds_389::path,
-    creates => $instance_path,
-    require => File[$instance_template],
-    notify  => Exec["stop ${server_id} to create new token"],
+    command   => $_cmd,
+    path      => $ds_389::path,
+    creates   => $instance_path,
+    logoutput => true,
+    require   => File[$instance_template],
+    notify    => Exec["stop ${server_id} to create new token"],
   }
   ~> exec { "remove default cert DB: ${server_id}":
     command     => "rm -f ${$instance_path}/cert9.db ${$instance_path}/key4.db",
