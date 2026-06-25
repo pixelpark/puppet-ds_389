@@ -163,6 +163,7 @@ define ds_389::instance (
     mode      => '0440',
     owner     => $user,
     group     => $group,
+    replace   => false,
     content   => "Internal (Software) Token:${root_dn_pass}\n",
     show_diff => false,
     require   => Exec["setup ds: ${server_id}"],
