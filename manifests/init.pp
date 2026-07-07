@@ -80,31 +80,12 @@ class ds_389 (
   Optional[String] $dnf_module_name = undef,
   Optional[String] $dnf_module_version = undef,
 ) {
-  class { 'ds_389::install': }
+  contain 'ds_389::install'
 
-  if $instances {
-    $instances.each |$instance_name, $params| {
-      ds_389::instance { $instance_name:
-        root_dn           => $params['root_dn'],
-        suffix            => $params['suffix'],
-        cert_db_pass      => $params['cert_db_pass'],
-        root_dn_pass      => $params['root_dn_pass'],
-        group             => $params['group'],
-        user              => $params['user'],
-        server_id         => $params['server_id'],
-        server_host       => $params['server_host'],
-        server_port       => $params['server_port'],
-        server_ssl_port   => $params['server_ssl_port'],
-        subject_alt_names => $params['subject_alt_names'],
-        replication       => $params['replication'],
-        ssl               => $params['ssl'],
-        ssl_version_min   => $params['ssl_version_min'],
-        schema_extensions => $params['schema_extensions'],
-        modify_ldifs      => $params['modify_ldifs'],
-        add_ldifs         => $params['add_ldifs'],
-        base_load_ldifs   => $params['base_load_ldifs'],
-        require           => Class['ds_389::install'],
-      }
+  $instances.each |$instance_name, $params| {
+    Class['ds_389::install']
+    -> ds_389::instance { $instance_name:
+      * => $params,
     }
   }
 }

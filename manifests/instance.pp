@@ -22,10 +22,13 @@
 #   A hash of ldif add files to load after all other config files have been added. Optional.
 #
 # @param cert_db_pass
-#   The certificate db password to ensure. Required.
+#   The certificate db password to ensure. Used to encrypt the p12 file.
 #
 # @param create_suffix
 #   Set this parameter to `True` to create a generic root node entry for the suffix in the database.
+#
+# @param internal_token
+#   Set the internal (software) token to be use to decrypt the NSS certificate database inside the p12 file during startup.
 #
 # @param group
 #   The group for the instance. Default: `$ds_389::group`
@@ -83,6 +86,7 @@ define ds_389::instance (
   String $root_dn,
   Variant[String,Sensitive[String]] $root_dn_pass,
   String $suffix,
+  Variant[String,Sensitive[String]] $internal_token = $root_dn_pass,
   Boolean $backup_enable = false,
   Boolean $backup_notls = false,
   Boolean $create_suffix = true,
@@ -163,7 +167,7 @@ define ds_389::instance (
     mode      => '0440',
     owner     => $user,
     group     => $group,
-    content   => "Internal (Software) Token:${root_dn_pass}\n",
+    content   => "Internal (Software) Token:${internal_token}\n",
     show_diff => false,
     require   => Exec["setup ds: ${server_id}"],
     notify    => Exec["restart ${server_id} to pick up new token"],
@@ -202,7 +206,7 @@ define ds_389::instance (
     }
 
     exec { "Create cert DB: ${server_id}":
-      command     => "pk12util -i ${ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${root_dn_pass}", # lint:ignore:140chars
+      command     => "pk12util -i ${ds_389::ssl_dir}/${server_id}.p12 -d ${instance_path} -W ${cert_db_pass} -K ${internal_token}", # lint:ignore:140chars
       path        => $ds_389::path,
       refreshonly => true,
       before      => Exec["Add trust for server cert: ${server_id}"],
